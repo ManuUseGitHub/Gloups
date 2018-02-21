@@ -8,21 +8,17 @@
     <link rel="stylesheet" href="css/air_fix.css" />
     <script src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
     <script type="text/javascript" src="Scripts/showdown.min.js"></script>
+    <script type="text/javascript" src="Scripts/loadMarkDown.min.js"></script>
 </head>
 
 <body>
+    <div>
+        <button onclick="load('README.md')">Maze Gulp page</button>
+        <button onclick="load('help.md')">Help Page</button>
+    </div>
     <div id='content'></div>
     <script>
-    var client = new XMLHttpRequest();
-    client.open('GET', 'README.md');
-
-    client.onreadystatechange = function() {
-        var converter = new showdown.Converter(),
-            text = client.responseText,
-            html = converter.makeHtml(text);
-        $('#content').html(html);
-    }
-    client.send();
+        load('README.md');
     </script>
 </body>
 

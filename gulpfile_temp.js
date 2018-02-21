@@ -829,7 +829,7 @@ function logFilePath(filePath) {
 }
 
 function logHelp() {
-    console.log(fs.readFileSync("help.md", "utf8"));
+    console.log(fs.readFileSync("site/help.md", "utf8"));
 }
 
 function logErrorsOnTaskArgvs(errors) {
