@@ -1,8 +1,9 @@
-
 node_modules/
 
 yarn\.lock
 
 package-lock\.json
 
-custom/config\.old\.ini
+custom/*\.ini
+
+gulpfile_temp\.js
