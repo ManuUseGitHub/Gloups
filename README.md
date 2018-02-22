@@ -1,4 +1,4 @@
-![logo](mzg2.ico)
+![logo](site/mzg2.ico)
 # MazeGulp
 An Amazing gulp helper that provides services like compression of scripts (CSS and JS) , compilation of scripts (LESS, SASS, TS and JS) and more ... on the fly globaly from a root path like C:\ or Home folder.
 

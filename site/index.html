@@ -4,22 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <title>MazeGulp</title>
-    <link rel="stylesheet" href="css/air.css" />
+    <link rel="stylesheet" href="css/air.min.css" />
     <link rel="stylesheet" href="css/air_fix.css" />
+    <link rel="stylesheet" href="css/jquery-ui.structure.min.css" />
+    <link rel="stylesheet" href="css/jquery-ui.min.css" />
+    <link rel="stylesheet" href="css/jquery-ui.theme.min.css" />
+    <link rel="stylesheet" href="css/jquery-ui.fix.css" />
+    <script type="text/javascript" src="Scripts/Production/jquery1.7.min.js"></script>
     <script src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
-    <script type="text/javascript" src="Scripts/showdown.min.js"></script>
+    <script type="text/javascript" src="Scripts/Production/showdown.min.js"></script>
     <script type="text/javascript" src="Scripts/loadMarkDown.min.js"></script>
+    <script type="text/javascript" src="Scripts/Production/jquery-ui.min.js"></script>
 </head>
 
 <body>
     <div>
         <button onclick="load('README.md')">Maze Gulp page</button>
         <button onclick="load('help.md')">Help Page</button>
+        <button onclick="$( '#dialog' ).dialog()">Logo</button>
     </div>
     <div id='content'></div>
     <script>
         load('README.md');
     </script>
+    <div id="dialog" title="Basic dialog">
+  <p>Image:</p>
+  <img src="mzg4.ico" alt="Placeholder Image" />
+
+</div>
 </body>
 
 </html>
