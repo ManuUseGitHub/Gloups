@@ -1,10 +1,3 @@
-/**************************************************************************************************
- *                                PARAMETERIZING and DEFAULT TASK
- *************************************************************************************************/
-
-// define the default task and add the watch task to it
-gulp.task('default', ["setParams"]);
-
 gulp.task('setParams', function() {
 
     var firstTaskName = this.seq.slice(-1)[0];
