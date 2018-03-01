@@ -3,7 +3,7 @@ gulp.task('writeTemp', function() {
 
     if (gulp.src(mzgFiles).pipe(jsValidate())) {
 
-        var newMzgFiles = insertPath();
+        var newMzgFiles = insertPath(mzgFiles);
 
         gulp.src(newMzgFiles)
             .pipe(concat(gulpFileTempPath))

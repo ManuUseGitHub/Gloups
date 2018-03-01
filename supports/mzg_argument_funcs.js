@@ -1,78 +1,31 @@
-function configurationOfRewriteOnArvs() {
-    var services = {
-
-        // custom
-        'uglyness': 'beauty',
-        'times': 'once',
-    };
-
-    var subAr = process.argv.slice(2, process.argv.length);
-    subAr.forEach(function(serv) {
-        try {
-            var opt = (/^--(.*)$/.exec(serv));
-
-            if (opt && (matchOption = opt[1])) {
-
-                console.log(matchOption);
-                if (matchOption == 'ugly') {
-                    services.uglyness = matchOption;
-
-                } else if (matchOption == 'multiple') {
-                    services.times = matchOption;
-
-                } else {
-                    console.log(chalk.red("unknown option --" + matchOption));
-                }
-            }
-        } catch (err) {
-            errors.push(err + " Error with option: ");
-        }
-    })
-    return services;
-}
-
 function tasksToRunOnArgvs() {
-    var services = {
-
-        // custom
-        'wars': 'removeWarVersion',
-        'del': 'autodel',
-        'minjs': 'automin',
-        'ts': 'typescript',
-        'less': 'less',
-        'sass': 'sass',
-        'mincss': 'autominCss',
-
-        // presets
-        'all': 'autodel automin typescript less sass autominCss',
-        'style': 'less sass autominCss',
-        'js': 'autodel automin',
-        'typescript': 'autodel automin typescript'
-    };
-
     var effectiveServices = [];
     var errors = [];
     var optionCount = 0;
+    var service = '?';
 
-    var subAr = process.argv.slice(2, process.argv.length);
+    // start the arguments array at index 3 because argv contains [[default],TaskName,arg1,arg2, ... ,argN]
+    var subAr = process.argv.slice(3, process.argv.length);
+
     for (serv in subAr) {
         try {
-            var key = (/^--(.*)$/.exec(subAr[serv]));
+            var key = (/^([\-][\-]?)([^\-]+)$/.exec(subAr[serv]));
+            service = key[2];
 
-            if (key && (matchOption = key[1])) {
+            // check if the argument is well formed based on the dash caracter : 
+            //      > -a or --abc not --a or -abc
+            checkWellForming(key, service);
 
-                if (/^all|style|js|typescript$/.test(matchOption)) {
-                    effectiveServices = services[matchOption].split(" ");
-                    if (optionCount > 0) {
-                        errors = [];
-                        throw "GRAVE ERROR: Too much presets";
-                    }
-                } else if (services[matchOption]) {
-                    effectiveServices.push(services[matchOption]);
-                } else {
-                    console.log(chalk.red("unknown option --" + matchOption));
-                }
+            // -a to --abc
+            service = convertAliasToFullNameOption(key,service);
 
+            if (key && (matchOption = service)) {
+
+                // check if a preset is single ; throws if not
+                effectiveServices = checkPresetsOverdose(effectiveServices, optionCount);
+
+                // check and push options that are real ; throws if no real options
+                pushMatchingOption(effectiveServices, matchOption);
             }
         } catch (err) {
             errors.push(err + " Error with option: ");
@@ -85,4 +38,39 @@ function tasksToRunOnArgvs() {
     }
     logErrorsOnTaskArgvs(errors);
     return effectiveServices;
+}
+
+function checkWellForming(key, service) {
+    if (key[1].length > 2) {
+        errors = [];
+        throw "GRAVE ERROR: argument malformed";
+    }
+}
+
+function convertAliasToFullNameOption(key,service) {
+    if (key[1].length == 1) {
+        service = services[service];
+    }
+    return service;
+}
+
+function checkPresetsOverdose(effectiveServices, optionCount) {
+    if (presetsRegex.test(matchOption)) {
+        effectiveServices = services[matchOption].split(" ");
+        if (optionCount > 0) {
+            throw "GRAVE ERROR: Presets should be alone : " + matchOption;
+        }
+    }
+    console.log(effectiveServices);
+    return effectiveServices;
+}
+
+function pushMatchingOption(effectiveServices, matchOption) {
+    if (!presetsRegex.test(matchOption)) {
+        if (services[matchOption]) {
+            effectiveServices.push(services[matchOption]);
+        } else {
+            throw "GRAVE ERROR: unknown option or preset or alias : -" + matchOption + " or --" + matchOption;
+        }
+    }
 }

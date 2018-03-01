@@ -19,7 +19,6 @@ gulp.task('removeWarVersion', function() {
 
     var last = "";
     gulp.watch(config.pathesToWars, function(event) {
-        //if(last != last){}
         if (/^(.*.war)$/.test(event.path)) {
 
             try {

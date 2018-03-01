@@ -1,4 +1,3 @@
-/******************************************* Typescript *******************************************/
 gulp.task('typescript', function() {
     logTaskPurpose(this.currentTask.name);
 

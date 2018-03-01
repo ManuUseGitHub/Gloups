@@ -14,7 +14,7 @@ function classReading() {
         while ( (!this.isStopped()) && (c = this.getNextChar())) {
             
             // the line feed is encontoured 
-            if (/^[\r\n]$/g.test(c) || this.isEndReached()) {
+            if (/^[\n\r]$/g.test(c) || this.isEndReached()) {
                 this.toLine();
                 processingLine(this.getLine());
                 this.resetLine();
@@ -42,7 +42,8 @@ function classReading() {
     }
 
     this.toLine = function() {
-        this.line = this.line.join("").replace('\r', '').replace('\n', '');
+        this.line = this.line.join("")
+        this.line = this.line.replace(/^[\n\r]$/g, '');
     }
     this.resetLine = function () {
         this.line = [];

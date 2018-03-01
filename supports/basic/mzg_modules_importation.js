@@ -4,6 +4,7 @@ var argv = require('yargs').argv;
 var chalk = require('chalk');
 
 var cleanCSS = require('gulp-clean-css');
+var coffee = require('gulp-coffee');
 var concat = require('gulp-concat');
 var copy = require('gulp-copy');
 var del = require('del');

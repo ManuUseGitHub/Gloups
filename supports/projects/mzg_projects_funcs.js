@@ -10,7 +10,7 @@ function setUpProjectWatchingPaths(project_path) {
             if (match = /^(.*)=.*$/g.exec(reading.getLine())) {
                 key = match[1];
             };
-            if (/^(minify_js|ts_to_js|minify_css|less|sass)$/.test(key) && /^\[$/g.test(reading.getLine())) {
+            if (/^(minify_js|ts_to_js|coffee_to_js|minify_css|less|sass)$/.test(key) && /^\[$/g.test(reading.getLine())) {
                 processConfigTargetProjects(project_path, reading, key);
             }
         }

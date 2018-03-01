@@ -1,48 +1,45 @@
-var gulpFileTempPath = "supports/rewriting/gulpfile_temp.js";
-var jsRegexFilePathPattern = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";
-var pathFiles = [];
-
-var mzgFiles = [
-	'supports/basic/mzg_modules_importation.js',
-	'supports/basic/mzg_vars.js',
-	
-	'supports/basic/tasks/mzg_default_task.js',
-	'supports/basic/tasks/mzg_set_params_task.js',
-	'supports/basic/tasks/mzg_jshint_task.js',
-	'supports/basic/tasks/mzg_help_me_task.js',
-
-	'projects_setup_tasks/mzg_set_vars_task.js',
-	'projects_setup_tasks/mzg_scan_projects_task.js',
-	'projects_setup_tasks/mzg_services_mapping_task.js',
-	
-	'services_tasks/js_tasks/mzg_automin_task.js',
-	'services_tasks/js_tasks/mzg_autodel_task.js',
-	'services_tasks/js_tasks/mzg_merg_all_minified_task.js',
-	'services_tasks/js_tasks/mzg_tyepscript_task.js',
-
-	'services_tasks/css_tasks/mzg_automin_css_task.js',
-	'services_tasks/css_tasks/mzg_auto_format_css_task.js',
-	'services_tasks/css_tasks/mzg_less_task.js',
-	'services_tasks/css_tasks/mzg_sass_task.js',
-
-	'services_tasks/mzg_other_oriented_tasks.js',
-	
-	// supports
-	'supports/rewriting/mzg_rewriting_vars.js',
-	'supports/rewriting/mzg_rewriting_funcs.js',
-	'supports/rewriting/tasks/mzg_apply_temp_task.js',
-	'supports/rewriting/tasks/mzg_write_temp_task.js',
-	'supports/mzg_runtask.js',
-	
-	// functions
-	'supports/files/configurationSetting/mzg_config_funcs.js',
-	'supports/projects/mzg_projects_funcs.js',
-	'supports/mzg_argument_funcs.js',
-	'supports/mzg_logging.js',
-
-	// mzg classes 
-	'supports/files/mzg_reading_file_class.js'
-];
-
-// sets things up to serve
+// Sets things up to serve
 var config = getConfig();
+
+// Mapping of arguments for serve taks. arguments have one matching. 
+// An alias matches a service, as -l matches --less (less task)
+// A preset is a set of arguments that works legitimately together.
+// 		> style tasks such as: 
+//			autominification of css files
+//			autocompilation of less files to css files
+//			autocompilation of scss files to css files
+// Even a preset has its own alias, as -st matches --style
+var services = {
+
+	// custom
+	'w': 'wars',
+	'wars': 'removeWarVersion',
+	'd': 'del',
+	'del': 'autodel',
+	'mj': 'minjs',
+	'minjs': 'automin',
+	'ts': 'typescript',
+	'c': 'coffee',
+	'coffee': 'coffeescript',
+	'l': 'less',
+	'less': 'less',
+	's': 'sass',
+	'sass': 'sass',
+	'mc': 'mincss',
+	'mincss': 'autominCss',
+
+	// presets
+	'a': 'all',
+	'all': 'autodel automin typescript coffeescript less sass autominCss',
+	'st': 'style',
+	'style': 'less sass autominCss',
+	'jvs': 'autodel automin',
+	'tps': 'typescript',
+	'typescript': 'autodel automin typescript',
+	'cof': 'coffeescript',
+	'coffeescript': 'autodel automin coffeescript',
+
+};
+
+var presetsRegex = /^\b(all|style|js|typescript|coffeescript)\b$/;
+var jsRegexFilePathPattern = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";

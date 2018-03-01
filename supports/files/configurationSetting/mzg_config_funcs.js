@@ -5,6 +5,7 @@ function getConfig() {
 
         "pathesToJs": [],
         "pathesToTs": [],
+        "pathesToCoffee": [],
         "pathesToStyle": [],
         "pathesToStyleLess": [],
         "pathesToWars": [],
@@ -89,7 +90,13 @@ function processConfigTargetProjects(project_path, reading, key) {
                     where: config.pathesToTs,
                     purpose: 'Compile .ts files into .js File'
                 }
-                extSubpath = '/**/*.ts';
+                extSubpath = '/**/*.coffee';
+            } else if (key == "coffee_to_js") {
+                configDescription = {
+                    where: config.pathesToCoffee,
+                    purpose: 'Compile .coffee files into .js File'
+                }
+                extSubpath = '/**/*.coffee';
             } else if (key == "minify_css") {
                 configDescription = {
                     where: config.pathesToStyle,

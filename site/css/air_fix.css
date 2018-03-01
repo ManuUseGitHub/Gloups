@@ -123,6 +123,11 @@ blockquote {
 	border-left: 4px solid #ff6060;
 }
 
+blockquote.warning {
+	border-left: 4px solid #ffe160;
+	background: #fff1b6;
+}
+
 a {
 	text-decoration: none;
 }

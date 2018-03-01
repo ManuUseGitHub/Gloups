@@ -12,14 +12,14 @@ var merging = function(event) {
     }
 
     bySetup = false;
-    gulp.start('writeTemp');
+    gulp.start(['writeTemp', 'writeDist']);
 }
 
 var mergingOnChanges = function(beautifully, one_time) {
 
     console.log("  concats these files:")
-    mzgFiles.forEach(function(item,index) {
-        console.log("    "+logFilePath(item) );
+    mzgFiles.forEach(function(item, index) {
+        console.log("    " + "(" + index + ")" + logFilePath(item));
     });
 
     console.log(
@@ -27,7 +27,7 @@ var mergingOnChanges = function(beautifully, one_time) {
         "    " + logFilePath("gulpfile.js") + " - the file used by gulp");
 
     if (!one_time) {
-        // event handler on these 3 files. Gulp will merge them into gulpfile.js
+        // event handler on these files. Gulp will merge them into gulpfile.js
         gulp.watch(mzgFiles, function(event) {
             merging(event);
         });
@@ -49,29 +49,32 @@ function getRidOfFileOfPath() {
             fssync.remove(item);
         } else {
             if (cpt++ < 3) {
-                console.log(chalk.yellow('file \'' + item + '\' might\'ve been removed'));
+                //console.log(chalk.yellow('file \'' + item + '\' might\'ve been removed'));
             }
         }
     })
-    if(cpt >0){
-        console.log(chalk.yellow('WARN. : '+cpt+' file(s) could not been removed ...'));
+    if (cpt > 0) {
+        console.log(chalk.green('OK : ' + cpt + ' file(s) could not have been removed ... they do not exist'));
     }
     pathFiles = [];
 }
 
-function insertPath() {
+function insertPath(files) {
     var newpaths = [];
-    mzgFiles.forEach(function(item) {
+    files.forEach(function(item) {
         var m = /^(.*)[.].*$/.exec(item);
         var pathOfFile = m[1] + '.path.js';
         newpaths.push(pathOfFile);
         pathFiles.push(pathOfFile);
         newpaths.push(item);
 
-        var l = (200 - (5 + pathOfFile.length + 2 + 2));
-        l = l > 0 ? l : 0;
+        //var l = (100 - (5 + pathOfFile.length + 2 + 2));
+        //l = l > 0 ? l : 0;
 
-        fssync.write(pathOfFile, '\n// -- [' + item + '] ' + Array(l).join("-"));
+        if (!/^.*log_sections.*$/.test(pathOfFile)) {
+            fssync.write(pathOfFile, '\n// -- [' + item + '] ' + "--"); //Array(l).join("-"));    
+        }
     });
+
     return newpaths;
 }

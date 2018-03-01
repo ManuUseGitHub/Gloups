@@ -8,6 +8,10 @@ gulp.task('setParams', function() {
 
         gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
 
+    }else if (/^serve$/.test(firstTaskName)) {
+        var tasks = tasksToRunOnArgvs();
+
+        gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
     // the fisrt task met is rewrite
     } else if (/^rewrite$/.test(firstTaskName)) {
         var services        = configurationOfRewriteOnArvs();

@@ -1,9 +1,5 @@
 gulp.task('applyTemp', function() {
     gulp.watch(gulpFileTempPath, function(event) {
-        process(event);
-    })
-
-    var process = function(event) {
         if (gulp.src(gulpFileTempPath).pipe(jsValidate())) {
             gutil.log(chalk.cyan("gulpfile.js") + "' is " + chalk.green('validate'));
             var dStart = new Date();
@@ -16,9 +12,11 @@ gulp.task('applyTemp', function() {
                     gutil.log(chalk.cyan("gulpfile.js") + "' replaced after " + chalk.magenta(dResult));
 
                     //gulp folder
-                    return getGulpfolderFromFileBase(file);
+                    var folder = getGulpfolderFromFileBase(file);
+                    return folder;
                 }));
+            fssync.copy('help.md', 'site/help.md');
             getRidOfFileOfPath();
         }
-    }
+    });
 });

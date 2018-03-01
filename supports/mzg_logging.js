@@ -7,7 +7,37 @@ function logFilePath(filePath) {
 }
 
 function logHelp() {
-    console.log(fs.readFileSync("site/help.md", "utf8"));
+    var _data = fs.readFileSync("help.md", "utf8");
+    var reading = new classReading();
+    reading.initialize(_data, 0);
+    var match, line;
+
+
+    var cpt = 0;
+
+    console.log("\n\n");
+    reading.readLines(function() {
+        line = reading.getLine().replace(/\r?\n|\r/g, '');
+        if (match = /^([\s]*[#]+.*)$/.exec(line)) {
+            console.log(chalk.cyan(match[1]));
+        }else if (match = /^([\s]*)([$](?:[\s][^\s]+)+)([\s]{2,}.*|.*)$/.exec(line)) {
+            console.log(chalk.grey(match[1]) + match[2] + chalk.green(match[3]));
+        }else if (match = /^([\s]*[>].*)$/.exec(line)) {
+            console.log(chalk.green(match[1]));
+            // [WHITESPACE][OPTION],[TEXT],[OPTION2][TEXT][EXT][TEXT][EXT][TEXT] ...
+        } else if (match = /^([\s]*)([\-]+[^\s,]+)([^\-.]*)((?:[\s][\-]+[^\s]+)+)([^\-.]*)((?:[.][^.\s]+)+|)([^\-.]*)((?:[.][^.\s]+)+|)(.*)$/.exec(line)) {
+            console.log(chalk.grey(match[1]) + match[2] + chalk.grey(match[3]) + match[4] + chalk.grey(match[5]) + chalk.magenta(match[6]) + chalk.grey(match[7]) + chalk.magenta(match[8]) + chalk.grey(match[9]));
+        } else if (match = /^([^\-]*)((?:[\-]+[^\s]+[\s]?)+)([\s]?.*)$/.exec(line)) {
+            console.log(chalk.grey(match[1]) + match[2] + chalk.grey(match[3]));
+        } else if (line.length > 0) {
+            console.log(chalk.grey(line));
+        } else if (++cpt % 3 == 2) {
+            console.log(line);
+        }
+        if (line.length > 0) {
+            cpt = 0;
+        }
+    });
 }
 
 function logErrorsOnTaskArgvs(errors) {
@@ -89,6 +119,10 @@ function logTaskPurpose(taskName) {
         case "typescript":
             console.log("  Will compile .ts files matching the folowing path(s):\n");
             logWatchList(config.pathesToTs);
+            break;
+        case "coffeescript":
+            console.log("  Will compile .coffee files matching the folowing path(s):\n");
+            logWatchList(config.pathesToCoffee);
             break;
         case "autominCss":
             console.log("  Will compress .css files matching the folowing path(s):\n");
