@@ -39,7 +39,7 @@ Valid options are:
 Presets are:
 
     --all,              Provides all services.
-    -al                 Equals to : --del --minjs --ts --coffee --less --mincss
+    -a                  Equals to : --del --minjs --ts --coffee --less --mincss
                         Or equals to : -d -mj -ts -c -l -mc
 
     --style,            Provides .less and .css files oriented services.
