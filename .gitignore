@@ -7,7 +7,3 @@ package-lock\.json
 custom/*\.ini
 
 gulpfile_temp\.js
-
-dist/
-
-custom/
