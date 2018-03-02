@@ -88,7 +88,7 @@ $ gulp helpMe
 (which will display help.md content) to know about what service is available and presets as well.
 
 ## License
-MIT © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
+[MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
 
 [uglify-badge]: js-gulp--uglify-f9ea85.svg
 [uglify-link]: https://www.npmjs.com/package/gulp-uglify
@@ -109,4 +109,4 @@ MIT © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/
 [cleanCSS-link]: https://www.npmjs.com/package/gulp-clean-css
 
 [license-badge]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
-[license-link]: LICENCE
+[license-link]: LICENSE
