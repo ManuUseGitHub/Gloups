@@ -1,4 +1,4 @@
-# Maze Gulp
+# Gloups
 ### COMMANDES
 Viable commandes are:
 

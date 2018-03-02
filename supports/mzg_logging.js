@@ -104,7 +104,7 @@ function logTaskPurpose(taskName) {
     switch (taskName) {
         case "setVars":
             console.log("  Sets configuration variables")
-            console.log('  See the .INI file of project mapping to set MazeGulp ready to serve your projects here :');
+            console.log('  See the .INI file of project mapping to set Gloups ready to serve your projects here :');
             console.log('  > ' + logFilePath('custom/config.mzg.ini') + ':\n');
             break;
         case "automin":
@@ -137,7 +137,7 @@ function logTaskPurpose(taskName) {
             logWatchList(config.pathesToSass);
             break;
         case "scanProjects":
-            console.log("  Creates .INI configuration files in your project root folder need to make MazeGulp able to serve\n");
+            console.log("  Creates .INI configuration files in your project root folder need to make Gloups able to serve\n");
             break;
         default:
             console.log("  Task unknown: " + taskName + "\n");

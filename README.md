@@ -8,18 +8,18 @@
 That ecosystem provides services like compression of scripts (CSS and JS) , compilation of scripts (LESS, SASS, TS and JS) and more ... on the fly globaly from a root path like C:\ or Home folder. Say no more implementation of gulp localy for every project use juste one, use this one.
 
 ### in other words
-The purpose is to ovoid installing gulp in every project and repeat dozen of time the same code for the same purpose in every project. Just configure MazeGulp and a file local to the project and you're done.
+The purpose is to ovoid installing gulp in every project and repeat dozen of time the same code for the same purpose in every project. Just configure Gloups and a file local to the project and you're done.
 
 ## Installation
 
-1. Download the MazeGulp project or clone it.
+1. Download the Gloups project or clone it.
     
     ```
-    $ git clone https://github.com/ManuUseGitHub/MazeGulp.git 
+    $ git clone https://github.com/ManuUseGitHub/Gloups.git 
     ```
 
 
-2. If MazeGulp is Your first Tool using Node installed, make sure node is installed.
+2. If Gloups is Your first Tool using Node installed, make sure node is installed.
     
     ```
     $ node --version
@@ -43,13 +43,13 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
 
 1. Configure the projects mapping file *(custom/config.ini)*.  
 
-    The example template within the exemple section should gide you to setup MazeGulp accordingly to your projects.
+    The example template within the exemple section should gide you to setup Gloups accordingly to your projects.
     A project's definition should match the following syntax 
     
     ```
     [
-        ProjectNameDisplayedInMazeGulp,
-        "root/path/folder/for/project/relative/to/MazeGulp",
+        ProjectNameDisplayedInGloups,
+        "root/path/folder/for/project/relative/to/Gloups",
         *
     ],
 
