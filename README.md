@@ -2,9 +2,10 @@
 # MazeGulp
 [![MIT license][license-badge]][license-link]
 
-[![uglify service][uglify-badge]][uglify-link]
 [![typescript service][typescript-badge]][typescript-link]
 [![coffeescript service][coffee-badge]][coffee-link]
+[![uglify service][uglify-badge]][uglify-link]
+
 [![less service][less-badge]][less-link]
 [![sass service][sass-badge]][sass-link]
 [![clean css service][cleanCSS-badge]][cleanCSS-link]
@@ -90,22 +91,22 @@ $ gulp helpMe
 
 (which will display help.md content) to know about what service is available and presets as well.
 
-[uglify-badge]: https://img.shields.io/badge/service-gulp--uglify-17cfa3.svg?style=flat-square
+[uglify-badge]: https://img.shields.io/badge/js-gulp--uglify-f9ea85.svg?style=flat-square
 [uglify-link]: https://www.npmjs.com/package/gulp-uglify
 
-[typescript-badge]: https://img.shields.io/badge/service-gulp--typescript-17cfa3.svg?style=flat-square
+[typescript-badge]: https://img.shields.io/badge/ts-gulp--typescript-152740.svg?style=flat-square
 [typescript-link]: https://www.npmjs.com/package/gulp-typescript
 
-[coffee-badge]: https://img.shields.io/badge/service-gulp--coffee-17cfa3.svg?style=flat-square
+[coffee-badge]: https://img.shields.io/badge/coffee-gulp--coffee-3e2723.svg?style=flat-square
 [coffee-link]: https://www.npmjs.com/package/gulp-coffee
 
-[less-badge]: https://img.shields.io/badge/service-gulp--less-17cfa3.svg?style=flat-square
+[less-badge]: https://img.shields.io/badge/less-gulp--less-1d365d.svg?style=flat-square
 [less-link]: https://www.npmjs.com/package/gulp-less
 
-[sass-badge]: https://img.shields.io/badge/service-gulp--sass-17cfa3.svg?style=flat-square
+[sass-badge]: https://img.shields.io/badge/sass-gulp--sass-c6538c.svg?style=flat-square
 [sass-link]: https://www.npmjs.com/package/gulp-sass
 
-[cleanCSS-badge]: https://img.shields.io/badge/service-gulp--clean--css-17cfa3.svg?style=flat-square
+[cleanCSS-badge]: https://img.shields.io/badge/css-gulp--clean--css-17cfa3.svg?style=flat-square
 [cleanCSS-link]: https://www.npmjs.com/package/gulp-clean-css
 
 [license-badge]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
