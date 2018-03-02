@@ -72,7 +72,7 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
 ## Frequent Windows error
 If you encounter an error saying the following "'node' is not recognized as an internal or an external command", make node available by adding the path to it in the Environnement Path. 
     
-[stackoverflow-icon][stackoverflow-link] [stackoverflow &bull; answer-28821955](https://stackoverflow.com/questions/23412938/node-is-not-recognized-as-an-internal-or-an-external-command-operable-program#answer-28821955)
+[![stackoverflow][stackoverflow-icon]][stackoverflow-link] [stackoverflow &bull; answer-28821955](https://stackoverflow.com/questions/23412938/node-is-not-recognized-as-an-internal-or-an-external-command-operable-program#answer-28821955)
 
 
 ## Usage
