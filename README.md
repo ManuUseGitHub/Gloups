@@ -14,7 +14,9 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
 
 1. Download the Gloups project or clone it.
     
+    ```
     $ git clone https://github.com/ManuUseGitHub/Gloups.git 
+    ```
     
     Extract the 'dist' folder and copy it where you want and open a terminal in it 
     If Gloups is Your first Tool using Node installed, make sure node is installed.

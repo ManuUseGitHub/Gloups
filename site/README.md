@@ -1,4 +1,7 @@
 ![logo][icon]
+
+----------
+
 # Gloups
 
 [![MIT license][license-badge]][license-link] [![uglify service][uglify-badge]][uglify-link] [![typescript service][typescript-badge]][typescript-link] [![coffeescript service][coffee-badge]][coffee-link] [![less service][less-badge]][less-link] [![sass service][sass-badge]][sass-link] [![clean css service][cleanCSS-badge]][cleanCSS-link]
@@ -13,7 +16,9 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
 
 1. Download the Gloups project or clone it.
     
+    ```
     $ git clone https://github.com/ManuUseGitHub/Gloups.git 
+    ```
     
     Extract the 'dist' folder and copy it where you want and open a terminal in it 
     If Gloups is Your first Tool using Node installed, make sure node is installed.
@@ -94,7 +99,7 @@ You can dispose of the static support webpage. It provides a stylish view for th
 ## License
 [MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
 
-[icon]:mzg2.ico
+[icon]:images/mzg2.ico
 
 [uglify-badge]: images/js-gulp--uglify-f9ea85.svg
 [uglify-link]: https://www.npmjs.com/package/gulp-uglify

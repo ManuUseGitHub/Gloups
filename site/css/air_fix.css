@@ -1,5 +1,5 @@
 html {
-	background-image: url('../papers.co-ve67-maze-art-dark-abstract-patterns-8-wallpaper.jpg');
+	background-image: url('../images/papers.co-ve67-maze-art-dark-abstract-patterns-8-wallpaper.jpg');
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-position: bottom;
@@ -17,7 +17,7 @@ img {
 	margin: 0 auto;
 }
 
-#dialog img {
+#dialog img, img[alt~="logo"] {
 	border-radius: 0;
 	height: initial;
 	margin: 0 auto;
@@ -84,7 +84,7 @@ img {
 
 }
 
-#mazegulp {
+hr {
 	border-top: 1px solid #17cfa3;
 }
 

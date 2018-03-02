@@ -28,6 +28,10 @@ var nop = require('gulp-nop');
 
 var rename = require("gulp-rename");
 var sass = require('gulp-sass');
+
+// to write custom pipe functions
+var through = require('through2');
+
 var ts = require('gulp-typescript');
 var uglify = require('gulp-uglify');
 var wait = require('gulp-wait');
