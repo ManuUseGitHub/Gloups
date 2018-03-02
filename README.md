@@ -1,18 +1,14 @@
 ![logo](site/mzg2.ico)
 # MazeGulp
-[![MIT license][license-badge]][license-link]
+|License|JS|CSS|
+| :---: | :---: | :---: |
+|[![MIT license][license-badge]][license-link]|[![uglify service][uglify-badge]][uglify-link] [![typescript service][typescript-badge]][typescript-link] [![coffeescript service][coffee-badge]][coffee-link]|[![less service][less-badge]][less-link] [![sass service][sass-badge]][sass-link] [![clean css service][cleanCSS-badge]][cleanCSS-link]|
 
-[![typescript service][typescript-badge]][typescript-link]
-[![coffeescript service][coffee-badge]][coffee-link]
-[![uglify service][uglify-badge]][uglify-link]
+## A Gulp implementation once and for all
+That ecosystem provides services like compression of scripts (CSS and JS) , compilation of scripts (LESS, SASS, TS and JS) and more ... on the fly globaly from a root path like C:\ or Home folder. Say no more implementation of gulp localy for every project use juste one, use this one.
 
-[![less service][less-badge]][less-link]
-[![sass service][sass-badge]][sass-link]
-[![clean css service][cleanCSS-badge]][cleanCSS-link]
-
-An Amazing gulp helper that provides services like compression of scripts (CSS and JS) , compilation of scripts (LESS, SASS, TS and JS) and more ... on the fly globaly from a root path like C:\ or Home folder.
-
-The purpose is to ovoid installing gulp in every project and repeat dozen of time the same code for the same purpose in every ney project. Just configure MazeGulp and a file local to the project and you're done.
+### in other words
+The purpose is to ovoid installing gulp in every project and repeat dozen of time the same code for the same purpose in every project. Just configure MazeGulp and a file local to the project and you're done.
 
 ## Installation
 
@@ -90,6 +86,9 @@ $ gulp helpMe
 ``` 
 
 (which will display help.md content) to know about what service is available and presets as well.
+
+## License
+MIT © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
 
 [uglify-badge]: js-gulp--uglify-f9ea85.svg
 [uglify-link]: https://www.npmjs.com/package/gulp-uglify
