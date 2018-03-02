@@ -76,19 +76,22 @@ If you encounter an error saying the following "'node' is not recognized as an i
 
 
 ## Usage
-Once everything is set run gulp options you want. The simplest way is to run all services via the preset --all.
+Once everything is set run gulp task 'serve' with options you want. The simplest way is to run all services via the preset --all.
 
-```
-$ gulp --all
-```
+    $ gulp serve --all
 
-Want to know which possibilities? Refer to the help.md file or run 
+Or use alias '-a'
 
-```
-$ gulp helpMe
-``` 
+    $ gulp serve -a
+
+For every possibilities, refer to the help.md file or run 
+
+    $ gulp helpMe
 
 (which will display help.md content) to know about what service is available and presets as well.
+
+## Static support webpage
+You can dispose of the static support webpage. It provides a stylish view for this README.md file and the help.md file
 
 ## License
 [MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
