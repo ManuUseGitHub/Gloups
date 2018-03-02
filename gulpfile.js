@@ -8,6 +8,7 @@ var argv = require('yargs').argv;
 //https://www.npmjs.com/package/chalk
 var chalk = require('chalk');
 
+var cleanCSS = require('gulp-clean-css');
 var coffee = require('gulp-coffee');
 var concat = require('gulp-concat');
 var del = require('del');

@@ -2,6 +2,13 @@
 # MazeGulp
 [![MIT license][license-badge]][license-link]
 
+[![uglify service][uglify-badge]][uglify-link]
+[![typescript service][typescript-badge]][typescript-link]
+[![coffeescript service][coffee-badge]][coffee-link]
+[![less service][less-badge]][less-link]
+[![sass service][sass-badge]][sass-link]
+[![clean css service][cleanCSS-badge]][cleanCSS-link]
+
 An Amazing gulp helper that provides services like compression of scripts (CSS and JS) , compilation of scripts (LESS, SASS, TS and JS) and more ... on the fly globaly from a root path like C:\ or Home folder.
 
 The purpose is to ovoid installing gulp in every project and repeat dozen of time the same code for the same purpose in every ney project. Just configure MazeGulp and a file local to the project and you're done.
@@ -29,11 +36,11 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
 
 4.  Then run
 
-    ```
     $ npm install
+
+5.  If you havent installed gulp before do it with
+
     $ npm install -g gulp --save-dev
-    ```  
-    
 
 ## Setup MazeGulp
 
@@ -82,6 +89,24 @@ $ gulp helpMe
 ``` 
 
 (which will display help.md content) to know about what service is available and presets as well.
+
+[uglify-badge]: https://img.shields.io/badge/service-gulp--uglify-17cfa3.svg?style=flat-square
+[uglify-link]: https://www.npmjs.com/package/gulp-uglify
+
+[typescript-badge]: https://img.shields.io/badge/service-gulp--typescript-17cfa3.svg?style=flat-square
+[typescript-link]: https://www.npmjs.com/package/gulp-typescript
+
+[coffee-badge]: https://img.shields.io/badge/service-gulp--coffee-17cfa3.svg?style=flat-square
+[coffee-link]: https://www.npmjs.com/package/gulp-coffee
+
+[less-badge]: https://img.shields.io/badge/service-gulp--less-17cfa3.svg?style=flat-square
+[less-link]: https://www.npmjs.com/package/gulp-less
+
+[sass-badge]: https://img.shields.io/badge/service-gulp--sass-17cfa3.svg?style=flat-square
+[sass-link]: https://www.npmjs.com/package/gulp-sass
+
+[cleanCSS-badge]: https://img.shields.io/badge/service-gulp--clean--css-17cfa3.svg?style=flat-square
+[cleanCSS-link]: https://www.npmjs.com/package/gulp-clean-css
 
 [license-badge]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
 [license-link]: LICENCE
