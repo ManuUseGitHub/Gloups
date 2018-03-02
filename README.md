@@ -10,32 +10,22 @@ That ecosystem provides services like compression of scripts (CSS and JS) , comp
 ### in other words
 The purpose is to ovoid installing gulp in every project and repeat dozen of time the same code for the same purpose in every project. Just configure Gloups and a file local to the project and you're done.
 
-## Installation
+## End user installation
 
 1. Download the Gloups project or clone it.
     
-    ```
     $ git clone https://github.com/ManuUseGitHub/Gloups.git 
-    ```
-
-
-2. If Gloups is Your first Tool using Node installed, make sure node is installed.
     
-    ```
+Extract the 'dist' folder and copy it where you want and open a terminal in it 
+If Gloups is Your first Tool using Node installed, make sure node is installed.
+    
     $ node --version
-    ```
 
-
-3. If you encounter an error saying the following "'node' is not recognized as an internal or an external command", make node available by adding the path to it in the Environnement Path. 
-    
-    [stackoverflow &bull; answer-28821955](https://stackoverflow.com/questions/23412938/node-is-not-recognized-as-an-internal-or-an-external-command-operable-program#answer-28821955)
-
-
-4.  Then run
+2.  run 
 
     $ npm install
 
-5.  If you havent installed gulp before do it with
+3.  Gloups use the gulp task runner so make sure it is installed
 
     $ npm install -g gulp --save-dev
 
@@ -46,7 +36,7 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
     The example template within the exemple section should gide you to setup Gloups accordingly to your projects.
     A project's definition should match the following syntax 
     
-    ```
+    ```INI
     [
         ProjectNameDisplayedInGloups,
         "root/path/folder/for/project/relative/to/Gloups",
@@ -71,7 +61,13 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
     ```
     $ gulp serviceMapping    
     ```
+
+## Frequent Windows error
+If you encounter an error saying the following "'node' is not recognized as an internal or an external command", make node available by adding the path to it in the Environnement Path. 
     
+[stackoverflow &bull; answer-28821955](https://stackoverflow.com/questions/23412938/node-is-not-recognized-as-an-internal-or-an-external-command-operable-program#answer-28821955)
+
+
 ## Usage
 Once everything is set run gulp options you want. The simplest way is to run all services via the preset --all.
 
