@@ -91,7 +91,7 @@ $ gulp helpMe
 
 (which will display help.md content) to know about what service is available and presets as well.
 
-[uglify-badge]: https://img.shields.io/badge/js-gulp--uglify-f9ea85.svg?style=flat-square
+[uglify-badge]: js-gulp--uglify-f9ea85.svg
 [uglify-link]: https://www.npmjs.com/package/gulp-uglify
 
 [typescript-badge]: https://img.shields.io/badge/ts-gulp--typescript-152740.svg?style=flat-square
