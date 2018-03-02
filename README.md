@@ -84,4 +84,4 @@ $ gulp helpMe
 (which will display help.md content) to know about what service is available and presets as well.
 
 [license-badge]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
-[license-link]: LICENSE
+[license-link]: LICENCE
