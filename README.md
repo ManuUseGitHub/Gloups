@@ -72,7 +72,7 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
 ## Frequent Windows error
 If you encounter an error saying the following "'node' is not recognized as an internal or an external command", make node available by adding the path to it in the Environnement Path. 
     
-[stackoverflow &bull; answer-28821955](https://stackoverflow.com/questions/23412938/node-is-not-recognized-as-an-internal-or-an-external-command-operable-program#answer-28821955)
+[stackoverflow-icon][stackoverflow-link] [stackoverflow &bull; answer-28821955](https://stackoverflow.com/questions/23412938/node-is-not-recognized-as-an-internal-or-an-external-command-operable-program#answer-28821955)
 
 
 ## Usage
@@ -96,7 +96,7 @@ You can dispose of the static support webpage. It provides a stylish view for th
 ## License
 [MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
 
-[uglify-badge]: js-gulp--uglify-f9ea85.svg
+[uglify-badge]: images/js-gulp--uglify-f9ea85.svg
 [uglify-link]: https://www.npmjs.com/package/gulp-uglify
 
 [typescript-badge]: https://img.shields.io/badge/ts-gulp--typescript-152740.svg?style=flat-square
@@ -116,3 +116,6 @@ You can dispose of the static support webpage. It provides a stylish view for th
 
 [license-badge]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
 [license-link]: LICENSE
+
+[stackoverflow-icon]: images/so-icon.svg
+[stackoverflow-link]: https://stackoverflow.com
