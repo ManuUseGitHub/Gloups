@@ -1,5 +1,5 @@
 ![logo](site/mzg2.ico)
-# MazeGulp
+# Gloups
 |License|JS|CSS|
 | :---: | :---: | :---: |
 |[![MIT license][license-badge]][license-link]|[![uglify service][uglify-badge]][uglify-link] [![typescript service][typescript-badge]][typescript-link] [![coffeescript service][coffee-badge]][coffee-link]|[![less service][less-badge]][less-link] [![sass service][sass-badge]][sass-link] [![clean css service][cleanCSS-badge]][cleanCSS-link]|
@@ -39,7 +39,7 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
 
     $ npm install -g gulp --save-dev
 
-## Setup MazeGulp
+## Setup
 
 1. Configure the projects mapping file *(custom/config.ini)*.  
 
