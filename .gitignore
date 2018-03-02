@@ -4,6 +4,6 @@ yarn\.lock
 
 package-lock\.json
 
-#custom/*\.ini
+custom/*\.ini
 
 gulpfile_temp\.js

@@ -1,5 +1,6 @@
 ![logo](site/mzg2.ico)
 # MazeGulp
+[![MIT license][license-badge]][license-link]
 An Amazing gulp helper that provides services like compression of scripts (CSS and JS) , compilation of scripts (LESS, SASS, TS and JS) and more ... on the fly globaly from a root path like C:\ or Home folder.
 
 The purpose is to ovoid installing gulp in every project and repeat dozen of time the same code for the same purpose in every ney project. Just configure MazeGulp and a file local to the project and you're done.
@@ -80,3 +81,6 @@ $ gulp helpMe
 ``` 
 
 (which will display help.md content) to know about what service is available and presets as well.
+
+[license-badge]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
+[license-link]: LICENSE

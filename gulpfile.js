@@ -8,17 +8,14 @@ var argv = require('yargs').argv;
 //https://www.npmjs.com/package/chalk
 var chalk = require('chalk');
 
-var cleanCSS = require('gulp-clean-css');
 var coffee = require('gulp-coffee');
 var concat = require('gulp-concat');
-var copy = require('gulp-copy');
 var del = require('del');
 
 // check file existance
 var fs = require("fs");
 var fssync = require("fs-sync");
 
-var glob = require("glob");
 var gulp = require('gulp');
 
 // logging
@@ -33,9 +30,7 @@ var less = require('gulp-less');
 // for alternate manipulations where no operations is needed
 var nop = require('gulp-nop');
 
-var path = require('path');
 var rename = require("gulp-rename");
-var runSequence = require('run-sequence');
 var sass = require('gulp-sass');
 var ts = require('gulp-typescript');
 var uglify = require('gulp-uglify');
