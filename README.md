@@ -1,4 +1,4 @@
-![logo](site/mzg2.ico)
+![logo](site/images/mzg2.ico)
 # Gloups
 |License|JS|CSS|
 | :---: | :---: | :---: |
