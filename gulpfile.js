@@ -623,9 +623,11 @@ gulp.task('applyDist', function() {
                 }));
 
             fssync.copy('help.md', 'site/help.md');
+
             fssync.copy('help.md', 'dist/help.md');
             fssync.copy('README.md', 'dist/README.md');
             fssync.copy('LICENSE', 'dist/LICENSE');
+            fssync.copy('images', 'dist/images');
 
             fssync.copy('custom/project_mapping_model.ini', 'dist/custom/config.ini');
             fssync.copy('custom/config_model.ini', 'dist/custom/config_model.ini');
