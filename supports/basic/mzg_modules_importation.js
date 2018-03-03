@@ -26,6 +26,8 @@ var less = require('gulp-less');
 // for alternate manipulations where no operations is needed
 var nop = require('gulp-nop');
 
+var path = require('path');
+
 var rename = require("gulp-rename");
 var sass = require('gulp-sass');
 
