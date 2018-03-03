@@ -12,8 +12,6 @@ var config = getConfig();
 var services = {
 
 	// custom
-	'w': 'wars',
-	'wars': 'removeWarVersion',
 	'd': 'del',
 	'del': 'autodel',
 	'mj': 'minjs',

@@ -5,9 +5,11 @@
 |[![MIT license][license-badge]][license-link]|[![uglify service][uglify-badge]][uglify-link] [![typescript service][typescript-badge]][typescript-link] [![coffeescript service][coffee-badge]][coffee-link]|[![less service][less-badge]][less-link] [![sass service][sass-badge]][sass-link] [![clean css service][cleanCSS-badge]][cleanCSS-link]|
 
 ## A Gulp implementation once and for all
-That ecosystem provides services like compression of scripts (CSS and JS) , compilation of scripts (LESS, SASS, TS and JS) and more ... on the fly globaly from a root path like C:\ or Home folder. Say no more implementation of gulp localy for every project use juste one, use this one.
+That ecosystem provides services like compression of scripts (CSS and JS) , compilation of scripts (LESS, SASS, TS and JS) and more ... on the fly globaly from a root path like C:\ or Home folder. 
 
-### in other words
+Say no more implementation of gulp localy for every project use juste one, use this one.
+
+### In other words
 The purpose is to ovoid installing gulp in every project and repeat dozen of time the same code for the same purpose in every project. Just configure Gloups and a file local to the project and you're done.
 
 ## End user installation
@@ -25,13 +27,13 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
     $ node --version
     ```
 
-2.  run 
+2.  Run.
     
     ```
     $ npm install
     ```
 
-3.  Gloups use the gulp task runner so make sure it is installed
+3.  Gloups use the gulp task runner so make sure it is installed.
     
     ```
     $ npm install -g gulp --save-dev
@@ -56,7 +58,7 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
 
     The star "\*" at last index means (check that project). To avoid checking a project, just let the value blank and keep the coma "," symbole.
 
-2.  Scan projects
+2.  Scan projects.
 
         $ gulp scanProjects 
 
@@ -71,10 +73,10 @@ The purpose is to ovoid installing gulp in every project and repeat dozen of tim
     $ gulp serviceMapping    
     ```
 
->## Frequent Windows issue
->If you encounter an error saying the following "'node' is not recognized as an internal or an external command", make node available by >adding the path to it in the Environnement Path. 
->    
->[![stackoverflow][stackoverflow-icon]][stackoverflow-link] [stackoverflow &bull; answer-28821955](https://stackoverflow.com/questions/23412938/node-is-not-recognized-as-an-internal-or-an-external-command-operable-program#answer-28821955)
+### Frequently Windows met issue
+If you encounter an error saying the following "'node' is not recognized as an internal or an external command", make node available by >adding the path to it in the Environnement Path. 
+    
+[![stackoverflow][stackoverflow-icon]][stackoverflow-link] [stackoverflow &bull; answer-28821955](https://stackoverflow.com/questions/23412938/node-is-not-recognized-as-an-internal-or-an-external-command-operable-program#answer-28821955)
 
 ## Usage
 Once everything is set run gulp task 'serve' with options you want. The simplest way is to run all services via the preset --all.

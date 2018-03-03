@@ -13,17 +13,18 @@ gulp.task('applyDist', function() {
                     return folder + '/dist';
                 }));
 
+            fssync.copy('help.md', 'dist/help.md');
+            fssync.copy('help.md', 'site/help.md');
+            fssync.copy('custom/project_mapping_model.ini', 'dist/custom/config.ini');
+            fssync.copy('custom/config_model.ini', 'dist/custom/config_model.ini');
+            fssync.copy('package.json', 'dist/package.json');
+
             gulp.src("site")
                 .pipe(through.obj(function(chunk, enc, cb) {
                     var distFolder = (/^(.*)[\\/].*$/.exec(chunk.base)[1])+'/dist/site';
                     fssync.copy(chunk.path,distFolder);
                     cb(null, chunk);
                 }));
-
-            fssync.copy('help.md', 'dist/help.md');
-            fssync.copy('custom/project_mapping_model.ini', 'dist/custom/config.ini');
-            fssync.copy('custom/config_model.ini', 'dist/custom/config_model.ini');
-            fssync.copy('package.json', 'dist/package.json');
         }
     })
 });

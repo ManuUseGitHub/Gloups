@@ -20,19 +20,18 @@
 
 <body>
     <div>
-        <button onclick="load('README.md')">Gloups page</button>
-        <button onclick="load('help.md')">Help Page</button>
-        <button onclick="$( '#dialog' ).dialog()">Logo</button>
+        <button class='ui-button ui-corner-all ui-widget' onclick="load('README.md')">Gloups page</button>
+        <button class='ui-button ui-corner-all ui-widget' onclick="load('help.md')">Help page</button>
+        <button class='ui-button ui-corner-all ui-widget' onclick="$( '#dialog' ).dialog()">Logo</button>
     </div>
     <div id='content'></div>
     <script>
-        load('README.md');
+    load('README.md');
     </script>
     <div id="dialog" title="Gloups">
-  <p>Logo</p>
-  <img src="images/mzg4.ico" alt="Placeholder Image" />
-
-</div>
+        <p>Logo</p>
+        <img src="images/mzg4.ico" alt="Placeholder Image" />
+    </div>
 </body>
 
 </html>
