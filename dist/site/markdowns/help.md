@@ -12,7 +12,7 @@ Viable rewrite gulpfile.js commands are:
          > rewrite the file [watching for changes on files (see MZG_FILES)]
          > rewrite the file [minified].
 
-> WARN: unavailable for production.
+> WARN: unavailable for production very soon.
 
 that command will watch for MZG_FILES changes and wll then merge them into the gulpfile.js
 
