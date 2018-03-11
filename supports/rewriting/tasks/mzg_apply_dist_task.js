@@ -13,7 +13,7 @@ gulp.task('applyDist', function() {
                     return folder + '/dist';
                 }));
 
-            fssync.copy('help.md', 'site/help.md');
+            fssync.copy('help.md', 'site/markdowns/help.md');
 
             fssync.copy('help.md', 'dist/help.md');
             fssync.copy('README.md', 'dist/README.md');

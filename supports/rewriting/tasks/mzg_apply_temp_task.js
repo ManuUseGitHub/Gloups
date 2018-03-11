@@ -1,7 +1,7 @@
 gulp.task('applyTemp', function() {
     gulp.watch(gulpFileTempPath, function(event) {
         if (gulp.src(gulpFileTempPath).pipe(jsValidate())) {
-            gutil.log(chalk.cyan("gulpfile.js") + "' is " + chalk.green('validate'));
+            gutil.log(logFilePath("gulpfile.js") + " is " + chalk.green('validate'));
             var dStart = new Date();
 
             gulp.src(gulpFileTempPath)
@@ -15,7 +15,6 @@ gulp.task('applyTemp', function() {
                     var folder = getGulpfolderFromFileBase(file);
                     return folder;
                 }));
-            fssync.copy('help.md', 'site/help.md');
             getRidOfFileOfPath();
         }
     });

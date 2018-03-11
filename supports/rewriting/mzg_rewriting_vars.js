@@ -6,6 +6,15 @@ var gulpFileTempPath = "supports/rewriting/gulpfile_temp.js";
 var gulpFileTempPath2 = "supports/rewriting/gulpfile_temp2.js";
 var pathFiles = [];
 
+var RewriteServices = {
+	'u': 'ungly',
+	'b': 'beauty',
+	'uglyness': 'beauty',
+	'1': 'once',
+	'*': 'multiple',
+	'times': 'once',
+};
+
 var mzgFiles = [
 	'supports/rewriting/log_sections/mzg_log1.js', // section
 
