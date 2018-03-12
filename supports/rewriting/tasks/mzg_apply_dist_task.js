@@ -13,7 +13,7 @@ gulp.task('applyDist', function() {
                     return folder + '/dist';
                 }));
 
-            fssync.copy('help.md', 'site/markdowns/help.md');
+            fssync.copy('help.md', 'Gloups-site/markdowns/help.md');
 
             fssync.copy('help.md', 'dist/help.md');
             fssync.copy('README.md', 'dist/README.md');
@@ -24,9 +24,9 @@ gulp.task('applyDist', function() {
             fssync.copy('custom/config_model.ini', 'dist/custom/config_model.ini');
             fssync.copy('package.json', 'dist/package.json');
 
-            gulp.src("site")
+            gulp.src("Gloups-site")
                 .pipe(through.obj(function(chunk, enc, cb) {
-                    var distFolder = (/^(.*)[\\/].*$/.exec(chunk.base)[1]) + '/dist/site';
+                    var distFolder = (/^(.*)[\\/].*$/.exec(chunk.base)[1]) + '/dist/Gloups-site';
                     fssync.copy(chunk.path, distFolder);
                     cb(null, chunk);
                 }));
