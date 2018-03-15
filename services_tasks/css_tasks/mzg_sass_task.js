@@ -12,8 +12,14 @@ gulp.task('sass', function() {
             var process = function() {
 
                 gulp.src(event.path)
+                    .pipe(sourcemaps.init())
+                    .pipe(autoprefixer({
+                        browsers: ['last 2 versions'],
+                        cascade: false
+                    }))
                     //.pipe(sass.sync().on('error', sass.logError))// synchronously
                     .pipe(sass().on('error', sass.logError))
+                    .pipe(sourcemaps.write('./'))
                     .pipe(gulp.dest(function(file) {
                         var dest = getDestOfMatching(file.path, config.pathesToSass);
 

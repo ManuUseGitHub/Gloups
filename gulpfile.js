@@ -5,6 +5,8 @@
 // -- [supports/basic/mzg_modules_importation.js] --
 var argv = require('yargs').argv;
 
+var autoprefixer = require('gulp-autoprefixer');
+
 //https://www.npmjs.com/package/chalk
 var chalk = require('chalk');
 
@@ -35,6 +37,8 @@ var path = require('path');
 
 var rename = require("gulp-rename");
 var sass = require('gulp-sass');
+
+var sourcemaps = require('gulp-sourcemaps');
 
 // to write custom pipe functions
 var through = require('through2');
@@ -452,15 +456,21 @@ gulp.task('autominCss', function() {
             if (/^.*.css$/.test(event.path)) {
                 // process compilation of less files
                 var process = function() {
+
+                    var dest = getDestOfMatching(event.path, config.pathesToStyle);
                     gulp.src(event.path)
+                        .pipe(sourcemaps.init())
+                        .pipe(autoprefixer({
+                            browsers: ['last 2 versions'],
+                            cascade: false
+                        }))
                         .pipe(cleanCSS({
                             compatibility: 'ie8'
                         })).pipe(rename({
                             suffix: '.min'
                         }))
+                        .pipe(sourcemaps.write('./'))
                         .pipe(gulp.dest(function(file) {
-                            var dest = getDestOfMatching(file.path, config.pathesToStyle);
-
                             gutil.log("Compressed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
                             return dest;
                         }));
@@ -504,9 +514,15 @@ gulp.task('less', function() {
             // process compilation of less files
             var process = function() {
                 gulp.src(event.path)
+                    .pipe(sourcemaps.init())
+                    .pipe(autoprefixer({
+                        browsers: ['last 2 versions'],
+                        cascade: false
+                    }))
                     .pipe(less({
                         paths: [path.join(__dirname, 'less', 'includes')]
                     }))
+                    .pipe(sourcemaps.write('./'))
                     .pipe(gulp.dest(function(file) {
                         var dest = getDestOfMatching(file.path, config.pathesToStyleLess);
 
@@ -536,8 +552,14 @@ gulp.task('sass', function() {
             var process = function() {
 
                 gulp.src(event.path)
+                    .pipe(sourcemaps.init())
+                    .pipe(autoprefixer({
+                        browsers: ['last 2 versions'],
+                        cascade: false
+                    }))
                     //.pipe(sass.sync().on('error', sass.logError))// synchronously
                     .pipe(sass().on('error', sass.logError))
+                    .pipe(sourcemaps.write('./'))
                     .pipe(gulp.dest(function(file) {
                         var dest = getDestOfMatching(file.path, config.pathesToSass);
 
@@ -632,23 +654,17 @@ gulp.task('applyDist', function() {
                     return folder + '/dist';
                 }));
 
-            fssync.copy('help.md', 'Gloups-site/markdowns/help.md');
-
             fssync.copy('help.md', 'dist/help.md');
-            fssync.copy('README.md', 'dist/README.md');
-            fssync.copy('LICENSE', 'dist/LICENSE');
-            fssync.copy('images', 'dist/images');
 
             fssync.copy('custom/project_mapping_model.ini', 'dist/custom/config.ini');
             fssync.copy('custom/config_model.ini', 'dist/custom/config_model.ini');
             fssync.copy('package.json', 'dist/package.json');
 
-            gulp.src("Gloups-site")
+            /*gulp.src("relative-folder")
                 .pipe(through.obj(function(chunk, enc, cb) {
-                    var distFolder = (/^(.*)[\\/].*$/.exec(chunk.base)[1]) + '/dist/Gloups-site';
-                    fssync.copy(chunk.path, distFolder);
                     cb(null, chunk);
                 }));
+            */
         }
     })
 });
@@ -752,7 +768,7 @@ function setConfig() {
 function pushProjectIntoConfigViaReading(reading, key) {
     var projectReader = new classReading();
     projectReader.initialize(reading.getData(), reading.getIter());
-    var projectPattern = /^.*\[(.*),"(.*)",(.*)\],?$/g,
+    var projectPattern = /^[^;]+\[(.*),"(.*)",(.*)\],?$/g,
         match;
 
     projectReader.readLines(function() {
@@ -992,7 +1008,6 @@ function checkPresetsOverdose(effectiveServices, optionCount) {
             throw "GRAVE ERROR: Presets should be alone : " + matchOption;
         }
     }
-    console.log(effectiveServices);
     return effectiveServices;
 }
 

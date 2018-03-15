@@ -10,15 +10,21 @@ gulp.task('autominCss', function() {
             if (/^.*.css$/.test(event.path)) {
                 // process compilation of less files
                 var process = function() {
+
+                    var dest = getDestOfMatching(event.path, config.pathesToStyle);
                     gulp.src(event.path)
+                        .pipe(sourcemaps.init())
+                        .pipe(autoprefixer({
+                            browsers: ['last 2 versions'],
+                            cascade: false
+                        }))
                         .pipe(cleanCSS({
                             compatibility: 'ie8'
                         })).pipe(rename({
                             suffix: '.min'
                         }))
+                        .pipe(sourcemaps.write('./'))
                         .pipe(gulp.dest(function(file) {
-                            var dest = getDestOfMatching(file.path, config.pathesToStyle);
-
                             gutil.log("Compressed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
                             return dest;
                         }));

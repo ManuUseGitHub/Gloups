@@ -61,7 +61,6 @@ function checkPresetsOverdose(effectiveServices, optionCount) {
             throw "GRAVE ERROR: Presets should be alone : " + matchOption;
         }
     }
-    console.log(effectiveServices);
     return effectiveServices;
 }
 

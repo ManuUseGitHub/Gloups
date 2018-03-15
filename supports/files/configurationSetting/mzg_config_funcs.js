@@ -40,7 +40,7 @@ function setConfig() {
 function pushProjectIntoConfigViaReading(reading, key) {
     var projectReader = new classReading();
     projectReader.initialize(reading.getData(), reading.getIter());
-    var projectPattern = /^.*\[(.*),"(.*)",(.*)\],?$/g,
+    var projectPattern = /^[^;]+\[(.*),"(.*)",(.*)\],?$/g,
         match;
 
     projectReader.readLines(function() {

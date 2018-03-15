@@ -1,5 +1,7 @@
 var argv = require('yargs').argv;
 
+var autoprefixer = require('gulp-autoprefixer');
+
 //https://www.npmjs.com/package/chalk
 var chalk = require('chalk');
 
@@ -30,6 +32,8 @@ var path = require('path');
 
 var rename = require("gulp-rename");
 var sass = require('gulp-sass');
+
+var sourcemaps = require('gulp-sourcemaps');
 
 // to write custom pipe functions
 var through = require('through2');
