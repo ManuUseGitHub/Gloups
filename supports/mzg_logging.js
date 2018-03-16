@@ -99,6 +99,21 @@ function timeComputed() {
     return [date.getHours(), date.getMinutes(), date.getSeconds()].join(":");
 }
 
+function logServiceActivatedPushed(purpose,project,pathes,subpathToExtention) {
+    if (config.verbose) {
+        var match;
+
+        if (match = /^([^.]+)([.][^\s]*)([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
+            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]) + chalk.magenta(match[4]) + chalk.grey(match[5]));
+        } else if (match = /^([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
+            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]));
+        }
+
+        console.log("Watch : '" + chalk.cyan(project + '\\' + pathes[1] + subpathToExtention) + "'");
+        console.log("Dest. : '" + chalk.cyan(project + '\\' + pathes[2]) + "'\n");
+    }
+}
+
 function logTaskPurpose(taskName) {
     logTaskName(taskName);
     switch (taskName) {

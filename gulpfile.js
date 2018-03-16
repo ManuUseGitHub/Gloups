@@ -213,7 +213,7 @@ gulp.task('setVars', function() {
         var project = config.projects[p_path];
         if (fssync.exists(project.path + '\\config.mzg.ini')) {
             console.log(chalk.green(project.project) + ' - OK');
-            if (project.checked == '*') {
+            if (project.checked) {
                 setUpProjectWatchingPaths(project.path);
             }
         } else {
@@ -656,7 +656,7 @@ gulp.task('applyDist', function() {
 
             fssync.copy('help.md', 'dist/help.md');
 
-            fssync.copy('custom/project_mapping_model.ini', 'dist/custom/config.ini');
+            fssync.copy('custom/project_mapping_model.json', 'dist/custom/config.json');
             fssync.copy('custom/config_model.ini', 'dist/custom/config_model.ini');
             fssync.copy('package.json', 'dist/package.json');
 
@@ -742,59 +742,52 @@ function getConfig() {
     }
 }
 
-function setConfig() {
-    var match;
-    var _data = fs.readFileSync("custom/config.ini", "utf8");
+function readJsonConfig(filePath) {
+    var _data = fs.readFileSync(filePath, "utf8");
     var reading = new classReading();
     reading.initialize(_data, 0);
-    var key;
 
-    // at ery line read, 
+    var m;
+    var l;
+    var commentBloc = 0;
+    var has_smthng = true;
+    var content = "";
+    m = /^(.*)(\.json)$/.exec(filePath);
+    var tempfile = m[1]+'.temp'+m[2];
+
+    // at any line read, 
+    fssync.write(tempfile, '', 'utf8');
     reading.readLines(function() {
 
-        // when a key is read:
-        if (match = /^(.*)=.*$/g.exec(reading.getLine())) {
-            key = match[1];
-        };
-
-        // the key 'Projects_paths' was read : analyse of project definitions within.
-        if (/^Projects_paths$/.test(key) && /^\[$/g.test(reading.getLine())) {
-            pushProjectIntoConfigViaReading(reading, key);
+        // stripping comments ---------------------------------------------------------------------
+        l = reading.getLine();
+        if (has_smthng = (m = /^(.*)\/\/.*$/g.exec(l))) {           // "(.. content ..) [//] .. .."
+            content = m[1];
+        } else if (has_smthng = (m = /^(.*)\/\*$/g.exec(l))) {      // "(.. content ..) [/*] .. .."
+            content = m[1];
+            ++commentBloc;
+        } else if (has_smthng = (m = /^.*\*\/(.*)$/g.exec(l))) {    // ".. .. [*/] (.. content ..)"
+            content = m[1];
+            --commentBloc;
+        } else if (has_smthng = (commentBloc == 0)) {
+            content = l;
         }
+
+        //                          every matching creates a candidate to write 
+        if (has_smthng) {
+            if (!/^[\s]*$/g.test(content)) {    // white lines are ignored
+                fs.appendFileSync(tempfile, content + "\r\n", 'utf8');
+            }
+        }
+        // ----------------------------------------------------------------------------------------
     });
+    var temp = fs.readFileSync(tempfile, "utf8");
+    fssync.remove(tempfile);
+    return JSON.parse(temp);
 }
 
-
-function pushProjectIntoConfigViaReading(reading, key) {
-    var projectReader = new classReading();
-    projectReader.initialize(reading.getData(), reading.getIter());
-    var projectPattern = /^[^;]+\[(.*),"(.*)",(.*)\],?$/g,
-        match;
-
-    projectReader.readLines(function() {
-        var line = projectReader.getLine();
-
-        //is the line matches the project pattern
-        if (match = projectPattern.exec(line)) {
-
-            if (key == "Projects_paths") {
-
-                // pushing projects informations
-                config.projects.push({
-                    project: match[1],
-                    path: match[2],
-                    checked: match[3]
-                });
-            }
-
-        }
-
-        // the end of list (EOL.) is reached ! Stop it all
-        if (/^]$/g.test(projectReader.getLine())) {
-            projectReader.stop();
-            reading.setIter(projectReader.getIter());
-        }
-    });
+function setConfig() {
+    config.projects = readJsonConfig("custom/config.json").projects;
 }
 
 function processConfigTargetProjects(project_path, reading, key) {
@@ -895,18 +888,8 @@ function pushNewEntryFor(matchingEntryDefinition, configDescription) {
         dest: project + '\\' + pathes[2]
     });
 
-    if (config.verbose) {
-        var match;
+    logServiceActivatedPushed(purpose,project,pathes,subpathToExtention);
 
-        if (match = /^([^.]+)([.][^\s]*)([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
-            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]) + chalk.magenta(match[4]) + chalk.grey(match[5]));
-        } else if (match = /^([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
-            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]));
-        }
-
-        console.log("Watch : '" + chalk.cyan(project + '\\' + pathes[1] + subpathToExtention) + "'");
-        console.log("Dest. : '" + chalk.cyan(project + '\\' + pathes[2]) + "'\n");
-    }
 }
 
 function getDestOfMatching(filePath, configTab) {
@@ -1266,6 +1249,21 @@ function timeComputed() {
     var date = new Date();
 
     return [date.getHours(), date.getMinutes(), date.getSeconds()].join(":");
+}
+
+function logServiceActivatedPushed(purpose,project,pathes,subpathToExtention) {
+    if (config.verbose) {
+        var match;
+
+        if (match = /^([^.]+)([.][^\s]*)([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
+            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]) + chalk.magenta(match[4]) + chalk.grey(match[5]));
+        } else if (match = /^([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
+            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]));
+        }
+
+        console.log("Watch : '" + chalk.cyan(project + '\\' + pathes[1] + subpathToExtention) + "'");
+        console.log("Dest. : '" + chalk.cyan(project + '\\' + pathes[2]) + "'\n");
+    }
 }
 
 function logTaskPurpose(taskName) {

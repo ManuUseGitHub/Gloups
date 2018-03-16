@@ -37,29 +37,15 @@
 //		replace with your custom project informations the project field is a label to highlight
 //		the project in Gloups -----------------------------------------------------------------
 
-//	    {
-//			"project":"DEMO1",
-//			"path": "../xampp/htdocs/ProjectDemo1",
-//			"checked":false
-//		},
-//		{
-//			"project":"DEMO2",
-//			"path": "../xampp/htdocs/ProjectDemo2",
-//			"checked":false
-//		},
-	    
-//		concrete exemple of the usability using the static site --------------------------------
-
 	    {
-			"project":"Gloups-Site",
-			"path": "../xampp/htdocs/www/laravel/mysite/Gloups-Site",
-			"checked":true
-		},
-
-		{
-			"project":"mySite",
-			"path": "C:/xampp/htdocs/www/laravel/mysite",
+			"project":"DEMO1",
+			"path": "../xampp/htdocs/ProjectDemo1",
 			"checked":false
-		}
+		},
+		{
+			"project":"DEMO2",
+			"path": "../xampp/htdocs/ProjectDemo2",
+			"checked":false
+		},
 	]
 }
