@@ -9,13 +9,12 @@ gulp.task('applyTemp', function() {
                 .pipe(gulp.dest(function(file) {
 
                     var dResult = ms2Time(new Date() - dStart);
-                    gutil.log(chalk.cyan("gulpfile.js") + "' replaced after " + chalk.magenta(dResult));
+                    gutil.log(chalk.cyan("gulpfile.js") + " replaced after " + chalk.magenta(dResult));
 
                     //gulp folder
                     var folder = getGulpfolderFromFileBase(file);
                     return folder;
                 }));
-            getRidOfFileOfPath();
         }
     });
 });

@@ -12,7 +12,7 @@ gulp.task('coffeescript', function() {
         	.pipe(coffee({bare: true}))
             .pipe(gulp.dest(function(file) {
                 var dest = getDestOfMatching(file.path, config.pathesToCoffee);
-                gutil.log("Compiled file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                gutil.log("Compiled file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                 return dest;
             }));
     })

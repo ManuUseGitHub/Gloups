@@ -1,16 +1,3 @@
-function translateAliassesInArgs(argvs, serviceArgs) {
-    var match;
-    var result = [];
-    argvs.forEach(function(arg) {
-        if (match = /^-([^\-]+)$/.exec(arg)) {
-            result.push('--' + serviceArgs[match[1]]);
-        } else {
-            result.push(arg);
-        }
-    });
-    return result;
-}
-
 function configurationOfRewriteOnArvs() {
     var argvs = translateAliassesInArgs(process.argv, RewriteServices);
     var subAr = getSliceOfMatchingOptions(argvs, "ugly|beauty|once|multiple");
@@ -32,23 +19,4 @@ function configurationOfRewriteOnArvs() {
         'times': RewriteServices.times,
         'uglyness': RewriteServices.uglyness
     };
-}
-
-function getSliceOfMatchingOptions(argvs, args) {
-    var start = 0;
-    var end = 0;
-    try {
-        argvs.forEach(function(arg) {
-            if (!(new RegExp("^--(" + args + ")$", "g")).test(arg)) {
-                if (start != end) {
-                    // there is no 'break' statement in JS ... so throw an exception is the best solution
-                    throw {};
-                }
-                start++;
-            }
-            end++;
-        });
-    } catch (e) { /*nothing*/ }
-
-    return argvs.slice(start, end);
 }

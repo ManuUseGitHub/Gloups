@@ -8,7 +8,6 @@ function getConfig() {
         "pathesToCoffee": [],
         "pathesToStyle": [],
         "pathesToStyleLess": [],
-        "pathesToWars": [],
         "pathesToSass": [],
         "projects": []
     }
@@ -25,7 +24,7 @@ function readJsonConfig(filePath) {
     var has_smthng = true;
     var content = "";
     m = /^(.*)(\.json)$/.exec(filePath);
-    var tempfile = m[1]+'.temp'+m[2];
+    var tempfile = m[1] + '.temp' + m[2];
 
     // at any line read, 
     fssync.write(tempfile, '', 'utf8');
@@ -33,12 +32,12 @@ function readJsonConfig(filePath) {
 
         // stripping comments ---------------------------------------------------------------------
         l = reading.getLine();
-        if (has_smthng = (m = /^(.*)\/\/.*$/g.exec(l))) {           // "(.. content ..) [//] .. .."
+        if (has_smthng = (m = /^(.*)\/\/.*$/g.exec(l))) { // "(.. content ..) [//] .. .."
             content = m[1];
-        } else if (has_smthng = (m = /^(.*)\/\*$/g.exec(l))) {      // "(.. content ..) [/*] .. .."
+        } else if (has_smthng = (m = /^(.*)\/\*$/g.exec(l))) { // "(.. content ..) [/*] .. .."
             content = m[1];
             ++commentBloc;
-        } else if (has_smthng = (m = /^.*\*\/(.*)$/g.exec(l))) {    // ".. .. [*/] (.. content ..)"
+        } else if (has_smthng = (m = /^.*\*\/(.*)$/g.exec(l))) { // ".. .. [*/] (.. content ..)"
             content = m[1];
             --commentBloc;
         } else if (has_smthng = (commentBloc == 0)) {
@@ -47,7 +46,7 @@ function readJsonConfig(filePath) {
 
         //                          every matching creates a candidate to write 
         if (has_smthng) {
-            if (!/^[\s]*$/g.test(content)) {    // white lines are ignored
+            if (!/^[\s]*$/g.test(content)) { // white lines are ignored
                 fs.appendFileSync(tempfile, content + "\r\n", 'utf8');
             }
         }
@@ -62,69 +61,70 @@ function setConfig() {
     config.projects = readJsonConfig("custom/config.json").projects;
 }
 
-function processConfigTargetProjects(project_path, reading, key) {
-    var pathReader = new classReading();
-    pathReader.initialize(reading.getData(), reading.getIter());
-    var match;
+function makePathesCoveringAllFilesFor(projectFolder, matchingForEntry, subpathToExtention, purpose) {
 
-    pathReader.readLines(function() {
-        var line = pathReader.getLine();
-        if (match = /^.*\["(.*)","(.*)"\].*$/g.exec(line)) {
-            var configDescription;
-            var extSubpath;
-            if (key == "minify_js") {
-                configDescription = {
-                    where: config.pathesToJs,
-                    purpose: 'Compress .js files into .min.js files'
-                }
-                extSubpath = '/**/*.js'
-            } else if (key == "ts_to_js") {
-                configDescription = {
-                    where: config.pathesToTs,
-                    purpose: 'Compile .ts files into .js File'
-                }
-                extSubpath = '/**/*.coffee';
-            } else if (key == "coffee_to_js") {
-                configDescription = {
-                    where: config.pathesToCoffee,
-                    purpose: 'Compile .coffee files into .js File'
-                }
-                extSubpath = '/**/*.coffee';
-            } else if (key == "minify_css") {
-                configDescription = {
-                    where: config.pathesToStyle,
-                    purpose: 'Compress .css files'
-                }
-                extSubpath = '/**/*.css';
-            } else if (key == "less") {
-                configDescription = {
-                    where: config.pathesToStyleLess,
-                    purpose: 'Compile .less files into .css files'
-                }
-                extSubpath = '/**/*.less';
-            } else if (key == "sass") {
-                configDescription = {
-                    where: config.pathesToSass,
-                    purpose: 'Compile .scss files into .css files'
-                }
-                extSubpath = '/**/*.scss';
-            } else if (key == "war") {
-                configDescription = {
-                    where: config.pathesToWars,
-                    purpose: 'Rename .WAR files'
-                }
-                extSubpath = '/**/*.war';
-            }
-            var description = {
-                project: project_path,
-                pathes: match,
-                subpathToExtention: extSubpath
-            };
-            pushNewEntryFor(description, configDescription);
+    var addon = matchingForEntry.addon;
+    var entrySet = matchingForEntry.pathesToService;
+
+    for (var i = 0, t = addon.length; i < t; ++i) {
+        // concatenate /**/*.ext to the watch folder
+        addon[i].watch = addon[i].watch + subpathToExtention;
+
+        var pathes = [addon[i].watch, addon[i].dest];
+
+        if (0 < i) { // only the first time to avoid repeating the same purpose
+            purpose = "[SAME-PURPOSE]";
         }
-        if (/^]$/g.test(pathReader.getLine())) {
-            pathReader.stop();
-            reading.setIter(pathReader.getIter());
-        }
-    });
+
+        logServiceActivatedPushed(purpose, projectFolder, addon[i]);
+
+        // rebaseing the path to validate the watching
+        addon[i].watch = projectFolder + "/" + addon[i].watch;
+        addon[i].dest = projectFolder + "/" + addon[i].dest;
+
+        entrySet = entrySet.concat(addon[i]);
+    }
+    if (config.verbose){
+        console.log();
+    }
+
+    //pushing the addon to the entrySet an "entry" is a watching list for js or ts or coffee ... css ... etc."
+    return entrySet;
+}
+
+function processConfigTargetProjects(project_path) {
+    var projectServices = readJsonConfig(project_path + '/config.mzg.json');
+
+    console.log("Activated Services for target project under the path [FOLDER]:");
+    console.log(logFilePath(project_path) + "\n");
+
+    config.pathesToJs = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToJs),
+        'addon': projectServices.minify_js
+    }, '/**.js', 'Compress .js files into .min.js files');
+
+    config.pathesToTs = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToTs),
+        'addon': projectServices.ts_to_js
+    }, '/**.ts', 'Compile .ts files into .js file');
+
+    config.pathesToCoffee = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToCoffee),
+        'addon': projectServices.coffee_to_js
+    }, '/**.coffee', 'Compile .coffee files into .js file');
+
+    config.pathesToStyle = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToStyle),
+        'addon': projectServices.minify_css
+    }, '/**.css', 'Compress .css files');
+
+    config.pathesToStyleLess = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToStyleLess),
+        'addon': projectServices.less
+    }, '/**.less', 'Compile .less files into .css files');
+
+    config.pathesToSass = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToSass),
+        'addon': projectServices.sass
+    }, '/**.scss', 'Compile .scss files into .css files');
 }

@@ -18,12 +18,6 @@ gulp.task('applyDist', function() {
             fssync.copy('custom/project_mapping_model.json', 'dist/custom/config.json');
             fssync.copy('custom/config_model.ini', 'dist/custom/config_model.ini');
             fssync.copy('package.json', 'dist/package.json');
-
-            /*gulp.src("relative-folder")
-                .pipe(through.obj(function(chunk, enc, cb) {
-                    cb(null, chunk);
-                }));
-            */
         }
     })
 });

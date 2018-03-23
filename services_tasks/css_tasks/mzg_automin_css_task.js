@@ -23,9 +23,10 @@ gulp.task('autominCss', function() {
                         })).pipe(rename({
                             suffix: '.min'
                         }))
+                        .pipe(insert.append("\n/* -- Compressed with Gloups|"+GLOUPS_VERSION+" using gulp-clean-css -- */"))
                         .pipe(sourcemaps.write('./'))
                         .pipe(gulp.dest(function(file) {
-                            gutil.log("Compressed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                            gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                             return dest;
                         }));
                 }

@@ -14,7 +14,7 @@ gulp.task('typescript', function() {
 
             .pipe(gulp.dest(function(file) {
                 var dest = getDestOfMatching(file.path, config.pathesToTs);
-                gutil.log("Compressed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                 return dest;
             }));
     })

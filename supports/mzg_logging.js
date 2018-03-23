@@ -20,9 +20,9 @@ function logHelp() {
         line = reading.getLine().replace(/\r?\n|\r/g, '');
         if (match = /^([\s]*[#]+.*)$/.exec(line)) {
             console.log(chalk.cyan(match[1]));
-        }else if (match = /^([\s]*)([$](?:[\s][^\s]+)+)([\s]{2,}.*|.*)$/.exec(line)) {
+        } else if (match = /^([\s]*)([$](?:[\s][^\s]+)+)([\s]{2,}.*|.*)$/.exec(line)) {
             console.log(chalk.grey(match[1]) + match[2] + chalk.green(match[3]));
-        }else if (match = /^([\s]*[>].*)$/.exec(line)) {
+        } else if (match = /^([\s]*[>].*)$/.exec(line)) {
             console.log(chalk.green(match[1]));
             // [WHITESPACE][OPTION],[TEXT],[OPTION2][TEXT][EXT][TEXT][EXT][TEXT] ...
         } else if (match = /^([\s]*)([\-]+[^\s,]+)([^\-.]*)((?:[\s][\-]+[^\s]+)+)([^\-.]*)((?:[.][^.\s]+)+|)([^\-.]*)((?:[.][^.\s]+)+|)(.*)$/.exec(line)) {
@@ -67,7 +67,7 @@ function logProcessCompleteOnFile(file, realAction, process) {
         // logging the time elapsed
         var dResult = ms2Time(new Date() - dStart);
         console.log();
-        gutil.log("'" + chalk.cyan(file) + "' " + realAction + " after" + chalk.magenta(dResult));
+        gutil.log(logFilePath(file) + " " + realAction + " after" + chalk.magenta(dResult));
 
     } catch (err) {
 
@@ -99,72 +99,80 @@ function timeComputed() {
     return [date.getHours(), date.getMinutes(), date.getSeconds()].join(":");
 }
 
-function logServiceActivatedPushed(purpose,project,pathes,subpathToExtention) {
+function logServiceActivatedPushed(purpose, project, addon) {
     if (config.verbose) {
         var match;
 
         if (match = /^([^.]+)([.][^\s]*)([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
-            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]) + chalk.magenta(match[4]) + chalk.grey(match[5]));
+            console.log(chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]) + chalk.magenta(match[4]) + chalk.grey(match[5]));
         } else if (match = /^([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
-            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]));
+            console.log(chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]));
         }
 
-        console.log("Watch : '" + chalk.cyan(project + '\\' + pathes[1] + subpathToExtention) + "'");
-        console.log("Dest. : '" + chalk.cyan(project + '\\' + pathes[2]) + "'\n");
+        console.log(
+            "Watch :" + logFilePath('[..]/' + addon.watch) + " - " +
+            "Dest. :" + logFilePath('[..]/' + addon.dest)
+        );
+
+        var sourcemaps = addon.sourcemaps;
+        if (sourcemaps !== undefined) {
+            console.log(sourcemaps ? chalk.green("Sourcemaps !") : chalk.grey("no sourcemaps"));
+        }
     }
 }
 
 function logTaskPurpose(taskName) {
     logTaskName(taskName);
-    switch (taskName) {
-        case "setVars":
-            console.log("  Sets configuration variables")
-            console.log('  See the .INI file of project mapping to set Gloups ready to serve your projects here :');
-            console.log('  > ' + logFilePath('custom/config.mzg.ini') + ':\n');
-            break;
-        case "automin":
-            console.log("  Will uglify .js files matching the folowing path(s):\n");
-            logWatchList(config.pathesToJs);
-            break;
-        case "autodel":
-            console.log(
-                "  Delete " + logFilePath(".min.js orphan files") + " when " + logFilePath(".js files model") + " are deleted\n"
-            );
-            break;
-        case "typescript":
-            console.log("  Will compile .ts files matching the folowing path(s):\n");
-            logWatchList(config.pathesToTs);
-            break;
-        case "coffeescript":
-            console.log("  Will compile .coffee files matching the folowing path(s):\n");
-            logWatchList(config.pathesToCoffee);
-            break;
-        case "autominCss":
-            console.log("  Will compress .css files matching the folowing path(s):\n");
-            logWatchList(config.pathesToStyle);
-            break;
-        case "less":
-            console.log("  Will compile .less files matching the folowing path(s):\n");
-            logWatchList(config.pathesToStyleLess);
-            break;
-        case "sass":
-            console.log("  Will compile .sass files matching the folowing path(s):\n");
-            logWatchList(config.pathesToSass);
-            break;
-        case "scanProjects":
-            console.log("  Creates .INI configuration files in your project root folder need to make Gloups able to serve\n");
-            break;
-        default:
-            console.log("  Task unknown: " + taskName + "\n");
+    var tasks = {
+        "setVars": "" +
+            "  Sets configuration variables \n" +
+            '  See the .INI file of project mapping to set Gloups ready to serve your projects here :\n' +
+            '  > ' + logFilePath('custom/config.mzg.ini') + ':\n',
+        "automin": "" +
+            "  Will uglify .js files matching the folowing path(s):\n",
+        "autodel": "" +
+            "  Delete " + logFilePath(".min.js orphan files") + " when " + logFilePath(".js files model") + " are deleted\n",
+        "typescript": "" +
+            "  Will compile .ts files matching the folowing path(s):\n",
+        "coffeescript": "" +
+            "  Will compile .coffee files matching the folowing path(s):\n",
+        "autominCss": "" +
+            "  Will compress .css files matching the folowing path(s):\n",
+        "less": "" +
+            "  Will compile .less files matching the folowing path(s):\n",
+        "sass": "" +
+            "  Will compile .sass files matching the folowing path(s):\n",
+        "scanProjects": "" +
+            "  Creates configuration file in every project root folder\n"
+    };
+
+
+    if (tasks[taskName]) {
+        console.log(tasks[taskName]);
+        logWatchList(taskName)
+    } else {
+        console.log(chalk.yellow("  no information provided \n"));
     }
 };
 
-function logWatchList(configTab) {
-    var wl = watchList(configTab);
-    wl.forEach(function(t) {
-        console.log("    '" + chalk.cyan(t) + "'");
-    });
-    console.log();
+function logWatchList(taskName) {
+
+    var associations = {
+        "automin": config.pathesToJs,
+        "typescript": config.pathesToTs,
+        "coffeescript": config.pathesToCoffee,
+        "autominCss": config.pathesToStyle,
+        "less": config.pathesToStyleLess,
+        "sass": config.pathesToSass
+    };
+
+    if (associations[taskName]) {
+        var wl = watchList(associations[taskName]);
+        wl.forEach(function(t) {
+            console.log("    " + logFilePath(t));
+        });
+        console.log();
+    }
 }
 
 function logTaskName(taskName) {

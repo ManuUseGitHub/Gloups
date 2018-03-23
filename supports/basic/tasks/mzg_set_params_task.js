@@ -14,9 +14,9 @@ gulp.task('setParams', function() {
         gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
     // the fisrt task met is rewrite
     } else if (/^rewrite$/.test(firstTaskName)) {
-        var services        = configurationOfRewriteOnArvs();
-        var stayBeautiful   = !/^ugly$/.test(services.uglyness);
-        var watchOnce       = !/^multiple$/.test(services.times);
+        var _services        = configurationOfRewriteOnArvs();
+        var stayBeautiful   = !/^ugly$/.test(_services.uglyness);
+        var watchOnce       = !/^multiple$/.test(_services.times);
 
         logTaskName(
             (stayBeautiful ? "imBeauty" : "imUgly") +

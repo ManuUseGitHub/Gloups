@@ -7,7 +7,7 @@ gulp.task('automin', function() {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
-        var regex = new RegExp(jsRegexFilePathPattern, "g");
+        var regex = new RegExp(JS_REGEX_FILE_PATH_PATTERN, "g");
         var match = regex.exec(event.path);
 
         // process compression of js files
@@ -23,7 +23,7 @@ gulp.task('automin', function() {
                     .pipe(gulp.dest(function(file) {
                         var dest = getDestOfMatching(file.path, config.pathesToJs);
 
-                        gutil.log("Compressed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                        gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                         return dest;
                     }));
             }

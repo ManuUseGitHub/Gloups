@@ -31,6 +31,7 @@
     "gulp-coffee": "^3.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-css-format": "^0.1.2",
+    "gulp-insert": "^0.5.0",
     "gulp-jshint": "^2.1.0",
     "gulp-jsvalidate": "^3.0.0",
     "gulp-less": "^3.5.0",
@@ -50,5 +51,9 @@
     "typescript": "^2.7.2",
     "yargs": "^10.0.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "npm": "^5.7.1",
+    "vue-cli": "^2.9.3",
+    "yarn": "^1.5.1"
+  }
 }

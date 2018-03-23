@@ -8,6 +8,7 @@ gulp.task('less', function() {
     gulp.watch(wl, function(event) {
         if (/.*.less$/.test(event.path)) {
 
+            console.log("once !");
             // process compilation of less files
             var process = function() {
                 gulp.src(event.path)
@@ -19,11 +20,17 @@ gulp.task('less', function() {
                     .pipe(less({
                         paths: [path.join(__dirname, 'less', 'includes')]
                     }))
+                    .pipe(insert.append("\n/* -- Compiled with Gloups|" + GLOUPS_VERSION + " using gulp-less -- */"))
                     .pipe(sourcemaps.write('./'))
                     .pipe(gulp.dest(function(file) {
                         var dest = getDestOfMatching(file.path, config.pathesToStyleLess);
+                        var once;
 
-                        gutil.log("Processed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                        if (once) {
+                            gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
+                            once = false;
+                        }
+
                         return dest;
                     }));
             };

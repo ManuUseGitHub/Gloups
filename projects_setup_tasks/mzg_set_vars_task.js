@@ -5,7 +5,7 @@ gulp.task('setVars', function() {
     }
     for (p_path in config.projects) {
         var project = config.projects[p_path];
-        if (fssync.exists(project.path + '\\config.mzg.ini')) {
+        if (fssync.exists(project.path + '\\config.mzg.json')) {
             console.log(chalk.green(project.project) + ' - OK');
             if (project.checked) {
                 setUpProjectWatchingPaths(project.path);

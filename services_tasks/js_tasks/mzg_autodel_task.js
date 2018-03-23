@@ -6,7 +6,7 @@ gulp.task('autodel', function(event) {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
-        var regex = new RegExp(jsRegexFilePathPattern, "g");
+        var regex = new RegExp(JS_REGEX_FILE_PATH_PATTERN, "g");
         var match = regex.exec(event.path);
 
         if (event.type === "deleted" && match) {
@@ -25,7 +25,7 @@ gulp.task('autodel', function(event) {
                         del(destMinFileName, {
                             force: true
                         });
-                    gutil.log("source folder here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                    gutil.log("source folder here :\n" + breath() + "> " + logFilePath(dest));
                 });
             }
 

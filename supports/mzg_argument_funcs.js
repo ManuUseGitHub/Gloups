@@ -1,31 +1,60 @@
+function translateAliassesInArgs(argvs, serviceArgs) {
+    var match;
+    var result = [];
+    argvs.forEach(function(arg) {
+        if (match = /^-([^\-]+)$/.exec(arg)) {
+            result.push('--' + serviceArgs[match[1]]);
+        } else {
+            result.push(arg);
+        }
+    });
+    return result;
+}
+
+function getSliceOfMatchingOptions(argvs, args) {
+    var start = 0;
+    var end = 0;
+    try {
+        argvs.forEach(function(arg) {
+            if (!(new RegExp("^--(" + args + ")$", "g")).test(arg)) {
+                if (start != end) {
+                    // there is no 'break' statement in JS ... so throw an exception is the best solution
+                    throw {};
+                }
+                start++;
+            }
+            end++;
+        });
+    } catch (e) { /*nothing*/ }
+
+    return argvs.slice(start, end);
+}
+
 function tasksToRunOnArgvs() {
     var effectiveServices = [];
     var errors = [];
-    var optionCount = 0;
-    var service = '?';
+    var optionsCount = 0;
 
-    // start the arguments array at index 3 because argv contains [[default],TaskName,arg1,arg2, ... ,argN]
-    var subAr = process.argv.slice(3, process.argv.length);
+    // translate aliasses into args equivalances like -a is replaced by --all in the arg. string
+    var subs = translateAliassesInArgs(process.argv, SERVICES);
+    
+    // strips all non options or presets arguments
+    var subAr = getSliceOfMatchingOptions(subs, GLOUPS_OPTIONS);
 
-    for (serv in subAr) {
+    for (service in subAr) {
         try {
-            var key = (/^([\-][\-]?)([^\-]+)$/.exec(subAr[serv]));
-            service = key[2];
-
-            // check if the argument is well formed based on the dash caracter : 
-            //      > -a or --abc not --a or -abc
-            checkWellForming(key, service);
-
-            // -a to --abc
-            service = convertAliasToFullNameOption(key,service);
-
-            if (key && (matchOption = service)) {
+            service = (/^[\-][\-]?([^\-]+)$/.exec(subAr[service]))[1];
+            
+            if (new RegExp("^\\b(" + PRESET_OPTIONS + ")\\b$").test(service)) {
 
                 // check if a preset is single ; throws if not
-                effectiveServices = checkPresetsOverdose(effectiveServices, optionCount);
+                checkPresetsOverdose(++optionsCount, service);
 
-                // check and push options that are real ; throws if no real options
-                pushMatchingOption(effectiveServices, matchOption);
+                // convert the preset into a list of matching options
+                effectiveServices = SERVICES[service].split(' ');
+            
+            }else{
+                effectiveServices.push(SERVICES[service]);    
             }
         } catch (err) {
             errors.push(err + " Error with option: ");
@@ -34,42 +63,15 @@ function tasksToRunOnArgvs() {
                 break;
             }
         }
-        optionCount++;
+        optionsCount++;
     }
+
     logErrorsOnTaskArgvs(errors);
     return effectiveServices;
 }
 
-function checkWellForming(key, service) {
-    if (key[1].length > 2) {
-        errors = [];
-        throw "GRAVE ERROR: argument malformed";
-    }
-}
-
-function convertAliasToFullNameOption(key,service) {
-    if (key[1].length == 1) {
-        service = services[service];
-    }
-    return service;
-}
-
-function checkPresetsOverdose(effectiveServices, optionCount) {
-    if (presetsRegex.test(matchOption)) {
-        effectiveServices = services[matchOption].split(" ");
-        if (optionCount > 0) {
-            throw "GRAVE ERROR: Presets should be alone : " + matchOption;
-        }
-    }
-    return effectiveServices;
-}
-
-function pushMatchingOption(effectiveServices, matchOption) {
-    if (!presetsRegex.test(matchOption)) {
-        if (services[matchOption]) {
-            effectiveServices.push(services[matchOption]);
-        } else {
-            throw "GRAVE ERROR: unknown option or preset or alias : -" + matchOption + " or --" + matchOption;
-        }
+function checkPresetsOverdose(optionsCount, service) {
+    if (optionsCount > 1) {
+        throw "GRAVE ERROR: Presets should be alone : " + service;
     }
 }

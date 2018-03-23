@@ -23,7 +23,7 @@ gulp.task('sass', function() {
                     .pipe(gulp.dest(function(file) {
                         var dest = getDestOfMatching(file.path, config.pathesToSass);
 
-                        gutil.log("Processed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                        gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                         return dest;
                     }));
             };

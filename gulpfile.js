@@ -2,52 +2,65 @@
 	*                                 								VARIABLES :	module requirement    &    Configuration VARIABLES 																	*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [supports/basic/mzg_modules_importation.js] --
+// -- [supports/basic/mzg_modules_importation.js] -- 
+// A ----------------------------------------------------------------------------------------------
 var argv = require('yargs').argv;
-
 var autoprefixer = require('gulp-autoprefixer');
-
+// B ----------------------------------------------------------------------------------------------
+// C ----------------------------------------------------------------------------------------------
 //https://www.npmjs.com/package/chalk
 var chalk = require('chalk');
-
 var cleanCSS = require('gulp-clean-css');
 var coffee = require('gulp-coffee');
 var concat = require('gulp-concat');
+// D ----------------------------------------------------------------------------------------------
 var del = require('del');
-
+// E ----------------------------------------------------------------------------------------------
+// F ----------------------------------------------------------------------------------------------
 // check file existance
 var fs = require("fs");
 var fssync = require("fs-sync");
-
+// G ----------------------------------------------------------------------------------------------
 var gulp = require('gulp');
-
 // logging
 var gutil = require('gulp-util');
-
+// H ----------------------------------------------------------------------------------------------
+// I ----------------------------------------------------------------------------------------------
+var insert = require('gulp-insert');
+// J ----------------------------------------------------------------------------------------------
 // error solved : http://kuebiko.blogspot.be/2016/01/gulp-jshint200-requires-peer-of.html
 var jshint = require('gulp-jshint');
-
 var jsValidate = require('gulp-jsvalidate');
+// K ----------------------------------------------------------------------------------------------
+// L ----------------------------------------------------------------------------------------------
 var less = require('gulp-less');
-
+// M ----------------------------------------------------------------------------------------------
+// N ----------------------------------------------------------------------------------------------
 // for alternate manipulations where no operations is needed
 var nop = require('gulp-nop');
-
+// O ----------------------------------------------------------------------------------------------
+// P ----------------------------------------------------------------------------------------------
 var path = require('path');
-
+// Q ----------------------------------------------------------------------------------------------
+// R ----------------------------------------------------------------------------------------------
 var rename = require("gulp-rename");
+// S ----------------------------------------------------------------------------------------------
 var sass = require('gulp-sass');
-
 var sourcemaps = require('gulp-sourcemaps');
-
+// T ----------------------------------------------------------------------------------------------
 // to write custom pipe functions
 var through = require('through2');
-
 var ts = require('gulp-typescript');
+// U ----------------------------------------------------------------------------------------------
 var uglify = require('gulp-uglify');
+// V ----------------------------------------------------------------------------------------------
+// W ----------------------------------------------------------------------------------------------
 var wait = require('gulp-wait');
+// X ----------------------------------------------------------------------------------------------
+// Y ----------------------------------------------------------------------------------------------
+// Z ----------------------------------------------------------------------------------------------
 
-// -- [supports/basic/mzg_vars.js] --
+// -- [supports/basic/mzg_vars.js] -- 
 // Sets things up to serve
 var config = getConfig();
 
@@ -59,7 +72,7 @@ var config = getConfig();
 //			autocompilation of less files to css files
 //			autocompilation of scss files to css files
 // Even a preset has its own alias, as -st matches --style
-var services = {
+var SERVICES = {
 
 	// custom
 	'd': 'del',
@@ -89,10 +102,15 @@ var services = {
 
 };
 
-var presetsRegex = /^\b(all|style|js|typescript|coffeescript)\b$/;
-var jsRegexFilePathPattern = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";
+var PRESET_OPTIONS = "all|style|js|typescript|coffeescript";
+var SERVICES_OPTIONS = "del|minjs|ts|coffee|less|sass|mincss";
+var GLOUPS_OPTIONS = SERVICES_OPTIONS + "|" + PRESET_OPTIONS;
 
-// -- [supports/rewriting/mzg_rewriting_vars.js] --
+var GLOUPS_VERSION = "4.5";
+
+var JS_REGEX_FILE_PATH_PATTERN = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";
+
+// -- [supports/rewriting/mzg_rewriting_vars.js] -- 
 var bySetup = true; // messages will be displayed base on event fired by files.
 var stayBeautiful = true;
 var modifiedMZGEvent = null;
@@ -199,11 +217,11 @@ distFiles.splice(3, 1);
 	*                                 												PARAMETERIZING and DEFAULT TASK 																				*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [supports/basic/tasks/mzg_default_task.js] --
+// -- [supports/basic/tasks/mzg_default_task.js] -- 
 // define the default task and add the watch task to it
 gulp.task('default',["setParams"]);
 
-// -- [projects_setup_tasks/mzg_set_vars_task.js] --
+// -- [projects_setup_tasks/mzg_set_vars_task.js] -- 
 gulp.task('setVars', function() {
     setConfig();
     if(!config.verbose){
@@ -211,7 +229,7 @@ gulp.task('setVars', function() {
     }
     for (p_path in config.projects) {
         var project = config.projects[p_path];
-        if (fssync.exists(project.path + '\\config.mzg.ini')) {
+        if (fssync.exists(project.path + '\\config.mzg.json')) {
             console.log(chalk.green(project.project) + ' - OK');
             if (project.checked) {
                 setUpProjectWatchingPaths(project.path);
@@ -226,7 +244,7 @@ gulp.task('setVars', function() {
     
 });
 
-// -- [supports/basic/tasks/mzg_set_params_task.js] --
+// -- [supports/basic/tasks/mzg_set_params_task.js] -- 
 gulp.task('setParams', function() {
 
     var firstTaskName = this.seq.slice(-1)[0];
@@ -243,9 +261,9 @@ gulp.task('setParams', function() {
         gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
     // the fisrt task met is rewrite
     } else if (/^rewrite$/.test(firstTaskName)) {
-        var services        = configurationOfRewriteOnArvs();
-        var stayBeautiful   = !/^ugly$/.test(services.uglyness);
-        var watchOnce       = !/^multiple$/.test(services.times);
+        var _services        = configurationOfRewriteOnArvs();
+        var stayBeautiful   = !/^ugly$/.test(_services.uglyness);
+        var watchOnce       = !/^multiple$/.test(_services.times);
 
         logTaskName(
             (stayBeautiful ? "imBeauty" : "imUgly") +
@@ -256,14 +274,14 @@ gulp.task('setParams', function() {
     }
 });
 
-// -- [supports/basic/tasks/mzg_jshint_task.js] --
+// -- [supports/basic/tasks/mzg_jshint_task.js] -- 
 gulp.task('jshint', function() {
     return gulp.src(config.pathesToJs)
         .pipe(jshint())
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
-// -- [supports/basic/tasks/mzg_help_me_task.js] --
+// -- [supports/basic/tasks/mzg_help_me_task.js] -- 
 gulp.task('helpMe', function() {
     logHelp();
 });
@@ -272,21 +290,21 @@ gulp.task('helpMe', function() {
  	*************************************************************************************************************************************************************************************************/
 
 
-// -- [projects_setup_tasks/mzg_scan_projects_task.js] --
+// -- [projects_setup_tasks/mzg_scan_projects_task.js] -- 
 gulp.task('scanProjects', function() {
     logTaskPurpose(this.currentTask.name);
     setConfig();
     config.projects.forEach(function(project) {
-        if (!fssync.exists(project.path + '\\config.mzg.ini')) {
-            console.log("file :" + logFilePath(project.path + '\\config.mzg.ini') + ' does not exist ... creation very soon')
-            gulp.src('custom/config_model.ini')
-                .pipe(rename('config.mzg.ini'))
+        if (!fssync.exists(project.path + '\\config.mzg.json')) {
+            console.log("file :" + logFilePath(project.path + '\\config.mzg.json') + ' does not exist ... creation very soon')
+            gulp.src('custom/config_model.json')
+                .pipe(rename('config.mzg.json'))
                 .pipe(gulp.dest(project.path));
         }
     })
 });
 
-// -- [projects_setup_tasks/mzg_services_mapping_task.js] --
+// -- [projects_setup_tasks/mzg_services_mapping_task.js] -- 
 gulp.task('serviceMapping', function() {
     logTaskPurpose(this.currentTask.name);
     config.verbose = true;
@@ -296,13 +314,13 @@ gulp.task('serviceMapping', function() {
 	*                                 															SERVE TASK 																							*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [services_tasks/mzg_serve_task.js] --
+// -- [services_tasks/mzg_serve_task.js] -- 
 gulp.task('serve',['setParams']);
 /*	*************************************************************************************************************************************************************************************************
 	*                                 														JS ORIENTED TASKS 																						*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [services_tasks/js_tasks/mzg_automin_task.js] --
+// -- [services_tasks/js_tasks/mzg_automin_task.js] -- 
 // configure which files to watch and what tasks to use on file changes
 gulp.task('automin', function() {
     logTaskPurpose(this.currentTask.name);
@@ -312,7 +330,7 @@ gulp.task('automin', function() {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
-        var regex = new RegExp(jsRegexFilePathPattern, "g");
+        var regex = new RegExp(JS_REGEX_FILE_PATH_PATTERN, "g");
         var match = regex.exec(event.path);
 
         // process compression of js files
@@ -328,7 +346,7 @@ gulp.task('automin', function() {
                     .pipe(gulp.dest(function(file) {
                         var dest = getDestOfMatching(file.path, config.pathesToJs);
 
-                        gutil.log("Compressed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                        gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                         return dest;
                     }));
             }
@@ -345,7 +363,7 @@ gulp.task('automin', function() {
     }, jshint);
 });
 
-// -- [services_tasks/js_tasks/mzg_autodel_task.js] --
+// -- [services_tasks/js_tasks/mzg_autodel_task.js] -- 
 gulp.task('autodel', function(event) {
     logTaskPurpose(this.currentTask.name);
 
@@ -354,7 +372,7 @@ gulp.task('autodel', function(event) {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
-        var regex = new RegExp(jsRegexFilePathPattern, "g");
+        var regex = new RegExp(JS_REGEX_FILE_PATH_PATTERN, "g");
         var match = regex.exec(event.path);
 
         if (event.type === "deleted" && match) {
@@ -373,7 +391,7 @@ gulp.task('autodel', function(event) {
                         del(destMinFileName, {
                             force: true
                         });
-                    gutil.log("source folder here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                    gutil.log("source folder here :\n" + breath() + "> " + logFilePath(dest));
                 });
             }
 
@@ -384,7 +402,7 @@ gulp.task('autodel', function(event) {
     }, jshint);
 });
 
-// -- [services_tasks/js_tasks/mzg_merg_all_minified_task.js] --
+// -- [services_tasks/js_tasks/mzg_merg_all_minified_task.js] -- 
 // merge all js script into one big js uglyfied
 gulp.task('mergeAllMinified', function() {
     gulp.watch(config.pathesToJs, function() {
@@ -396,7 +414,7 @@ gulp.task('mergeAllMinified', function() {
     });
 });
 
-// -- [services_tasks/js_tasks/mzg_tyepscript_task.js] --
+// -- [services_tasks/js_tasks/mzg_tyepscript_task.js] -- 
 gulp.task('typescript', function() {
     logTaskPurpose(this.currentTask.name);
 
@@ -413,13 +431,13 @@ gulp.task('typescript', function() {
 
             .pipe(gulp.dest(function(file) {
                 var dest = getDestOfMatching(file.path, config.pathesToTs);
-                gutil.log("Compressed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                 return dest;
             }));
     })
 });
 
-// -- [services_tasks/js_tasks/mzg_coffeescript_task.js] --
+// -- [services_tasks/js_tasks/mzg_coffeescript_task.js] -- 
 var coffee = require('gulp-coffee');
  
 gulp.task('coffeescript', function() {
@@ -434,7 +452,7 @@ gulp.task('coffeescript', function() {
         	.pipe(coffee({bare: true}))
             .pipe(gulp.dest(function(file) {
                 var dest = getDestOfMatching(file.path, config.pathesToCoffee);
-                gutil.log("Compiled file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                gutil.log("Compiled file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                 return dest;
             }));
     })
@@ -443,7 +461,7 @@ gulp.task('coffeescript', function() {
 	*                                 														CSS ORIENTED TASKS 																						*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [services_tasks/css_tasks/mzg_automin_css_task.js] --
+// -- [services_tasks/css_tasks/mzg_automin_css_task.js] -- 
 gulp.task('autominCss', function() {
     logTaskPurpose(this.currentTask.name);
 
@@ -469,9 +487,10 @@ gulp.task('autominCss', function() {
                         })).pipe(rename({
                             suffix: '.min'
                         }))
+                        .pipe(insert.append("\n/* -- Compressed with Gloups|"+GLOUPS_VERSION+" using gulp-clean-css -- */"))
                         .pipe(sourcemaps.write('./'))
                         .pipe(gulp.dest(function(file) {
-                            gutil.log("Compressed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                            gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                             return dest;
                         }));
                 }
@@ -483,7 +502,7 @@ gulp.task('autominCss', function() {
     });
 });
 
-// -- [services_tasks/css_tasks/mzg_auto_format_css_task.js] --
+// -- [services_tasks/css_tasks/mzg_auto_format_css_task.js] -- 
 gulp.task('autoformatCss', function() {
     gulp.watch(config.pathesToStyleLess, function(event) {
         if (!/^(.*.min.css)$/.test(event.path)) {
@@ -500,7 +519,7 @@ gulp.task('autoformatCss', function() {
     });
 });
 
-// -- [services_tasks/css_tasks/mzg_less_task.js] --
+// -- [services_tasks/css_tasks/mzg_less_task.js] -- 
 gulp.task('less', function() {
     logTaskPurpose(this.currentTask.name);
 
@@ -511,6 +530,7 @@ gulp.task('less', function() {
     gulp.watch(wl, function(event) {
         if (/.*.less$/.test(event.path)) {
 
+            console.log("once !");
             // process compilation of less files
             var process = function() {
                 gulp.src(event.path)
@@ -522,11 +542,17 @@ gulp.task('less', function() {
                     .pipe(less({
                         paths: [path.join(__dirname, 'less', 'includes')]
                     }))
+                    .pipe(insert.append("\n/* -- Compiled with Gloups|" + GLOUPS_VERSION + " using gulp-less -- */"))
                     .pipe(sourcemaps.write('./'))
                     .pipe(gulp.dest(function(file) {
                         var dest = getDestOfMatching(file.path, config.pathesToStyleLess);
+                        var once;
 
-                        gutil.log("Processed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                        if (once) {
+                            gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
+                            once = false;
+                        }
+
                         return dest;
                     }));
             };
@@ -537,7 +563,7 @@ gulp.task('less', function() {
     });
 });
 
-// -- [services_tasks/css_tasks/mzg_sass_task.js] --
+// -- [services_tasks/css_tasks/mzg_sass_task.js] -- 
 gulp.task('sass', function() {
     logTaskPurpose(this.currentTask.name);
 
@@ -563,7 +589,7 @@ gulp.task('sass', function() {
                     .pipe(gulp.dest(function(file) {
                         var dest = getDestOfMatching(file.path, config.pathesToSass);
 
-                        gutil.log("Processed file version updated/created here :\n" + breath() + "> '" + chalk.cyan(dest) + "'");
+                        gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
                         return dest;
                     }));
             };
@@ -577,7 +603,7 @@ gulp.task('sass', function() {
 	*                                 													OTHER ORIENTED TASKS 																						*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [services_tasks/mzg_other_oriented_tasks.js] --
+// -- [services_tasks/mzg_other_oriented_tasks.js] -- 
 gulp.task('removeWarVersion', function() {
     //logTaskPurpose(this.currentTask.name);
 
@@ -615,7 +641,7 @@ gulp.task('removeWarVersion', function() {
 	*                                 										REWRITING TASKS : Tasks Changing gulpfile.js 																			*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [supports/rewriting/tasks/mzg_apply_temp_task.js] --
+// -- [supports/rewriting/tasks/mzg_apply_temp_task.js] -- 
 gulp.task('applyTemp', function() {
     gulp.watch(gulpFileTempPath, function(event) {
         if (gulp.src(gulpFileTempPath).pipe(jsValidate())) {
@@ -627,18 +653,17 @@ gulp.task('applyTemp', function() {
                 .pipe(gulp.dest(function(file) {
 
                     var dResult = ms2Time(new Date() - dStart);
-                    gutil.log(chalk.cyan("gulpfile.js") + "' replaced after " + chalk.magenta(dResult));
+                    gutil.log(chalk.cyan("gulpfile.js") + " replaced after " + chalk.magenta(dResult));
 
                     //gulp folder
                     var folder = getGulpfolderFromFileBase(file);
                     return folder;
                 }));
-            getRidOfFileOfPath();
         }
     });
 });
 
-// -- [supports/rewriting/tasks/mzg_apply_dist_task.js] --
+// -- [supports/rewriting/tasks/mzg_apply_dist_task.js] -- 
 gulp.task('applyDist', function() {
     gulp.watch(gulpFileTempPath2, function(event) {
 
@@ -659,63 +684,56 @@ gulp.task('applyDist', function() {
             fssync.copy('custom/project_mapping_model.json', 'dist/custom/config.json');
             fssync.copy('custom/config_model.ini', 'dist/custom/config_model.ini');
             fssync.copy('package.json', 'dist/package.json');
-
-            /*gulp.src("relative-folder")
-                .pipe(through.obj(function(chunk, enc, cb) {
-                    cb(null, chunk);
-                }));
-            */
         }
     })
 });
 
-// -- [supports/rewriting/tasks/mzg_write_temp_task.js] --
+// -- [supports/rewriting/tasks/mzg_write_temp_task.js] -- 
 gulp.task('writeTemp', function() {
     var dStart = new Date();
 
     if (gulp.src(mzgFiles).pipe(jsValidate())) {
-
-        var newMzgFiles = insertPath(mzgFiles);
-
-        gulp.src(newMzgFiles)
+        gulp.src(mzgFiles)
+            .pipe(insert.prepend(function(file){
+                var pathfile = /^.*[\/\\](?:Gloups|gulp)[\/\\](.*)/.exec(file.path)[1];
+                return !/^.*log_sections.*$/.test(pathfile)?"\n// -- ["+pathfile.replace(/[\\]/g, '/')+"] -- \n":"";
+            }))
             .pipe(concat(gulpFileTempPath))
             .pipe((stayBeautiful ? nop : uglify)())
             .pipe(gulp.dest(function(file) {
                 var dResult = ms2Time(new Date() - dStart);
-                gutil.log(chalk.cyan(gulpFileTempPath) + "' writen after " + chalk.magenta(dResult));
+                gutil.log(logFilePath(gulpFileTempPath) + " writen after " + chalk.magenta(dResult));
 
                 return getGulpfolderFromFileBase(file);
             }));
     }
 });
 
-// -- [supports/rewriting/tasks/mzg_write_dist_task.js] --
+// -- [supports/rewriting/tasks/mzg_write_dist_task.js] -- 
 gulp.task('writeDist', function() {
     var dStart = new Date();
 
     if (gulp.src(distFiles).pipe(jsValidate())) {
 
-        var newMzgFiles = insertPath(distFiles);
-
-        gulp.src(newMzgFiles)
+        gulp.src(distFiles)
             .pipe(concat(gulpFileTempPath2))
             .pipe(uglify())
             .pipe(gulp.dest(function(file) {
                 var dResult = ms2Time(new Date() - dStart);
-                gutil.log(chalk.cyan(gulpFileTempPath2) + "' writen after " + chalk.magenta(dResult));
+                gutil.log(logFilePath(gulpFileTempPath2) + " writen after " + chalk.magenta(dResult));
 
                 return getGulpfolderFromFileBase(file);
             }));
     }
 });
 
-// -- [supports/rewriting/tasks/mzg_rewrite_task.js] --
+// -- [supports/rewriting/tasks/mzg_rewrite_task.js] -- 
 gulp.task('rewrite', ['setParams', 'applyTemp','applyDist']);
 /*	*************************************************************************************************************************************************************************************************
 	*                              									RUNTASK : Tasks utilities that have to stay in gulpfile.js 																		*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [supports/mzg_runtask.js] --
+// -- [supports/mzg_runtask.js] -- 
 gulp.Gulp.prototype.__runTask = gulp.Gulp.prototype._runTask;
 gulp.Gulp.prototype._runTask = function(task) {
     this.currentTask = task;
@@ -725,7 +743,7 @@ gulp.Gulp.prototype._runTask = function(task) {
 	*                                 														FUNCTIONS : utils 																						*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [supports/files/configurationSetting/mzg_config_funcs.js] --
+// -- [supports/files/configurationSetting/mzg_config_funcs.js] -- 
 function getConfig() {
     return config ? config : {
         // See 'serviceMapping' project setup task
@@ -736,7 +754,6 @@ function getConfig() {
         "pathesToCoffee": [],
         "pathesToStyle": [],
         "pathesToStyleLess": [],
-        "pathesToWars": [],
         "pathesToSass": [],
         "projects": []
     }
@@ -753,7 +770,7 @@ function readJsonConfig(filePath) {
     var has_smthng = true;
     var content = "";
     m = /^(.*)(\.json)$/.exec(filePath);
-    var tempfile = m[1]+'.temp'+m[2];
+    var tempfile = m[1] + '.temp' + m[2];
 
     // at any line read, 
     fssync.write(tempfile, '', 'utf8');
@@ -761,12 +778,12 @@ function readJsonConfig(filePath) {
 
         // stripping comments ---------------------------------------------------------------------
         l = reading.getLine();
-        if (has_smthng = (m = /^(.*)\/\/.*$/g.exec(l))) {           // "(.. content ..) [//] .. .."
+        if (has_smthng = (m = /^(.*)\/\/.*$/g.exec(l))) { // "(.. content ..) [//] .. .."
             content = m[1];
-        } else if (has_smthng = (m = /^(.*)\/\*$/g.exec(l))) {      // "(.. content ..) [/*] .. .."
+        } else if (has_smthng = (m = /^(.*)\/\*$/g.exec(l))) { // "(.. content ..) [/*] .. .."
             content = m[1];
             ++commentBloc;
-        } else if (has_smthng = (m = /^.*\*\/(.*)$/g.exec(l))) {    // ".. .. [*/] (.. content ..)"
+        } else if (has_smthng = (m = /^.*\*\/(.*)$/g.exec(l))) { // ".. .. [*/] (.. content ..)"
             content = m[1];
             --commentBloc;
         } else if (has_smthng = (commentBloc == 0)) {
@@ -775,7 +792,7 @@ function readJsonConfig(filePath) {
 
         //                          every matching creates a candidate to write 
         if (has_smthng) {
-            if (!/^[\s]*$/g.test(content)) {    // white lines are ignored
+            if (!/^[\s]*$/g.test(content)) { // white lines are ignored
                 fs.appendFileSync(tempfile, content + "\r\n", 'utf8');
             }
         }
@@ -790,106 +807,78 @@ function setConfig() {
     config.projects = readJsonConfig("custom/config.json").projects;
 }
 
-function processConfigTargetProjects(project_path, reading, key) {
-    var pathReader = new classReading();
-    pathReader.initialize(reading.getData(), reading.getIter());
-    var match;
+function makePathesCoveringAllFilesFor(projectFolder, matchingForEntry, subpathToExtention, purpose) {
 
-    pathReader.readLines(function() {
-        var line = pathReader.getLine();
-        if (match = /^.*\["(.*)","(.*)"\].*$/g.exec(line)) {
-            var configDescription;
-            var extSubpath;
-            if (key == "minify_js") {
-                configDescription = {
-                    where: config.pathesToJs,
-                    purpose: 'Compress .js files into .min.js files'
-                }
-                extSubpath = '/**/*.js'
-            } else if (key == "ts_to_js") {
-                configDescription = {
-                    where: config.pathesToTs,
-                    purpose: 'Compile .ts files into .js File'
-                }
-                extSubpath = '/**/*.coffee';
-            } else if (key == "coffee_to_js") {
-                configDescription = {
-                    where: config.pathesToCoffee,
-                    purpose: 'Compile .coffee files into .js File'
-                }
-                extSubpath = '/**/*.coffee';
-            } else if (key == "minify_css") {
-                configDescription = {
-                    where: config.pathesToStyle,
-                    purpose: 'Compress .css files'
-                }
-                extSubpath = '/**/*.css';
-            } else if (key == "less") {
-                configDescription = {
-                    where: config.pathesToStyleLess,
-                    purpose: 'Compile .less files into .css files'
-                }
-                extSubpath = '/**/*.less';
-            } else if (key == "sass") {
-                configDescription = {
-                    where: config.pathesToSass,
-                    purpose: 'Compile .scss files into .css files'
-                }
-                extSubpath = '/**/*.scss';
-            } else if (key == "war") {
-                configDescription = {
-                    where: config.pathesToWars,
-                    purpose: 'Rename .WAR files'
-                }
-                extSubpath = '/**/*.war';
-            }
-            var description = {
-                project: project_path,
-                pathes: match,
-                subpathToExtention: extSubpath
-            };
-            pushNewEntryFor(description, configDescription);
+    var addon = matchingForEntry.addon;
+    var entrySet = matchingForEntry.pathesToService;
+
+    for (var i = 0, t = addon.length; i < t; ++i) {
+        // concatenate /**/*.ext to the watch folder
+        addon[i].watch = addon[i].watch + subpathToExtention;
+
+        var pathes = [addon[i].watch, addon[i].dest];
+
+        if (0 < i) { // only the first time to avoid repeating the same purpose
+            purpose = "[SAME-PURPOSE]";
         }
-        if (/^]$/g.test(pathReader.getLine())) {
-            pathReader.stop();
-            reading.setIter(pathReader.getIter());
-        }
-    });
+
+        logServiceActivatedPushed(purpose, projectFolder, addon[i]);
+
+        // rebaseing the path to validate the watching
+        addon[i].watch = projectFolder + "/" + addon[i].watch;
+        addon[i].dest = projectFolder + "/" + addon[i].dest;
+
+        entrySet = entrySet.concat(addon[i]);
+    }
+    if (config.verbose){
+        console.log();
+    }
+
+    //pushing the addon to the entrySet an "entry" is a watching list for js or ts or coffee ... css ... etc."
+    return entrySet;
 }
 
-// -- [supports/projects/mzg_projects_funcs.js] --
+function processConfigTargetProjects(project_path) {
+    var projectServices = readJsonConfig(project_path + '/config.mzg.json');
+
+    console.log("Activated Services for target project under the path [FOLDER]:");
+    console.log(logFilePath(project_path) + "\n");
+
+    config.pathesToJs = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToJs),
+        'addon': projectServices.minify_js
+    }, '/**.js', 'Compress .js files into .min.js files');
+
+    config.pathesToTs = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToTs),
+        'addon': projectServices.ts_to_js
+    }, '/**.ts', 'Compile .ts files into .js file');
+
+    config.pathesToCoffee = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToCoffee),
+        'addon': projectServices.coffee_to_js
+    }, '/**.coffee', 'Compile .coffee files into .js file');
+
+    config.pathesToStyle = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToStyle),
+        'addon': projectServices.minify_css
+    }, '/**.css', 'Compress .css files');
+
+    config.pathesToStyleLess = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToStyleLess),
+        'addon': projectServices.less
+    }, '/**.less', 'Compile .less files into .css files');
+
+    config.pathesToSass = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToSass),
+        'addon': projectServices.sass
+    }, '/**.scss', 'Compile .scss files into .css files');
+}
+
+// -- [supports/projects/mzg_projects_funcs.js] -- 
 function setUpProjectWatchingPaths(project_path) {
-    var match;
-    var _data = fs.readFileSync(project_path + '/config.mzg.ini', "utf8");
-    var reading = new classReading();
-    reading.initialize(_data, 0);
-    var key;
-
-    var process =
-        function() {
-            if (match = /^(.*)=.*$/g.exec(reading.getLine())) {
-                key = match[1];
-            };
-            if (/^(minify_js|ts_to_js|coffee_to_js|minify_css|less|sass)$/.test(key) && /^\[$/g.test(reading.getLine())) {
-                processConfigTargetProjects(project_path, reading, key);
-            }
-        }
-    reading.readLines(process);
-}
-
-function pushNewEntryFor(matchingEntryDefinition, configDescription) {
-    var project = matchingEntryDefinition.project;
-    var pathes = matchingEntryDefinition.pathes;
-    var subpathToExtention = matchingEntryDefinition.subpathToExtention;
-    var purpose = configDescription.purpose;
-
-    configDescription.where.push({
-        source: project + '\\' + pathes[1] + subpathToExtention,
-        dest: project + '\\' + pathes[2]
-    });
-
-    logServiceActivatedPushed(purpose,project,pathes,subpathToExtention);
-
+    processConfigTargetProjects(project_path);
+    
 }
 
 function getDestOfMatching(filePath, configTab) {
@@ -904,11 +893,11 @@ function getDestOfMatching(filePath, configTab) {
     for (p_path in configTab) {
 
         var entry = configTab[p_path];
-        var source = entry.source.replace(/[\\]/g, '/');
+        var watch = entry.watch.replace(/[\\]/g, '/');
         var dest = entry.dest.replace(/[\\]/g, '/');
 
         var pattern = '^([^\\\\/*]+).([^\\*]+)([\\/]?[\\/*]+[\\/]?)(.*)$';
-        var base = (new RegExp(pattern, "g").exec(source))[2];
+        var base = (new RegExp(pattern, "g").exec(watch))[2];
         var matching = (new RegExp('^.*(?:' + base + ').*$', "g").exec(filePath));
 
         if (matching) {
@@ -921,41 +910,70 @@ function getDestOfMatching(filePath, configTab) {
 function watchList(configTab) {
     var list = [];
     for (p_path in configTab) {
-        var source = configTab[p_path].source;
-        list.push(source);
+        var watch = configTab[p_path].watch;
+        list.push(watch);
     }
     return list;
 }
 
-// -- [supports/mzg_argument_funcs.js] --
+// -- [supports/mzg_argument_funcs.js] -- 
+function translateAliassesInArgs(argvs, serviceArgs) {
+    var match;
+    var result = [];
+    argvs.forEach(function(arg) {
+        if (match = /^-([^\-]+)$/.exec(arg)) {
+            result.push('--' + serviceArgs[match[1]]);
+        } else {
+            result.push(arg);
+        }
+    });
+    return result;
+}
+
+function getSliceOfMatchingOptions(argvs, args) {
+    var start = 0;
+    var end = 0;
+    try {
+        argvs.forEach(function(arg) {
+            if (!(new RegExp("^--(" + args + ")$", "g")).test(arg)) {
+                if (start != end) {
+                    // there is no 'break' statement in JS ... so throw an exception is the best solution
+                    throw {};
+                }
+                start++;
+            }
+            end++;
+        });
+    } catch (e) { /*nothing*/ }
+
+    return argvs.slice(start, end);
+}
+
 function tasksToRunOnArgvs() {
     var effectiveServices = [];
     var errors = [];
-    var optionCount = 0;
-    var service = '?';
+    var optionsCount = 0;
 
-    // start the arguments array at index 3 because argv contains [[default],TaskName,arg1,arg2, ... ,argN]
-    var subAr = process.argv.slice(3, process.argv.length);
+    // translate aliasses into args equivalances like -a is replaced by --all in the arg. string
+    var subs = translateAliassesInArgs(process.argv, SERVICES);
+    
+    // strips all non options or presets arguments
+    var subAr = getSliceOfMatchingOptions(subs, GLOUPS_OPTIONS);
 
-    for (serv in subAr) {
+    for (service in subAr) {
         try {
-            var key = (/^([\-][\-]?)([^\-]+)$/.exec(subAr[serv]));
-            service = key[2];
-
-            // check if the argument is well formed based on the dash caracter : 
-            //      > -a or --abc not --a or -abc
-            checkWellForming(key, service);
-
-            // -a to --abc
-            service = convertAliasToFullNameOption(key,service);
-
-            if (key && (matchOption = service)) {
+            service = (/^[\-][\-]?([^\-]+)$/.exec(subAr[service]))[1];
+            
+            if (new RegExp("^\\b(" + PRESET_OPTIONS + ")\\b$").test(service)) {
 
                 // check if a preset is single ; throws if not
-                effectiveServices = checkPresetsOverdose(effectiveServices, optionCount);
+                checkPresetsOverdose(++optionsCount, service);
 
-                // check and push options that are real ; throws if no real options
-                pushMatchingOption(effectiveServices, matchOption);
+                // convert the preset into a list of matching options
+                effectiveServices = SERVICES[service].split(' ');
+            
+            }else{
+                effectiveServices.push(SERVICES[service]);    
             }
         } catch (err) {
             errors.push(err + " Error with option: ");
@@ -964,43 +982,16 @@ function tasksToRunOnArgvs() {
                 break;
             }
         }
-        optionCount++;
+        optionsCount++;
     }
+
     logErrorsOnTaskArgvs(errors);
     return effectiveServices;
 }
 
-function checkWellForming(key, service) {
-    if (key[1].length > 2) {
-        errors = [];
-        throw "GRAVE ERROR: argument malformed";
-    }
-}
-
-function convertAliasToFullNameOption(key,service) {
-    if (key[1].length == 1) {
-        service = services[service];
-    }
-    return service;
-}
-
-function checkPresetsOverdose(effectiveServices, optionCount) {
-    if (presetsRegex.test(matchOption)) {
-        effectiveServices = services[matchOption].split(" ");
-        if (optionCount > 0) {
-            throw "GRAVE ERROR: Presets should be alone : " + matchOption;
-        }
-    }
-    return effectiveServices;
-}
-
-function pushMatchingOption(effectiveServices, matchOption) {
-    if (!presetsRegex.test(matchOption)) {
-        if (services[matchOption]) {
-            effectiveServices.push(services[matchOption]);
-        } else {
-            throw "GRAVE ERROR: unknown option or preset or alias : -" + matchOption + " or --" + matchOption;
-        }
+function checkPresetsOverdose(optionsCount, service) {
+    if (optionsCount > 1) {
+        throw "GRAVE ERROR: Presets should be alone : " + service;
     }
 }
  /*	*************************************************************************************************************************************************************************************************
@@ -1008,7 +999,7 @@ function pushMatchingOption(effectiveServices, matchOption) {
  	*************************************************************************************************************************************************************************************************/
 
 
-// -- [supports/rewriting/mzg_rewriting_funcs.js] --
+// -- [supports/rewriting/mzg_rewriting_funcs.js] -- 
 var merging = function(event) {
     if (event) {
         modifiedMZGEvent = event;
@@ -1018,8 +1009,8 @@ var merging = function(event) {
     // when the task is run there no fired event on a file ... this won't be displayed
     if (!bySetup) {
         console.log();
-        gutil.log("CHANGING '" + chalk.cyan("gulpfile.js") + "'...");
-        console.log("FIRED BY '" + chalk.cyan(event.path) + "'...\n");
+        gutil.log("CHANGING " + logFilePath("gulpfile.js") + "...");
+        console.log("FIRED BY " + logFilePath(event.path) + "...\n");
     }
 
     bySetup = false;
@@ -1049,61 +1040,11 @@ var mergingOnChanges = function(beautifully, one_time) {
 }
 
 function getGulpfolderFromFileBase(file) {
-    var gulpfolder = /^(.*[\/\\]gulp)[\/\\].*/.exec(file.base)[1]
+    var gulpfolder = /^(.*[\/\\](?:Gloups|gulp))[\/\\].*/.exec(file.base)[1]
     return gulpfolder;
 }
 
-function getRidOfFileOfPath() {
-    var cpt = 0;
-    pathFiles.forEach(function(item) {
-        if (fssync.exists(item)) {
-            fssync.remove(item);
-        } else {
-            if (cpt++ < 3) {
-                //console.log(chalk.yellow('file \'' + item + '\' might\'ve been removed'));
-            }
-        }
-    })
-    if (cpt > 0) {
-        console.log(chalk.green('OK : ' + cpt + ' file(s) could not have been removed ... they do not exist'));
-    }
-    pathFiles = [];
-}
-
-function insertPath(files) {
-    var newpaths = [];
-    files.forEach(function(item) {
-        var m = /^(.*)[.].*$/.exec(item);
-        var pathOfFile = m[1] + '.path.js';
-        newpaths.push(pathOfFile);
-        pathFiles.push(pathOfFile);
-        newpaths.push(item);
-
-        //var l = (100 - (5 + pathOfFile.length + 2 + 2));
-        //l = l > 0 ? l : 0;
-
-        if (!/^.*log_sections.*$/.test(pathOfFile)) {
-            fssync.write(pathOfFile, '\n// -- [' + item + '] ' + "--"); //Array(l).join("-"));    
-        }
-    });
-
-    return newpaths;
-}
-
-// -- [supports/rewriting/mzg_rewrite_arguments_func.js] --
-function translateAliassesInArgs(argvs, serviceArgs) {
-    var match;
-    var result = [];
-    argvs.forEach(function(arg) {
-        if (match = /^-([^\-]+)$/.exec(arg)) {
-            result.push('--' + serviceArgs[match[1]]);
-        } else {
-            result.push(arg);
-        }
-    });
-    return result;
-}
-
+// -- [supports/rewriting/mzg_rewrite_arguments_func.js] -- 
 function configurationOfRewriteOnArvs() {
     var argvs = translateAliassesInArgs(process.argv, RewriteServices);
     var subAr = getSliceOfMatchingOptions(argvs, "ugly|beauty|once|multiple");
@@ -1126,30 +1067,11 @@ function configurationOfRewriteOnArvs() {
         'uglyness': RewriteServices.uglyness
     };
 }
-
-function getSliceOfMatchingOptions(argvs, args) {
-    var start = 0;
-    var end = 0;
-    try {
-        argvs.forEach(function(arg) {
-            if (!(new RegExp("^--(" + args + ")$", "g")).test(arg)) {
-                if (start != end) {
-                    // there is no 'break' statement in JS ... so throw an exception is the best solution
-                    throw {};
-                }
-                start++;
-            }
-            end++;
-        });
-    } catch (e) { /*nothing*/ }
-
-    return argvs.slice(start, end);
-}
  /*	*************************************************************************************************************************************************************************************************
 	*                                 													 	LOGGING UTILITIES 																						*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [supports/mzg_logging.js] --
+// -- [supports/mzg_logging.js] -- 
 function breath() {
     return '           ';
 }
@@ -1172,9 +1094,9 @@ function logHelp() {
         line = reading.getLine().replace(/\r?\n|\r/g, '');
         if (match = /^([\s]*[#]+.*)$/.exec(line)) {
             console.log(chalk.cyan(match[1]));
-        }else if (match = /^([\s]*)([$](?:[\s][^\s]+)+)([\s]{2,}.*|.*)$/.exec(line)) {
+        } else if (match = /^([\s]*)([$](?:[\s][^\s]+)+)([\s]{2,}.*|.*)$/.exec(line)) {
             console.log(chalk.grey(match[1]) + match[2] + chalk.green(match[3]));
-        }else if (match = /^([\s]*[>].*)$/.exec(line)) {
+        } else if (match = /^([\s]*[>].*)$/.exec(line)) {
             console.log(chalk.green(match[1]));
             // [WHITESPACE][OPTION],[TEXT],[OPTION2][TEXT][EXT][TEXT][EXT][TEXT] ...
         } else if (match = /^([\s]*)([\-]+[^\s,]+)([^\-.]*)((?:[\s][\-]+[^\s]+)+)([^\-.]*)((?:[.][^.\s]+)+|)([^\-.]*)((?:[.][^.\s]+)+|)(.*)$/.exec(line)) {
@@ -1219,7 +1141,7 @@ function logProcessCompleteOnFile(file, realAction, process) {
         // logging the time elapsed
         var dResult = ms2Time(new Date() - dStart);
         console.log();
-        gutil.log("'" + chalk.cyan(file) + "' " + realAction + " after" + chalk.magenta(dResult));
+        gutil.log(logFilePath(file) + " " + realAction + " after" + chalk.magenta(dResult));
 
     } catch (err) {
 
@@ -1251,72 +1173,80 @@ function timeComputed() {
     return [date.getHours(), date.getMinutes(), date.getSeconds()].join(":");
 }
 
-function logServiceActivatedPushed(purpose,project,pathes,subpathToExtention) {
+function logServiceActivatedPushed(purpose, project, addon) {
     if (config.verbose) {
         var match;
 
         if (match = /^([^.]+)([.][^\s]*)([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
-            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]) + chalk.magenta(match[4]) + chalk.grey(match[5]));
+            console.log(chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]) + chalk.magenta(match[4]) + chalk.grey(match[5]));
         } else if (match = /^([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
-            console.log("pushing entry for [Purpose] " + chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]));
+            console.log(chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]));
         }
 
-        console.log("Watch : '" + chalk.cyan(project + '\\' + pathes[1] + subpathToExtention) + "'");
-        console.log("Dest. : '" + chalk.cyan(project + '\\' + pathes[2]) + "'\n");
+        console.log(
+            "Watch :" + logFilePath('[..]/' + addon.watch) + " - " +
+            "Dest. :" + logFilePath('[..]/' + addon.dest)
+        );
+
+        var sourcemaps = addon.sourcemaps;
+        if (sourcemaps !== undefined) {
+            console.log(sourcemaps ? chalk.green("Sourcemaps !") : chalk.grey("no sourcemaps"));
+        }
     }
 }
 
 function logTaskPurpose(taskName) {
     logTaskName(taskName);
-    switch (taskName) {
-        case "setVars":
-            console.log("  Sets configuration variables")
-            console.log('  See the .INI file of project mapping to set Gloups ready to serve your projects here :');
-            console.log('  > ' + logFilePath('custom/config.mzg.ini') + ':\n');
-            break;
-        case "automin":
-            console.log("  Will uglify .js files matching the folowing path(s):\n");
-            logWatchList(config.pathesToJs);
-            break;
-        case "autodel":
-            console.log(
-                "  Delete " + logFilePath(".min.js orphan files") + " when " + logFilePath(".js files model") + " are deleted\n"
-            );
-            break;
-        case "typescript":
-            console.log("  Will compile .ts files matching the folowing path(s):\n");
-            logWatchList(config.pathesToTs);
-            break;
-        case "coffeescript":
-            console.log("  Will compile .coffee files matching the folowing path(s):\n");
-            logWatchList(config.pathesToCoffee);
-            break;
-        case "autominCss":
-            console.log("  Will compress .css files matching the folowing path(s):\n");
-            logWatchList(config.pathesToStyle);
-            break;
-        case "less":
-            console.log("  Will compile .less files matching the folowing path(s):\n");
-            logWatchList(config.pathesToStyleLess);
-            break;
-        case "sass":
-            console.log("  Will compile .sass files matching the folowing path(s):\n");
-            logWatchList(config.pathesToSass);
-            break;
-        case "scanProjects":
-            console.log("  Creates .INI configuration files in your project root folder need to make Gloups able to serve\n");
-            break;
-        default:
-            console.log("  Task unknown: " + taskName + "\n");
+    var tasks = {
+        "setVars": "" +
+            "  Sets configuration variables \n" +
+            '  See the .INI file of project mapping to set Gloups ready to serve your projects here :\n' +
+            '  > ' + logFilePath('custom/config.mzg.ini') + ':\n',
+        "automin": "" +
+            "  Will uglify .js files matching the folowing path(s):\n",
+        "autodel": "" +
+            "  Delete " + logFilePath(".min.js orphan files") + " when " + logFilePath(".js files model") + " are deleted\n",
+        "typescript": "" +
+            "  Will compile .ts files matching the folowing path(s):\n",
+        "coffeescript": "" +
+            "  Will compile .coffee files matching the folowing path(s):\n",
+        "autominCss": "" +
+            "  Will compress .css files matching the folowing path(s):\n",
+        "less": "" +
+            "  Will compile .less files matching the folowing path(s):\n",
+        "sass": "" +
+            "  Will compile .sass files matching the folowing path(s):\n",
+        "scanProjects": "" +
+            "  Creates configuration file in every project root folder\n"
+    };
+
+
+    if (tasks[taskName]) {
+        console.log(tasks[taskName]);
+        logWatchList(taskName)
+    } else {
+        console.log(chalk.yellow("  no information provided \n"));
     }
 };
 
-function logWatchList(configTab) {
-    var wl = watchList(configTab);
-    wl.forEach(function(t) {
-        console.log("    '" + chalk.cyan(t) + "'");
-    });
-    console.log();
+function logWatchList(taskName) {
+
+    var associations = {
+        "automin": config.pathesToJs,
+        "typescript": config.pathesToTs,
+        "coffeescript": config.pathesToCoffee,
+        "autominCss": config.pathesToStyle,
+        "less": config.pathesToStyleLess,
+        "sass": config.pathesToSass
+    };
+
+    if (associations[taskName]) {
+        var wl = watchList(associations[taskName]);
+        wl.forEach(function(t) {
+            console.log("    " + logFilePath(t));
+        });
+        console.log();
+    }
 }
 
 function logTaskName(taskName) {
@@ -1345,7 +1275,7 @@ function logTaskEndBeauy(one_time) {
 	*                                 										CLASSES : Classes for configuration purpose 																			*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [supports/files/mzg_reading_file_class.js] --
+// -- [supports/files/mzg_reading_file_class.js] -- 
 function classReading() {
     this.line;
     this.data;

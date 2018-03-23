@@ -9,7 +9,7 @@ var config = getConfig();
 //			autocompilation of less files to css files
 //			autocompilation of scss files to css files
 // Even a preset has its own alias, as -st matches --style
-var services = {
+var SERVICES = {
 
 	// custom
 	'd': 'del',
@@ -39,5 +39,10 @@ var services = {
 
 };
 
-var presetsRegex = /^\b(all|style|js|typescript|coffeescript)\b$/;
-var jsRegexFilePathPattern = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";
+var PRESET_OPTIONS = "all|style|js|typescript|coffeescript";
+var SERVICES_OPTIONS = "del|minjs|ts|coffee|less|sass|mincss";
+var GLOUPS_OPTIONS = SERVICES_OPTIONS + "|" + PRESET_OPTIONS;
+
+var GLOUPS_VERSION = "4.5";
+
+var JS_REGEX_FILE_PATH_PATTERN = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";

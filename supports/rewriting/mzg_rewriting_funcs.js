@@ -7,8 +7,8 @@ var merging = function(event) {
     // when the task is run there no fired event on a file ... this won't be displayed
     if (!bySetup) {
         console.log();
-        gutil.log("CHANGING '" + chalk.cyan("gulpfile.js") + "'...");
-        console.log("FIRED BY '" + chalk.cyan(event.path) + "'...\n");
+        gutil.log("CHANGING " + logFilePath("gulpfile.js") + "...");
+        console.log("FIRED BY " + logFilePath(event.path) + "...\n");
     }
 
     bySetup = false;
@@ -38,43 +38,6 @@ var mergingOnChanges = function(beautifully, one_time) {
 }
 
 function getGulpfolderFromFileBase(file) {
-    var gulpfolder = /^(.*[\/\\]gulp)[\/\\].*/.exec(file.base)[1]
+    var gulpfolder = /^(.*[\/\\](?:Gloups|gulp))[\/\\].*/.exec(file.base)[1]
     return gulpfolder;
-}
-
-function getRidOfFileOfPath() {
-    var cpt = 0;
-    pathFiles.forEach(function(item) {
-        if (fssync.exists(item)) {
-            fssync.remove(item);
-        } else {
-            if (cpt++ < 3) {
-                //console.log(chalk.yellow('file \'' + item + '\' might\'ve been removed'));
-            }
-        }
-    })
-    if (cpt > 0) {
-        console.log(chalk.green('OK : ' + cpt + ' file(s) could not have been removed ... they do not exist'));
-    }
-    pathFiles = [];
-}
-
-function insertPath(files) {
-    var newpaths = [];
-    files.forEach(function(item) {
-        var m = /^(.*)[.].*$/.exec(item);
-        var pathOfFile = m[1] + '.path.js';
-        newpaths.push(pathOfFile);
-        pathFiles.push(pathOfFile);
-        newpaths.push(item);
-
-        //var l = (100 - (5 + pathOfFile.length + 2 + 2));
-        //l = l > 0 ? l : 0;
-
-        if (!/^.*log_sections.*$/.test(pathOfFile)) {
-            fssync.write(pathOfFile, '\n// -- [' + item + '] ' + "--"); //Array(l).join("-"));    
-        }
-    });
-
-    return newpaths;
 }
