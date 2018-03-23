@@ -16,7 +16,7 @@ gulp.task('applyDist', function() {
             fssync.copy('help.md', 'dist/help.md');
 
             fssync.copy('custom/project_mapping_model.json', 'dist/custom/config.json');
-            fssync.copy('custom/config_model.ini', 'dist/custom/config_model.ini');
+            fssync.copy('custom/config_model.json', 'dist/custom/config_model.json');
             fssync.copy('package.json', 'dist/package.json');
         }
     })
