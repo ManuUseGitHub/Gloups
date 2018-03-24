@@ -8,24 +8,24 @@ gulp.task('sass', function() {
     gulp.watch(wl, function(event) {
         if (/.*.scss$/.test(event.path)) {
 
+            var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToSass);
+            var sourcemapping = matchingEntry.sourcemaps;
+
             // process compilation of less files
             var process = function() {
 
                 gulp.src(event.path)
-                    .pipe(sourcemaps.init())
-                    .pipe(autoprefixer({
-                        browsers: ['last 2 versions'],
-                        cascade: false
-                    }))
+                    .pipe(sourcemapInit(sourcemapping))
+                    .pipe(autoprefix())
+
                     //.pipe(sass.sync().on('error', sass.logError))// synchronously
                     .pipe(sass().on('error', sass.logError))
-                    .pipe(sourcemaps.write('./'))
-                    .pipe(gulp.dest(function(file) {
-                        var dest = getDestOfMatching(file.path, config.pathesToSass);
+                    .pipe(insertSignatureAfter("Processed", "gulp-sass"))
 
-                        gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                        return dest;
-                    }));
+                    .pipe(sourcemapWrite(sourcemapping))
+                    .pipe(gulp.dest(matchingEntry.dest));
+
+                gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
             };
 
             // call with logging of the time taken by the task

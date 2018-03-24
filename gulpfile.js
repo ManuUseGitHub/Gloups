@@ -178,38 +178,43 @@ var mzgFiles = [
 
 	'supports/rewriting/log_sections/mzg_log8.js', // section
 
+	// configuration of modules here
+	'services_tasks/mzg_tasks_micro_services.js',
+
+	'supports/rewriting/log_sections/mzg_log9.js', // section
+
 	'supports/rewriting/tasks/mzg_apply_temp_task.js',
 	'supports/rewriting/tasks/mzg_apply_dist_task.js',
 	'supports/rewriting/tasks/mzg_write_temp_task.js',
 	'supports/rewriting/tasks/mzg_write_dist_task.js',
 	'supports/rewriting/tasks/mzg_rewrite_task.js',
 
-	'supports/rewriting/log_sections/mzg_log9.js', // section
+	'supports/rewriting/log_sections/mzg_log10.js', // section
 
 	'supports/mzg_runtask.js',
 
-	'supports/rewriting/log_sections/mzg_log10.js', // section
+	'supports/rewriting/log_sections/mzg_log11.js', // section
 
 	'supports/files/configurationSetting/mzg_config_funcs.js',
 	'supports/projects/mzg_projects_funcs.js',
 	'supports/mzg_argument_funcs.js',
 
-	'supports/rewriting/log_sections/mzg_log11.js', // section
+	'supports/rewriting/log_sections/mzg_log12.js', // section
 
 	'supports/rewriting/mzg_rewriting_funcs.js',
 	'supports/rewriting/mzg_rewrite_arguments_func.js',
 
-	'supports/rewriting/log_sections/mzg_log12.js', // section
+	'supports/rewriting/log_sections/mzg_log13.js', // section
 	'supports/mzg_logging.js',
 
-	'supports/rewriting/log_sections/mzg_log13.js', // section
+	'supports/rewriting/log_sections/mzg_log14.js', // section
 	'supports/files/mzg_reading_file_class.js'
 ];
 
 var distFiles = mzgFiles.slice();
 
-distFiles.splice(40, 3);
-distFiles.splice(28, 5);
+distFiles.splice(42, 3);
+distFiles.splice(30, 5);
 distFiles.splice(3, 1);
 
 //console.log(distFiles);
@@ -333,33 +338,24 @@ gulp.task('automin', function() {
         var regex = new RegExp(JS_REGEX_FILE_PATH_PATTERN, "g");
         var match = regex.exec(event.path);
 
-        // process compression of js files
-        var process = function() {
+        // the file that fired the event change is a .min.js file
+        if (!/.*.min.js$/.test(event.path) && match) {
 
-            // the file that fired the event change is a .min.js file
-            if (!/.*.min.js$/.test(event.path) && match) {
-                gulp.src(event.path)
-                    .pipe(uglify())
-                    .pipe(rename({
-                        suffix: '.min'
-                    }))
-                    .pipe(gulp.dest(function(file) {
-                        var dest = getDestOfMatching(file.path, config.pathesToJs);
+            var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToJs);
+            var sourcemapping = matchingEntry.sourcemaps;
 
-                        gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                        return dest;
-                    }));
-            }
+            gulp.src(event.path)
+                .pipe(sourcemapInit(sourcemapping))
+
+                .pipe(uglify())
+                .pipe(renameSuffixMin())
+                .pipe(insertSignatureAfter("Compressed", "gulp-uglify"))
+
+                .pipe(sourcemapWrite(sourcemapping))
+                .pipe(gulp.dest(matchingEntry.dest));
+
+            gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
         }
-
-        // call with logging of the time taken by the task
-        if ((match[5] + match[6]) === ".min.js" && event.type === "added") {
-            logProcessCompleteOnFile(match[2], 'created', process);
-        } else if (event.type !== "deleted") {
-            logProcessCompleteOnFile(match[2], 'compressed', process);
-        }
-
-
     }, jshint);
 });
 
@@ -379,7 +375,7 @@ gulp.task('autodel', function(event) {
 
             // process compression of js files
             var process = function() {
-                var dest = getDestOfMatching(event.path, config.pathesToJs);
+                var dest = getMatchingEntryConfig(event.path, config.pathesToJs);
 
                 // select in all case file.min.js destination file
                 var destFileName = (dest + '/' + match[2]).replace(/.min.js$/g, ".js");
@@ -423,23 +419,26 @@ gulp.task('typescript', function() {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
-        gulp.src(event.path)
-            .pipe(ts({
-                noImplicitAny: true,
-                outFile: event.path + ".js"
-            }))
 
-            .pipe(gulp.dest(function(file) {
-                var dest = getDestOfMatching(file.path, config.pathesToTs);
-                gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                return dest;
-            }));
+        var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToTs);
+        var sourcemapping = matchingEntry.sourcemaps;
+
+        gulp.src(event.path)
+            .pipe(sourcemapInit(sourcemapping))
+            
+            .pipe(typescripting(matchingEntry.dest))
+            .pipe(insertSignatureAfter("Compiled", "gulp-typescript"))
+
+            .pipe(sourcemapWrite(sourcemapping))
+            .pipe(gulp.dest(matchingEntry.dest));
+
+        gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
     })
 });
 
 // -- [services_tasks/js_tasks/mzg_coffeescript_task.js] -- 
 var coffee = require('gulp-coffee');
- 
+
 gulp.task('coffeescript', function() {
     logTaskPurpose(this.currentTask.name);
 
@@ -448,13 +447,20 @@ gulp.task('coffeescript', function() {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
+        
+        var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToCoffee);
+        var sourcemapping = matchingEntry.sourcemaps;
+
         gulp.src(event.path)
-        	.pipe(coffee({bare: true}))
-            .pipe(gulp.dest(function(file) {
-                var dest = getDestOfMatching(file.path, config.pathesToCoffee);
-                gutil.log("Compiled file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                return dest;
-            }));
+            .pipe(sourcemapInit(sourcemapping))
+            
+            .pipe(serveCoffee())
+            .pipe(insertSignatureAfter("Served coffee", "gulp-coffee"))
+            
+            .pipe(sourcemapWrite(sourcemapping))
+            .pipe(gulp.dest(matchingEntry.dest));
+
+        gutil.log("Compiled file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
     })
 });
 /*	*************************************************************************************************************************************************************************************************
@@ -470,33 +476,24 @@ gulp.task('autominCss', function() {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
-        if (!/^(.*.min.css|.*.less)$/.test(event.path)) {
+        if (!/^(.*.min.css|.*.less|.*.map)$/.test(event.path)) {
             if (/^.*.css$/.test(event.path)) {
-                // process compilation of less files
-                var process = function() {
 
-                    var dest = getDestOfMatching(event.path, config.pathesToStyle);
-                    gulp.src(event.path)
-                        .pipe(sourcemaps.init())
-                        .pipe(autoprefixer({
-                            browsers: ['last 2 versions'],
-                            cascade: false
-                        }))
-                        .pipe(cleanCSS({
-                            compatibility: 'ie8'
-                        })).pipe(rename({
-                            suffix: '.min'
-                        }))
-                        .pipe(insert.append("\n/* -- Compressed with Gloups|"+GLOUPS_VERSION+" using gulp-clean-css -- */"))
-                        .pipe(sourcemaps.write('./'))
-                        .pipe(gulp.dest(function(file) {
-                            gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                            return dest;
-                        }));
-                }
+                var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToStyle);
+                var sourcemapping = matchingEntry.sourcemaps;
 
-                // call with logging of the time taken by the task
-                logProcessCompleteOnFile(event.path, 'compiled', process);
+                gulp.src(event.path)
+                    .pipe(sourcemapInit(sourcemapping))
+                    .pipe(autoprefix())
+
+                    .pipe(cleanCssMinification())
+                    .pipe(renameSuffixMin())
+                    .pipe(insertSignatureAfter("Compressed", "gulp-clean-css"))
+                    
+                    .pipe(sourcemapWrite(sourcemapping))
+                    .pipe(gulp.dest(matchingEntry.dest));
+
+                gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
             }
         }
     });
@@ -529,36 +526,20 @@ gulp.task('less', function() {
     // passing the watch list
     gulp.watch(wl, function(event) {
         if (/.*.less$/.test(event.path)) {
+            var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToStyleLess);
+            var sourcemapping = matchingEntry.sourcemaps;
 
-            console.log("once !");
-            // process compilation of less files
-            var process = function() {
-                gulp.src(event.path)
-                    .pipe(sourcemaps.init())
-                    .pipe(autoprefixer({
-                        browsers: ['last 2 versions'],
-                        cascade: false
-                    }))
-                    .pipe(less({
-                        paths: [path.join(__dirname, 'less', 'includes')]
-                    }))
-                    .pipe(insert.append("\n/* -- Compiled with Gloups|" + GLOUPS_VERSION + " using gulp-less -- */"))
-                    .pipe(sourcemaps.write('./'))
-                    .pipe(gulp.dest(function(file) {
-                        var dest = getDestOfMatching(file.path, config.pathesToStyleLess);
-                        var once;
+            gulp.src(event.path)
+                .pipe(sourcemapInit(sourcemapping))
+                .pipe(autoprefix())
 
-                        if (once) {
-                            gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                            once = false;
-                        }
+                .pipe(makeLess())
+                .pipe(insertSignatureAfter("Processed", "gulp-less"))
 
-                        return dest;
-                    }));
-            };
+                .pipe(sourcemapWrite(sourcemapping))
+                .pipe(gulp.dest(matchingEntry.dest));
 
-            // call with logging of the time taken by the task
-            logProcessCompleteOnFile(event.path, 'compiled', process);
+            gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
         }
     });
 });
@@ -574,24 +555,24 @@ gulp.task('sass', function() {
     gulp.watch(wl, function(event) {
         if (/.*.scss$/.test(event.path)) {
 
+            var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToSass);
+            var sourcemapping = matchingEntry.sourcemaps;
+
             // process compilation of less files
             var process = function() {
 
                 gulp.src(event.path)
-                    .pipe(sourcemaps.init())
-                    .pipe(autoprefixer({
-                        browsers: ['last 2 versions'],
-                        cascade: false
-                    }))
+                    .pipe(sourcemapInit(sourcemapping))
+                    .pipe(autoprefix())
+
                     //.pipe(sass.sync().on('error', sass.logError))// synchronously
                     .pipe(sass().on('error', sass.logError))
-                    .pipe(sourcemaps.write('./'))
-                    .pipe(gulp.dest(function(file) {
-                        var dest = getDestOfMatching(file.path, config.pathesToSass);
+                    .pipe(insertSignatureAfter("Processed", "gulp-sass"))
 
-                        gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                        return dest;
-                    }));
+                    .pipe(sourcemapWrite(sourcemapping))
+                    .pipe(gulp.dest(matchingEntry.dest));
+
+                gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
             };
 
             // call with logging of the time taken by the task
@@ -602,41 +583,62 @@ gulp.task('sass', function() {
 /*	*************************************************************************************************************************************************************************************************
 	*                                 													OTHER ORIENTED TASKS 																						*
  	*************************************************************************************************************************************************************************************************/
+/*	*************************************************************************************************************************************************************************************************
+	*                                 										module configurations 																			*
+ 	*************************************************************************************************************************************************************************************************/
 
-// -- [services_tasks/mzg_other_oriented_tasks.js] -- 
-gulp.task('removeWarVersion', function() {
-    //logTaskPurpose(this.currentTask.name);
+// -- [services_tasks/mzg_tasks_micro_services.js] -- 
 
-    var process = function(event) {
-        var nameWithoutVersion = "";
-        gulp.src(event.path)
-            .pipe(wait(1500))
-            .pipe(rename(function(path) {
-                nameWithoutVersion = /^(.*)(?:-[0-9]*.[0-9]*.*)$/g.exec(event.path);
-                console.log(nameWithoutVersion[1]);
-                return nameWithoutVersion[1] + ".war";
-            }))
-            .pipe(gulp.dest(function(file) {
-                return file.base;
-            }));
-        console.log(nameWithoutVersion);
-        return nameWithoutVersion;
-    }
-
-    var last = "";
-    gulp.watch(config.pathesToWars, function(event) {
-        if (/^(.*.war)$/.test(event.path)) {
-
-            try {
-                last = process(event);
-                // call with logging of the time taken by the task
-                logProcessCompleteOnFile("", 'renamed', function() {});
-            } catch (ex) {
-
-            }
-        }
+function renameSuffixMin() {
+    return rename({
+        suffix: '.min'
     });
-});
+}
+
+function cleanCssMinification() {
+    return cleanCSS({
+        compatibility: 'ie8'
+    });
+}
+
+function typescripting(dest){
+    return ts({
+        noImplicitAny: true
+    });
+}
+
+function insertSignatureAfter(actionDone, thanksToModule) {
+    return insert.append("\n" +
+        "/* -- " + actionDone + " with Gloups|" + GLOUPS_VERSION +
+        " using " + thanksToModule + " -- */");
+}
+
+function sourcemapInit(sourcemapping) {
+    return (sourcemapping ? sourcemaps.init : nop)();
+}
+
+function sourcemapWrite(sourcemapping) {
+    return sourcemapping ? sourcemaps.write('./') : nop();
+}
+
+function autoprefix() {
+    return autoprefixer({
+        browsers: ['last 2 versions'],
+        cascade: false
+    });
+}
+
+function serveCoffee(){
+    return coffee({
+        bare: true
+    });
+}
+
+function makeLess(){
+    return less({
+        paths: [path.join(__dirname, 'less', 'includes')]
+    })
+}
 /*	*************************************************************************************************************************************************************************************************
 	*                                 										REWRITING TASKS : Tasks Changing gulpfile.js 																			*
  	*************************************************************************************************************************************************************************************************/
@@ -881,7 +883,7 @@ function setUpProjectWatchingPaths(project_path) {
     
 }
 
-function getDestOfMatching(filePath, configTab) {
+function getMatchingEntryConfig(filePath, configTab) {
 
     // replace '\' characters by '/' to prevent 
     // differences with the true path on windows systems
@@ -901,7 +903,7 @@ function getDestOfMatching(filePath, configTab) {
         var matching = (new RegExp('^.*(?:' + base + ').*$', "g").exec(filePath));
 
         if (matching) {
-            return entry.dest;
+            return entry;
         }
     }
     return null;

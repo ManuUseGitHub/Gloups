@@ -6,16 +6,19 @@ gulp.task('typescript', function() {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
-        gulp.src(event.path)
-            .pipe(ts({
-                noImplicitAny: true,
-                outFile: event.path + ".js"
-            }))
 
-            .pipe(gulp.dest(function(file) {
-                var dest = getDestOfMatching(file.path, config.pathesToTs);
-                gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                return dest;
-            }));
+        var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToTs);
+        var sourcemapping = matchingEntry.sourcemaps;
+
+        gulp.src(event.path)
+            .pipe(sourcemapInit(sourcemapping))
+            
+            .pipe(typescripting(matchingEntry.dest))
+            .pipe(insertSignatureAfter("Compiled", "gulp-typescript"))
+
+            .pipe(sourcemapWrite(sourcemapping))
+            .pipe(gulp.dest(matchingEntry.dest));
+
+        gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
     })
 });

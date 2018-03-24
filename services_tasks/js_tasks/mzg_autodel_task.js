@@ -13,7 +13,7 @@ gulp.task('autodel', function(event) {
 
             // process compression of js files
             var process = function() {
-                var dest = getDestOfMatching(event.path, config.pathesToJs);
+                var dest = getMatchingEntryConfig(event.path, config.pathesToJs);
 
                 // select in all case file.min.js destination file
                 var destFileName = (dest + '/' + match[2]).replace(/.min.js$/g, ".js");

@@ -7,36 +7,20 @@ gulp.task('less', function() {
     // passing the watch list
     gulp.watch(wl, function(event) {
         if (/.*.less$/.test(event.path)) {
+            var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToStyleLess);
+            var sourcemapping = matchingEntry.sourcemaps;
 
-            console.log("once !");
-            // process compilation of less files
-            var process = function() {
-                gulp.src(event.path)
-                    .pipe(sourcemaps.init())
-                    .pipe(autoprefixer({
-                        browsers: ['last 2 versions'],
-                        cascade: false
-                    }))
-                    .pipe(less({
-                        paths: [path.join(__dirname, 'less', 'includes')]
-                    }))
-                    .pipe(insert.append("\n/* -- Compiled with Gloups|" + GLOUPS_VERSION + " using gulp-less -- */"))
-                    .pipe(sourcemaps.write('./'))
-                    .pipe(gulp.dest(function(file) {
-                        var dest = getDestOfMatching(file.path, config.pathesToStyleLess);
-                        var once;
+            gulp.src(event.path)
+                .pipe(sourcemapInit(sourcemapping))
+                .pipe(autoprefix())
 
-                        if (once) {
-                            gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                            once = false;
-                        }
+                .pipe(makeLess())
+                .pipe(insertSignatureAfter("Processed", "gulp-less"))
 
-                        return dest;
-                    }));
-            };
+                .pipe(sourcemapWrite(sourcemapping))
+                .pipe(gulp.dest(matchingEntry.dest));
 
-            // call with logging of the time taken by the task
-            logProcessCompleteOnFile(event.path, 'compiled', process);
+            gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
         }
     });
 });

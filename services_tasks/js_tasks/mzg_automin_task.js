@@ -10,32 +10,23 @@ gulp.task('automin', function() {
         var regex = new RegExp(JS_REGEX_FILE_PATH_PATTERN, "g");
         var match = regex.exec(event.path);
 
-        // process compression of js files
-        var process = function() {
+        // the file that fired the event change is a .min.js file
+        if (!/.*.min.js$/.test(event.path) && match) {
 
-            // the file that fired the event change is a .min.js file
-            if (!/.*.min.js$/.test(event.path) && match) {
-                gulp.src(event.path)
-                    .pipe(uglify())
-                    .pipe(rename({
-                        suffix: '.min'
-                    }))
-                    .pipe(gulp.dest(function(file) {
-                        var dest = getDestOfMatching(file.path, config.pathesToJs);
+            var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToJs);
+            var sourcemapping = matchingEntry.sourcemaps;
 
-                        gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                        return dest;
-                    }));
-            }
+            gulp.src(event.path)
+                .pipe(sourcemapInit(sourcemapping))
+
+                .pipe(uglify())
+                .pipe(renameSuffixMin())
+                .pipe(insertSignatureAfter("Compressed", "gulp-uglify"))
+
+                .pipe(sourcemapWrite(sourcemapping))
+                .pipe(gulp.dest(matchingEntry.dest));
+
+            gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
         }
-
-        // call with logging of the time taken by the task
-        if ((match[5] + match[6]) === ".min.js" && event.type === "added") {
-            logProcessCompleteOnFile(match[2], 'created', process);
-        } else if (event.type !== "deleted") {
-            logProcessCompleteOnFile(match[2], 'compressed', process);
-        }
-
-
     }, jshint);
 });

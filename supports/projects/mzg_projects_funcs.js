@@ -3,7 +3,7 @@ function setUpProjectWatchingPaths(project_path) {
     
 }
 
-function getDestOfMatching(filePath, configTab) {
+function getMatchingEntryConfig(filePath, configTab) {
 
     // replace '\' characters by '/' to prevent 
     // differences with the true path on windows systems
@@ -23,7 +23,7 @@ function getDestOfMatching(filePath, configTab) {
         var matching = (new RegExp('^.*(?:' + base + ').*$', "g").exec(filePath));
 
         if (matching) {
-            return entry.dest;
+            return entry;
         }
     }
     return null;

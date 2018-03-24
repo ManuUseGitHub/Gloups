@@ -1,5 +1,5 @@
 var coffee = require('gulp-coffee');
- 
+
 gulp.task('coffeescript', function() {
     logTaskPurpose(this.currentTask.name);
 
@@ -8,12 +8,19 @@ gulp.task('coffeescript', function() {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
+        
+        var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToCoffee);
+        var sourcemapping = matchingEntry.sourcemaps;
+
         gulp.src(event.path)
-        	.pipe(coffee({bare: true}))
-            .pipe(gulp.dest(function(file) {
-                var dest = getDestOfMatching(file.path, config.pathesToCoffee);
-                gutil.log("Compiled file version updated/created here :\n" + breath() + "> " + logFilePath(dest));
-                return dest;
-            }));
+            .pipe(sourcemapInit(sourcemapping))
+            
+            .pipe(serveCoffee())
+            .pipe(insertSignatureAfter("Served coffee", "gulp-coffee"))
+            
+            .pipe(sourcemapWrite(sourcemapping))
+            .pipe(gulp.dest(matchingEntry.dest));
+
+        gutil.log("Compiled file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
     })
 });

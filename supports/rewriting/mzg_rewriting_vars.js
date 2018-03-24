@@ -65,38 +65,43 @@ var mzgFiles = [
 
 	'supports/rewriting/log_sections/mzg_log8.js', // section
 
+	// configuration of modules here
+	'services_tasks/mzg_tasks_micro_services.js',
+
+	'supports/rewriting/log_sections/mzg_log9.js', // section
+
 	'supports/rewriting/tasks/mzg_apply_temp_task.js',
 	'supports/rewriting/tasks/mzg_apply_dist_task.js',
 	'supports/rewriting/tasks/mzg_write_temp_task.js',
 	'supports/rewriting/tasks/mzg_write_dist_task.js',
 	'supports/rewriting/tasks/mzg_rewrite_task.js',
 
-	'supports/rewriting/log_sections/mzg_log9.js', // section
+	'supports/rewriting/log_sections/mzg_log10.js', // section
 
 	'supports/mzg_runtask.js',
 
-	'supports/rewriting/log_sections/mzg_log10.js', // section
+	'supports/rewriting/log_sections/mzg_log11.js', // section
 
 	'supports/files/configurationSetting/mzg_config_funcs.js',
 	'supports/projects/mzg_projects_funcs.js',
 	'supports/mzg_argument_funcs.js',
 
-	'supports/rewriting/log_sections/mzg_log11.js', // section
+	'supports/rewriting/log_sections/mzg_log12.js', // section
 
 	'supports/rewriting/mzg_rewriting_funcs.js',
 	'supports/rewriting/mzg_rewrite_arguments_func.js',
 
-	'supports/rewriting/log_sections/mzg_log12.js', // section
+	'supports/rewriting/log_sections/mzg_log13.js', // section
 	'supports/mzg_logging.js',
 
-	'supports/rewriting/log_sections/mzg_log13.js', // section
+	'supports/rewriting/log_sections/mzg_log14.js', // section
 	'supports/files/mzg_reading_file_class.js'
 ];
 
 var distFiles = mzgFiles.slice();
 
-distFiles.splice(40, 3);
-distFiles.splice(28, 5);
+distFiles.splice(42, 3);
+distFiles.splice(30, 5);
 distFiles.splice(3, 1);
 
 //console.log(distFiles);
