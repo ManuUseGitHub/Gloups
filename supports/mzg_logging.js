@@ -3,62 +3,95 @@ function breath() {
 }
 
 function logFilePath(filePath) {
-    return "'" + chalk.cyan(filePath) + "'";
+    return "'{0}'".format([chalk.cyan(filePath)]);
 }
 
+/**
+ * @function
+ * opens a tream on the help.md file and read all lines to the end. It will outpout the content
+ * formated with colors to make more sens to the commun user.
+ */
 function logHelp() {
     var _data = fs.readFileSync("help.md", "utf8");
     var reading = new classReading();
     reading.initialize(_data, 0);
     var match, line;
 
-
     var cpt = 0;
 
     console.log("\n\n");
     reading.readLines(function() {
         line = reading.getLine().replace(/\r?\n|\r/g, '');
-        if (match = /^([\s]*[#]+.*)$/.exec(line)) {
+
+        // reading the help.md file [MARKDOWN]
+        // Titles are cyan
+        if ((match = /^([\s]*[#]+.*)$/.exec(line))) {
             console.log(chalk.cyan(match[1]));
-        } else if (match = /^([\s]*)([$](?:[\s][^\s]+)+)([\s]{2,}.*|.*)$/.exec(line)) {
-            console.log(chalk.grey(match[1]) + match[2] + chalk.green(match[3]));
-        } else if (match = /^([\s]*[>].*)$/.exec(line)) {
+
+            // commands explanations see $ gulp helpMe +[void]+ effects ...
+        } else if ((match = /^([\s]*)([$](?:[\s][^\s]+)+)([\s]{2,}.*|.*)$/.exec(line))) {
+            console.log("{0}{1}{2}".format([chalk.grey(match[1]), match[2], chalk.green(match[3])]));
+
+            // Commentq are green
+        } else if ((match = /^([\s]*[>].*)$/.exec(line))) {
             console.log(chalk.green(match[1]));
-            // [WHITESPACE][OPTION],[TEXT],[OPTION2][TEXT][EXT][TEXT][EXT][TEXT] ...
-        } else if (match = /^([\s]*)([\-]+[^\s,]+)([^\-.]*)((?:[\s][\-]+[^\s]+)+)([^\-.]*)((?:[.][^.\s]+)+|)([^\-.]*)((?:[.][^.\s]+)+|)(.*)$/.exec(line)) {
-            console.log(chalk.grey(match[1]) + match[2] + chalk.grey(match[3]) + match[4] + chalk.grey(match[5]) + chalk.magenta(match[6]) + chalk.grey(match[7]) + chalk.magenta(match[8]) + chalk.grey(match[9]));
-        } else if (match = /^([^\-]*)((?:[\-]+[^\s]+[\s]?)+)([\s]?.*)$/.exec(line)) {
-            console.log(chalk.grey(match[1]) + match[2] + chalk.grey(match[3]));
+
+            // Alternation between extensions (magenta) and regular text (grey) ... (2 extensions)
+        } else if ((match = /^([\s]*)([\-]+[^\s,]+)([^\-.]*)((?:[\s][\-]+[^\s]+)+)([^\-.]*)((?:[.][^.\s]+)+|)([^\-.]*)((?:[.][^.\s]+)+|)(.*)$/.exec(line))) {
+            console.log("{0}{1}{2}{3}{4}{5}{6}{7}{8}".format([chalk.grey(match[1]), match[2], chalk.grey(match[3]), match[4], chalk.grey(match[5]), chalk.magenta(match[6]), chalk.grey(match[7]), chalk.magenta(match[8]), chalk.grey(match[9])]));
+
+            // Alternation between extensions (magenta) and regular text (grey) ... (1 extension)
+        } else if ((match = /^([^\-]*)((?:[\-]+[^\s]+[\s]?)+)([\s]?.*)$/.exec(line))) {
+            console.log("{0}{1}{2}".format([chalk.grey(match[1]), match[2], chalk.grey(match[3])]));
+
+            // Reguar text are grey
         } else if (line.length > 0) {
             console.log(chalk.grey(line));
+
+            // when two wite line are count, the dev wanted to put a real line feed
         } else if (++cpt % 3 == 2) {
             console.log(line);
         }
+
+        /* Each time a line is not blank (no length), count it as a real line because the reading 
+        process reeds line feeds as a lines which is not excpected*/
         if (line.length > 0) {
             cpt = 0;
         }
     });
 }
 
+/**
+ * @deprecated not realy used right now
+ * 
+ * @function
+ * Logs the error list obtained from the parameter in red
+ * 
+ * @param  {array[String]}
+ */
 function logErrorsOnTaskArgvs(errors) {
     if (errors.length > 0) {
-        console.log(chalk.red(errors.join('\n')));
-        console.log("WARNING \n\nYou may have made mistakes in shoosing wrong options");
-        console.log("call the folowing command to have more info of what options are valid");
-        console.log("gulp --help");
+        console.log("{0}\n{1}\n{2}\n{3}".format(chalk.red(errors.join('\n'))), [
+            "WARNING \n\nYou may have made mistakes in shoosing wrong options.",
+            "call the folowing command to have more info of what options are valid",
+            "gulp --help"
+        ]);
     }
 }
 
 function logProjectErrored(project) {
-    console.log(chalk.red(project.project) + ' - SOMETING IS WRONG');
-    console.log(breath() + "this project seems to have no configuration .INI file defined");
-    console.log(breath() + logFilePath(project.path + '\\config.mzg.ini') + chalk.red(' : MISSING'));
-    console.log('\n' + breath() + 'SOLUTION:');
-    console.log(breath() + 'run the command to setup projects local configuraitons:');
-    console.log(breath() + '> ' + chalk.grey('$ gulp scanProjects'));
+    console.log(
+        "{0}  - SOMETING IS WRONG\n    {1}\n    {2} {3}\n{4}\n{5}\n    > {6}".format([
+            chalk.red(project.project),
+            'this project seems to have no configuration .INI file defined',
+            logFilePath(project.path + '\\config.mzg.ini'), chalk.red(': MISSING'),
+            'SOLUTION:',
+            'run the command to setup projects local configuraitons:',
+            chalk.grey('$ gulp scanProjects')
+        ]));
 }
 
-function logProcessCompleteOnFile(file, realAction, process) {
+function logProcessCompleteOnFile(files, realAction, process) {
     try {
         // run the process treatment
         var dStart = new Date();
@@ -67,8 +100,18 @@ function logProcessCompleteOnFile(file, realAction, process) {
         // logging the time elapsed
         var dResult = ms2Time(new Date() - dStart);
         console.log();
-        gutil.log(logFilePath(file) + " " + realAction + " after" + chalk.magenta(dResult));
-
+        
+        if(files.length > 1){
+            console.log(forNowShortLog("{0} of these files:\n".format([realAction])));
+                files.forEach( function(file) {
+                    console.log(logFilePath(file));
+                });
+            console.log();
+            console.log(forNowShortLog("after {0}".format([chalk.magenta(dResult)])));
+        }else{
+            console.log(forNowShortLog("{0} {1} after {2}".format([logFilePath(files), realAction, chalk.magenta(dResult)])));    
+        }
+        
     } catch (err) {
 
         //logging eventual errors
@@ -99,20 +142,27 @@ function timeComputed() {
     return [date.getHours(), date.getMinutes(), date.getSeconds()].join(":");
 }
 
+function forNowLongLog(fmt, messageComponents) {
+    return "[{0}] {1}".format([chalk.gray(dateComputed()), fmt.format(messageComponents)]);
+}
+
+function forNowShortLog(fmt, messageComponents) {
+    var transformed = fmt.format(messageComponents);
+    return "[{0}] {1}".format([chalk.gray(timeComputed()), transformed]);
+}
+
 function logServiceActivatedPushed(purpose, project, addon) {
     if (config.verbose) {
         var match;
 
-        if (match = /^([^.]+)([.][^\s]*)([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
-            console.log(chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]) + chalk.magenta(match[4]) + chalk.grey(match[5]));
-        } else if (match = /^([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose)) {
-            console.log(chalk.grey(match[1]) + chalk.magenta(match[2]) + chalk.grey(match[3]));
+        if ((match = /^([^.]+)([.][^\s]*)([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose))) {
+            console.log("{0}{1}{2}{3}{4}".format([chalk.grey(match[1]), chalk.magenta(match[2]), chalk.grey(match[3]), chalk.magenta(match[4]), chalk.grey(match[5])]));
+
+        } else if ((match = /^([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose))) {
+            console.log("{0}{1}{2}".format([chalk.grey(match[1]), chalk.magenta(match[2]), chalk.grey(match[3])]));
         }
 
-        console.log(
-            "Watch :" + logFilePath('[..]/' + addon.watch) + " - " +
-            "Dest. :" + logFilePath('[..]/' + addon.dest)
-        );
+        console.log("Watch :{0} - Dest. :{1}".format([logFilePath('[..]/' + addon.watch), logFilePath('[..]/' + addon.dest)]));
 
         var sourcemaps = addon.sourcemaps;
         if (sourcemaps !== undefined) {
@@ -121,6 +171,16 @@ function logServiceActivatedPushed(purpose, project, addon) {
     }
 }
 
+/**
+ * @function
+ * Log what the task is designed for. to get the task name refere to RUNTASK section.
+ * However the taskName can be obtained via "this.curentTask". After the name is got, 
+ * this function will check a dictionnary and provide definitions regarding the key 
+ * wich is te name obtained.
+ * 
+ * @see gulp.Gulp.prototype.__runTask ~ supports/mzg_runtask.js
+ * @param  {string}
+ */
 function logTaskPurpose(taskName) {
     logTaskName(taskName);
     var tasks = {
@@ -149,11 +209,11 @@ function logTaskPurpose(taskName) {
 
     if (tasks[taskName]) {
         console.log(tasks[taskName]);
-        logWatchList(taskName)
+        logWatchList(taskName);
     } else {
         console.log(chalk.yellow("  no information provided \n"));
     }
-};
+}
 
 function logWatchList(taskName) {
 
@@ -176,7 +236,7 @@ function logWatchList(taskName) {
 }
 
 function logTaskName(taskName) {
-    console.log(".............................................................")
+    console.log(".............................................................");
     console.log("[Task] " + chalk.red(taskName) + ":");
 }
 

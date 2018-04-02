@@ -47,5 +47,5 @@ function serveCoffee(){
 function makeLess(){
     return less({
         paths: [path.join(__dirname, 'less', 'includes')]
-    })
+    });
 }

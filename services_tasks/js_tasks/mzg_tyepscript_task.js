@@ -12,13 +12,14 @@ gulp.task('typescript', function() {
 
         gulp.src(event.path)
             .pipe(sourcemapInit(sourcemapping))
-            
+
             .pipe(typescripting(matchingEntry.dest))
             .pipe(insertSignatureAfter("Compiled", "gulp-typescript"))
 
             .pipe(sourcemapWrite(sourcemapping))
             .pipe(gulp.dest(matchingEntry.dest));
 
-        gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
-    })
+        console.log(forNowShortLog("Compressed file version updated/created here :\n{0}> {1}", [breath(), logFilePath(matchingEntry.dest)]));
+
+    });
 });

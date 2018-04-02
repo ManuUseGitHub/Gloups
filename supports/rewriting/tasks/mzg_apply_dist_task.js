@@ -9,7 +9,7 @@ gulp.task('applyDist', function() {
                 .pipe(gulp.dest(function(file) {
                     var folder = getGulpfolderFromFileBase(file);
                     var dResult = ms2Time(new Date() - dStart);
-                    gutil.log("Gulp project distribution generated under " + logFilePath(folder + '/dist') + " after " + chalk.magenta(dResult));
+                    console.log(forNowShortLog("Gulp project distribution generated under {0} after {1}",[logFilePath(folder + '/dist'),chalk.magenta(dResult)]));
                     return folder + '/dist';
                 }));
 
@@ -19,5 +19,5 @@ gulp.task('applyDist', function() {
             fssync.copy('custom/config_model.json', 'dist/custom/config_model.json');
             fssync.copy('package.json', 'dist/package.json');
         }
-    })
+    });
 });

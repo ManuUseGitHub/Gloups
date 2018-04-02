@@ -1,7 +1,7 @@
 gulp.task('applyTemp', function() {
     gulp.watch(gulpFileTempPath, function(event) {
         if (gulp.src(gulpFileTempPath).pipe(jsValidate())) {
-            gutil.log(logFilePath("gulpfile.js") + " is " + chalk.green('validate'));
+            console.log(forNowShortLog("{0} is {1}", [logFilePath("gulpfile.js"), chalk.green('validate')]));
             var dStart = new Date();
 
             gulp.src(gulpFileTempPath)
@@ -9,7 +9,7 @@ gulp.task('applyTemp', function() {
                 .pipe(gulp.dest(function(file) {
 
                     var dResult = ms2Time(new Date() - dStart);
-                    gutil.log(chalk.cyan("gulpfile.js") + " replaced after " + chalk.magenta(dResult));
+                    console.log(forNowShortLog("{0} replaced after {1}", [chalk.cyan("gulpfile.js"), chalk.magenta(dResult)]));
 
                     //gulp folder
                     var folder = getGulpfolderFromFileBase(file);

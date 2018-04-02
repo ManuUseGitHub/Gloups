@@ -8,7 +8,7 @@ gulp.task('writeDist', function() {
             .pipe(uglify())
             .pipe(gulp.dest(function(file) {
                 var dResult = ms2Time(new Date() - dStart);
-                gutil.log(logFilePath(gulpFileTempPath2) + " writen after " + chalk.magenta(dResult));
+                console.log(forNowShortLog("{0} writen after {1}", [logFilePath(gulpFileTempPath2), chalk.magenta(dResult)]));
 
                 return getGulpfolderFromFileBase(file);
             }));

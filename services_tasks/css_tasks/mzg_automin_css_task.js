@@ -19,11 +19,11 @@ gulp.task('autominCss', function() {
                     .pipe(cleanCssMinification())
                     .pipe(renameSuffixMin())
                     .pipe(insertSignatureAfter("Compressed", "gulp-clean-css"))
-                    
+
                     .pipe(sourcemapWrite(sourcemapping))
                     .pipe(gulp.dest(matchingEntry.dest));
 
-                gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
+                console.log(forNowShortLog("Compression done for: \n\n {0}\n", [logFilePath(event.path)]));
             }
         }
     });

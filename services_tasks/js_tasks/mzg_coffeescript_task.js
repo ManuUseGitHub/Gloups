@@ -8,19 +8,19 @@ gulp.task('coffeescript', function() {
 
     // passing the watch list
     gulp.watch(wl, function(event) {
-        
+
         var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToCoffee);
         var sourcemapping = matchingEntry.sourcemaps;
 
         gulp.src(event.path)
             .pipe(sourcemapInit(sourcemapping))
-            
+
             .pipe(serveCoffee())
             .pipe(insertSignatureAfter("Served coffee", "gulp-coffee"))
-            
+
             .pipe(sourcemapWrite(sourcemapping))
             .pipe(gulp.dest(matchingEntry.dest));
 
-        gutil.log("Compiled file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
-    })
+        console.log(forNowShortLog("Compiled file version updated/created here :\n{0}> {1}", [breath(), logFilePath(matchingEntry.dest)]));
+    });
 });

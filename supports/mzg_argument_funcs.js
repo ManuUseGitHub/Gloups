@@ -41,7 +41,7 @@ function tasksToRunOnArgvs() {
     // strips all non options or presets arguments
     var subAr = getSliceOfMatchingOptions(subs, GLOUPS_OPTIONS);
 
-    for (service in subAr) {
+    for (var service in subAr) {
         try {
             service = (/^[\-][\-]?([^\-]+)$/.exec(subAr[service]))[1];
             

@@ -12,15 +12,16 @@ gulp.task('less', function() {
 
             gulp.src(event.path)
                 .pipe(sourcemapInit(sourcemapping))
-                .pipe(autoprefix())
 
-                .pipe(makeLess())
+                .pipe(less({
+                    plugins: [lessAutoprefix]
+                }))
                 .pipe(insertSignatureAfter("Processed", "gulp-less"))
 
                 .pipe(sourcemapWrite(sourcemapping))
                 .pipe(gulp.dest(matchingEntry.dest));
 
-            gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
+            console.log(forNowShortLog("Processed file version updated/created here :\n{0}> {1}", [breath(), logFilePath(matchingEntry.dest)]));
         }
     });
 });

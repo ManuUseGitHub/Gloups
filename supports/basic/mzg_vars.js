@@ -41,8 +41,13 @@ var SERVICES = {
 
 var PRESET_OPTIONS = "all|style|js|typescript|coffeescript";
 var SERVICES_OPTIONS = "del|minjs|ts|coffee|less|sass|mincss";
-var GLOUPS_OPTIONS = SERVICES_OPTIONS + "|" + PRESET_OPTIONS;
-
 var GLOUPS_VERSION = "4.5";
 
 var JS_REGEX_FILE_PATH_PATTERN = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";
+
+var GLOUPS_OPTIONS = SERVICES_OPTIONS+'|'+PRESET_OPTIONS;
+
+var SILENT_TASKS = "watch|vet|unit-test|integration-test";
+var ISALL = true;
+
+var isdist={};

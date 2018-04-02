@@ -58,8 +58,8 @@
 
 		{
 			"project":"mySite",
-			"path": "C:/xampp/htdocs/www/laravel/mysite",
-			"checked":false
+			"path": "../xampp/htdocs/www/laravel/mysite",
+			"checked":true
 		}
 	]
 }

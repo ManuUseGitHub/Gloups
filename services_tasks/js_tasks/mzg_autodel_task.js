@@ -25,12 +25,12 @@ gulp.task('autodel', function(event) {
                         del(destMinFileName, {
                             force: true
                         });
-                    gutil.log("source folder here :\n" + breath() + "> " + logFilePath(dest));
+                    console.log(forNowShortLog("source folder here :\n{0}> {1}",[breath(),logFilePath(dest)]));
                 });
-            }
+            };
 
             // call with logging of the time taken by the task
-            logProcessCompleteOnFile(match[2].replace(/.js$/g, ".min.js"), 'deleted', process);
+            logProcessCompleteOnFile([match[2].replace(/.js$/g, ".min.js")], 'deleted', process);
 
         }
     }, jshint);

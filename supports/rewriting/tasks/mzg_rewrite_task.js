@@ -1,1 +1,1 @@
-gulp.task('rewrite', ['setParams', 'applyTemp','applyDist']);
+gulp.task('rewrite', ['setParams', 'applyTemp', 'applyDist']);

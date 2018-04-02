@@ -11,25 +11,28 @@ gulp.task('sass', function() {
             var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToSass);
             var sourcemapping = matchingEntry.sourcemaps;
 
+            // getting the fileName and checking if its a qualified file to be process (not starting by undererscore "_.*");
+            var realTargets = getMatchingPrincipalSCSS(matchingEntry.projectPath, event.path);
+
             // process compilation of less files
             var process = function() {
-
-                gulp.src(event.path)
+                gulp.src(realTargets)
                     .pipe(sourcemapInit(sourcemapping))
-                    .pipe(autoprefix())
 
                     //.pipe(sass.sync().on('error', sass.logError))// synchronously
                     .pipe(sass().on('error', sass.logError))
+                    .pipe(autoprefix())
                     .pipe(insertSignatureAfter("Processed", "gulp-sass"))
 
                     .pipe(sourcemapWrite(sourcemapping))
-                    .pipe(gulp.dest(matchingEntry.dest));
-
-                gutil.log("Processed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
+                    .pipe(gulp.dest(matchingEntry.dest))
+                    .on('finish', function() {
+                        console.log(forNowShortLog("Processed file destination:\n\n {0}", [logFilePath(matchingEntry.dest)]));
+                    });
             };
 
             // call with logging of the time taken by the task
-            logProcessCompleteOnFile(event.path, 'compiled', process);
+            logProcessCompleteOnFile(realTargets, 'Processing', process);
         }
     });
 });

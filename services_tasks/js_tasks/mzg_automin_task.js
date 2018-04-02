@@ -26,7 +26,7 @@ gulp.task('automin', function() {
                 .pipe(sourcemapWrite(sourcemapping))
                 .pipe(gulp.dest(matchingEntry.dest));
 
-            gutil.log("Compressed file version updated/created here :\n" + breath() + "> " + logFilePath(matchingEntry.dest));
+            console.log(forNowShortLog("Compressed file version updated/created here :\n{0} > {1}", [breath(), logFilePath(matchingEntry.dest)]));
         }
     }, jshint);
 });

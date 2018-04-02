@@ -6,6 +6,7 @@ var autoprefixer = require('gulp-autoprefixer');
 //https://www.npmjs.com/package/chalk
 var chalk = require('chalk');
 var cleanCSS = require('gulp-clean-css');
+var clear = require('clear');
 var coffee = require('gulp-coffee');
 var concat = require('gulp-concat');
 // D ----------------------------------------------------------------------------------------------
@@ -17,8 +18,6 @@ var fs = require("fs");
 var fssync = require("fs-sync");
 // G ----------------------------------------------------------------------------------------------
 var gulp = require('gulp');
-// logging
-var gutil = require('gulp-util');
 // H ----------------------------------------------------------------------------------------------
 // I ----------------------------------------------------------------------------------------------
 var insert = require('gulp-insert');
@@ -29,6 +28,8 @@ var jsValidate = require('gulp-jsvalidate');
 // K ----------------------------------------------------------------------------------------------
 // L ----------------------------------------------------------------------------------------------
 var less = require('gulp-less');
+var lessPluginAutoPrefix = require('less-plugin-autoprefix');
+var lessAutoprefix = new lessPluginAutoPrefix({browsers: ["last 2 versions"]});
 // M ----------------------------------------------------------------------------------------------
 // N ----------------------------------------------------------------------------------------------
 // for alternate manipulations where no operations is needed
@@ -48,6 +49,7 @@ var through = require('through2');
 var ts = require('gulp-typescript');
 // U ----------------------------------------------------------------------------------------------
 var uglify = require('gulp-uglify');
+var uglifyJs = require('uglify-js');
 // V ----------------------------------------------------------------------------------------------
 // W ----------------------------------------------------------------------------------------------
 var wait = require('gulp-wait');

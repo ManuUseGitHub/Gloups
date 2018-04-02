@@ -13,7 +13,7 @@ function configurationOfRewriteOnArvs() {
         } catch (err) {
             errors.push(err + " Error with option: ");
         }
-    })
+    });
 
     return {
         'times': RewriteServices.times,
