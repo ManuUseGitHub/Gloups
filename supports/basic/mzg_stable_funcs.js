@@ -23,6 +23,11 @@ String.prototype.format = function(args) {
 
 String.prototype.format.regex = new RegExp("{-?[0-9]+}", "g");
 
+// replacement of backslash by hack. Useful for windows pathfiles
+String.prototype.hackSlashes = function() {
+	return this.replace(/[\\]/g, '/');
+};
+
 // https://stackoverflow.com/questions/31361309/how-can-i-get-gulp-to-be-silent-for-some-tasks-unit-tests-vet-etc
 var cmd = String(process.argv[2]);
 

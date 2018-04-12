@@ -99,7 +99,6 @@ function logProcessCompleteOnFile(files, realAction, process) {
 
         // logging the time elapsed
         var dResult = ms2Time(new Date() - dStart);
-        console.log();
         
         if(files.length > 1){
             console.log(forNowShortLog("{0} of these files:\n".format([realAction])));
@@ -256,4 +255,13 @@ function logTaskEndBeauy(one_time) {
     } else {
         console.log();
     }
+}
+
+
+function getOneFeedBackForAll(intro){
+    return {
+        'files': [],
+        'txt': intro,
+        'k': 0
+    };
 }

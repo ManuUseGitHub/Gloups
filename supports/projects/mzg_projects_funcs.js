@@ -45,10 +45,7 @@ function setUpProjectWatchingPaths(project_path) {
 }
 
 function getMatchingEntryConfig(filePath, configTab) {
-
-    // replace '\' characters by '/' to prevent 
-    // differences with the true path on windows systems
-    filePath = filePath.replace(/[\\]/g, '/');
+    filePath = filePath.hackSlashes();
 
     // iterate on efery path within configTab to check 
     // what path sources fire the change event then find
@@ -56,8 +53,8 @@ function getMatchingEntryConfig(filePath, configTab) {
     for (var p_path in configTab) {
 
         var entry = configTab[p_path];
-        var watch = entry.watch.replace(/[\\]/g, '/');
-        var dest = entry.dest.replace(/[\\]/g, '/');
+        var watch = entry.watch.hackSlashes();
+        var dest = entry.dest.hackSlashes();
 
         var pattern = '^([^\\\\/*]+).([^\\*]+)([\\/]?[\\/*]+[\\/]?)(.*)$';
         var base = (new RegExp(pattern, "g").exec(watch))[2];
@@ -145,8 +142,8 @@ var walkSync = function(dir, filelist, regexFilter) {
         } else {
             if (!regexFilter.test(dir + '/' + file))
                 filelist.push({
-                    "dir": dir.replace(/[\\]/g, '/'),
-                    "path": (dir + '/' + file).replace(/[\\]/g, '/'),
+                    "dir": dir.hackSlashes(),
+                    "path": (dir + '/' + file).hackSlashes(),
                     "fileName": file
                 });
         }

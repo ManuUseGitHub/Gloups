@@ -1,29 +1,35 @@
 gulp.task('autominCss', function() {
     logTaskPurpose(this.currentTask.name);
 
+    var message = getOneFeedBackForAll("Are compressed: \n");
+
+
     // watch every single file matching those paths
     var wl = watchList(config.pathesToStyle);
 
-    // passing the watch list
     gulp.watch(wl, function(event) {
-        if (!/^(.*.min.css|.*.less|.*.map)$/.test(event.path)) {
+        if (event.type !== "deleted" && !/^(.*.min.css|.*.less|.*.scss|.*.map)$/.test(event.path)) {
             if (/^.*.css$/.test(event.path)) {
 
+                var mainProcess = lazyPipe()
+
+                    .pipe(autoprefix)
+                    .pipe(cleanCssMinification)
+                    .pipe(renameSuffixMin);
+
                 var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToStyle);
-                var sourcemapping = matchingEntry.sourcemaps;
+                var sourceMappedProcess =
+                    setSourceMappingAndSign(mainProcess, matchingEntry, {
+                        'action': "Compressed",
+                        'module': "gulp-clean-css"
+                    });
 
-                gulp.src(event.path)
-                    .pipe(sourcemapInit(sourcemapping))
-                    .pipe(autoprefix())
+                var destinatedProcess = sourceMappedProcess
+                    .pipe(function() {
+                        return gulp.dest(matchingEntry.dest);
+                    });
 
-                    .pipe(cleanCssMinification())
-                    .pipe(renameSuffixMin())
-                    .pipe(insertSignatureAfter("Compressed", "gulp-clean-css"))
-
-                    .pipe(sourcemapWrite(sourcemapping))
-                    .pipe(gulp.dest(matchingEntry.dest));
-
-                console.log(forNowShortLog("Compression done for: \n\n {0}\n", [logFilePath(event.path)]));
+                appendFilesToLog(message, destinatedProcess, event);
             }
         }
     });

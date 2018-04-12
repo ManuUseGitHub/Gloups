@@ -2,7 +2,7 @@ function translateAliassesInArgs(argvs, serviceArgs) {
     var match;
     var result = [];
     argvs.forEach(function(arg) {
-        if (match = /^-([^\-]+)$/.exec(arg)) {
+        if ((match = /^-([^\-]+)$/.exec(arg))) {
             result.push('--' + serviceArgs[match[1]]);
         } else {
             result.push(arg);
@@ -30,6 +30,36 @@ function getSliceOfMatchingOptions(argvs, args) {
     return argvs.slice(start, end);
 }
 
+function metAllArgs(argvNames) {
+    var subs = translateAliassesInArgs(process.argv, SERVICES);
+    var subAr = getSliceOfMatchingOptions(subs, ALL_SERVICES_OPTIONS);
+
+    var subRegex = '';
+
+    subAr.forEach(function(arg, index) {
+
+        var argName = (new RegExp("^--(.*)$", "g")).exec(arg);
+        var argNam = argName[1];
+
+        if (index != 0) {
+            subRegex += '|';
+        }
+        subRegex += argNam;
+    });
+
+    var failed = false;
+    for (var i in argvNames) {
+        var arg = argvNames[i];
+
+        // the arg is misspeled !
+        if (!(new RegExp("^(" + subRegex + ")$", "g").test(arg))) {
+            failed = true;
+            break;
+        }
+    }
+    return !failed;
+}
+
 function tasksToRunOnArgvs() {
     var effectiveServices = [];
     var errors = [];
@@ -37,14 +67,15 @@ function tasksToRunOnArgvs() {
 
     // translate aliasses into args equivalances like -a is replaced by --all in the arg. string
     var subs = translateAliassesInArgs(process.argv, SERVICES);
-    
+
     // strips all non options or presets arguments
     var subAr = getSliceOfMatchingOptions(subs, GLOUPS_OPTIONS);
+    var subAdvAr = getSliceOfMatchingOptions(subs, SERVICES_ADVANCED_OPTIONS);
 
     for (var service in subAr) {
         try {
             service = (/^[\-][\-]?([^\-]+)$/.exec(subAr[service]))[1];
-            
+
             if (new RegExp("^\\b(" + PRESET_OPTIONS + ")\\b$").test(service)) {
 
                 // check if a preset is single ; throws if not
@@ -52,9 +83,9 @@ function tasksToRunOnArgvs() {
 
                 // convert the preset into a list of matching options
                 effectiveServices = SERVICES[service].split(' ');
-            
-            }else{
-                effectiveServices.push(SERVICES[service]);    
+
+            } else {
+                effectiveServices.push(SERVICES[service]);
             }
         } catch (err) {
             errors.push(err + " Error with option: ");

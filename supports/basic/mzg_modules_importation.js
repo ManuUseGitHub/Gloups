@@ -8,6 +8,7 @@ var chalk = require('chalk');
 var cleanCSS = require('gulp-clean-css');
 var clear = require('clear');
 var coffee = require('gulp-coffee');
+//var combiner = require('stream-combiner');
 var concat = require('gulp-concat');
 // D ----------------------------------------------------------------------------------------------
 var del = require('del');
@@ -27,6 +28,7 @@ var jshint = require('gulp-jshint');
 var jsValidate = require('gulp-jsvalidate');
 // K ----------------------------------------------------------------------------------------------
 // L ----------------------------------------------------------------------------------------------
+var lazyPipe = require('lazypipe');
 var less = require('gulp-less');
 var lessPluginAutoPrefix = require('less-plugin-autoprefix');
 var lessAutoprefix = new lessPluginAutoPrefix({browsers: ["last 2 versions"]});
@@ -43,6 +45,7 @@ var rename = require("gulp-rename");
 // S ----------------------------------------------------------------------------------------------
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
+var stylefmt = require('gulp-stylefmt');
 // T ----------------------------------------------------------------------------------------------
 // to write custom pipe functions
 var through = require('through2');

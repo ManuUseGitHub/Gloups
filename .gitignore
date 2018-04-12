@@ -9,3 +9,5 @@ config.json
 #custom/*\.ini
 
 gulpfile_temp\.js
+
+draft/*.*

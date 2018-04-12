@@ -4,7 +4,7 @@ function classReading() {
     this.iter = null;
     this.stopped = false;
     this.initialize = function(data, iter) {
-        this.data = data;
+        this.data = data+' ';
         this.iter = iter;
         this.line = [];
     };

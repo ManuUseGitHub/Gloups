@@ -10,7 +10,7 @@ gulp.task('writeTemp', function() {
                 // outputing a comment with the file path if not a log_section file
                 return !/^.*log_sections.*$/.test(pathfile) ?
                     // a path or nothing 
-                    "\n// -- [{0}] -- \n".format([pathfile.replace(/[\\]/g, '/')]) : "";
+                    "\n// -- [{0}] -- \n".format([pathfile.hackSlashes()]) : "";
             }))
             .pipe(concat(gulpFileTempPath))
             .pipe((stayBeautiful ? nop : uglify)())

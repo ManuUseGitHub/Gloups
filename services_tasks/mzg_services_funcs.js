@@ -9,7 +9,6 @@ function contains(a, obj) {
 }
 
 function getMatchingPrincipalSCSS(projectPath, path) {
-    path = path.replace(/[\\]/g, '/'); 
     var m = null;
     m = /^.*[\/\\](.*)$/.exec(path);
 
@@ -39,4 +38,13 @@ function getMatchingPrincipalSCSS(projectPath, path) {
         return matchings;
     }
     return [path];
+}
+
+function getFreshTransitivity() {
+    return {
+        'should': false,
+        'dest': 'draft',
+        'compressing': nop,
+        'suffixing': nop
+    };
 }

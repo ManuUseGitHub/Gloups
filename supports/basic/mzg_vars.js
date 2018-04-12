@@ -25,23 +25,26 @@ var SERVICES = {
 	'sass': 'sass',
 	'mc': 'mincss',
 	'mincss': 'autominCss',
+	'tr':'transitive',
 
 	// presets
 	'a': 'all',
-	'all': 'autodel automin typescript coffeescript less sass autominCss',
+	'all': 'automin autodel typescript coffeescript autominCss less sass',
 	'st': 'style',
-	'style': 'less sass autominCss',
+	'style': 'autominCss less sass',
 	'jvs': 'autodel automin',
 	'tps': 'typescript',
 	'typescript': 'autodel automin typescript',
 	'cof': 'coffeescript',
 	'coffeescript': 'autodel automin coffeescript',
-
 };
 
 var PRESET_OPTIONS = "all|style|js|typescript|coffeescript";
 var SERVICES_OPTIONS = "del|minjs|ts|coffee|less|sass|mincss";
+var SERVICES_ADVANCED_OPTIONS = "transitive";
 var GLOUPS_VERSION = "4.5";
+
+var ALL_SERVICES_OPTIONS = PRESET_OPTIONS+'|'+SERVICES_OPTIONS+'|'+SERVICES_ADVANCED_OPTIONS;
 
 var JS_REGEX_FILE_PATH_PATTERN = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";
 
@@ -51,3 +54,6 @@ var SILENT_TASKS = "watch|vet|unit-test|integration-test";
 var ISALL = true;
 
 var isdist={};
+
+// https://stackoverflow.com/questions/43064924/how-to-target-all-browsers-with-gulp-auto-prefixer
+var AUTOPREFIXER_BROWSERS = ['> 1%', 'last 2 versions', 'firefox >= 4', 'safari 7', 'safari 8', 'IE 8', 'IE 9', 'IE 10', 'IE 11'];
