@@ -6,7 +6,8 @@ package-lock\.json
 
 config.json
 
-*/custom/*
+custom/*
+dist/custom/*
 
 gulpfile_temp\.js
 
