@@ -1,16 +1,16 @@
 {
 /*
- _________________________________________________________________________________________________
-|																							  	  |
-|                      	         -- EXEMPLES OF PROJECTS MAPPING --							  	  |
-|			  > you should keep this section as an exemple for further modifications			  |
-|			  > it is up to you to delete those lines 										  	  |
-|			  > but it shows how Mazegulp makes things working well 							  | 
-|_________________________________________________________________________________________________|
+ ____________________________________________________________________________________________
+|																							  |
+|                      	       -- EXEMPLES OF PROJECTS MAPPING --							  |
+|			> you should keep this section as an exemple for further modifications			  |
+|			> it is up to you to delete those lines 										  |
+|			> but it shows how Mazegulp makes things working well 							  | 
+|_____________________________________________________________________________________________|
 */
 	"projects":
 	[
-//		Do not check My project 1 -----------------------------------------------------------------
+//		Do not check My project 1 ------------------------------------------------------------
 
 //	    {
 //			"project":"MyProject1",
@@ -20,7 +20,7 @@
 
 //  					OR
 
-//		My project 1 should be checked ------------------------------------------------------------
+//		My project 1 should be checked -------------------------------------------------------
 
 //		{
 //			"project":"MyProject1",
@@ -28,10 +28,10 @@
 //			"checked":true
 //		},
 /*
- _________________________________________________________________________________________________
-|																							  	  |
-|                      	          -- YOUR PROJECTS MAPPING HERE --                                |
-|_________________________________________________________________________________________________|
+ _____________________________________________________________________________________________
+|																							  |
+|                      	        -- YOUR PROJECTS MAPPING HERE --                              |
+|_____________________________________________________________________________________________|
 */
 
 //		replace with your custom project informations.The "project" field is a label to highlight -
@@ -47,6 +47,6 @@
 			"project":"DEMO2",
 			"path": "../xampp/htdocs/ProjectDemo2",
 			"checked":false
-		},
+		}
 	]
 }

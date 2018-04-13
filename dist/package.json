@@ -31,6 +31,7 @@
     "gulp-coffee": "^3.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-css-format": "^0.1.2",
+    "gulp-help": "^1.6.1",
     "gulp-insert": "^0.5.0",
     "gulp-jshint": "^2.1.0",
     "gulp-jsvalidate": "^3.0.0",
@@ -39,11 +40,11 @@
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
     "gulp-sourcemaps": "^2.6.4",
+    "gulp-stylefmt": "^1.1.0",
     "gulp-typescript": "^3.2.4",
     "gulp-uglify": "^3.0.0",
-    "gulp-util": "^3.0.8",
     "gulp-wait": "0.0.2",
-    "jshint": "^2.9.5",
+    "lazypipe": "^1.0.1",
     "less-plugin-clean-css": "^1.5.1",
     "path": "^0.12.7",
     "run-sequence": "^2.2.0",
@@ -52,7 +53,12 @@
     "yargs": "^10.0.3"
   },
   "dependencies": {
+    "clear": "^0.1.0",
+    "global": "^4.3.2",
+    "jshint": "^2.9.5",
+    "less-plugin-autoprefix": "^1.5.1",
     "npm": "^5.7.1",
+    "uglify-js": "^3.3.16",
     "vue-cli": "^2.9.3",
     "yarn": "^1.5.1"
   }

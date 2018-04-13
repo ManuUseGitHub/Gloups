@@ -10,4 +10,4 @@ config.json
 
 gulpfile_temp\.js
 
-draft/*.*
+draft/*
