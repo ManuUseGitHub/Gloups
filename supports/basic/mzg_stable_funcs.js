@@ -67,3 +67,40 @@ if (ISALL || new RegExp("^(({0})(:.*)?)$".format([SILENT_TASKS])).test(cmd)) {
 		firstCall = true;
 	});
 }
+
+function getModule(module) {
+
+	if (typeof module == "string") {
+		for (var name in M) {
+			if (M[name] == module) {
+				var dStart = new Date();
+				M[name] = require(module);
+				// logging the time elapsed
+				var dResult = ms2Time(new Date() - dStart);
+
+				if (isdist.NOT_DISTRIBUTION) {
+					console.log(forNowShortLog(" {0}{1} loaded after {2}".format([
+						chalk.bgMagenta(' M:'),
+						chalk.bgMagenta(module + ' '),
+						chalk.magenta(dResult)
+					])));
+				}
+				return M[name];
+			}
+		}
+	}
+	return module;
+}
+
+var logOrig = console.log;
+
+function gloupslog(args){
+	logOrig(args);
+}
+
+var mayLogEssentials = metAllArgs(['essential']);
+
+if(mayLogEssentials){
+	console.log=function(){};
+	gloupslog(forNowShortLog(chalk.bgRed(' Logging only essential messages ')));
+}

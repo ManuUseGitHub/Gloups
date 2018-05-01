@@ -1,30 +1,30 @@
 gulp.task('less', function() {
-    logTaskPurpose(this.currentTask.name);
 
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToStyleLess);
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
-    var glob_transitivity = getFreshTransitivity();
-    // passing the watch list
-    gulp.watch(wl, function(event) {
-        if (/.*.less$/.test(event.path)) {
+		// says what modules gloups used to provide file compressions
+		'module': 'gulp-less',
 
-            // LAZYPIPE : main pipeline to provide SASS service -------------------------------
-            var mainProcess = lazyPipe()
-                .pipe(function() {
-                    return sass(less({
-                        plugins: [lessAutoprefix]
-                    })); //.on('error', less.logError);
-                })
-                .pipe(autoprefix)
-                .pipe(stylefmt);
+		// defines what files extension are allowed to be processed
+		'rules': [/.*.less$/],
 
-            var message = {
-                'action': "Processed",
-                'module': "gulp-less"
-            };
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe(function() {
+				return (M.less)({
+					paths: [(M.path).join(__dirname, 'less', 'includes')]
+				});
+			})
+			.pipe(autoprefix)
+			.pipe((M.stylefmt)),
 
-            consumePipeProcss(glob_transitivity, mainProcess, event.path, message);
-        }
-    });
+		// tells how to handle importation within preprocessed/precompiled files
+		'realTargetsFunction': function(filePath, matchingEntry) {
+			return [filePath];
+		}
+	};
+
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForPrecompiledFiles(this, config.pathesToStyleLess, obj);
 });

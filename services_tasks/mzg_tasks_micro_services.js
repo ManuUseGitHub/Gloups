@@ -1,142 +1,309 @@
+function runTaskProcessForCompression(athis, pathesTo, obj) {
+	logTaskPurpose(athis.currentTask.name);
+
+	var mainLazyPipeObj = createMainLazyPipeObject(pathesTo, "Compressed    ", obj.module);
+
+	// watch every single file matching those paths
+	var wl = watchList(pathesTo);
+
+	// no transitivity for compression because the compression is a B step out of ABC
+	// where A is the first and C the last step
+	var glob_transitivity = null;
+
+	gulp.watch(wl, function(event) {
+
+		var filePath = event.path;
+
+		// checking for extensions matching
+		if (checkMultipleRules(filePath, [event.type !== "deleted"].concat(obj.rules))) {
+
+			// set the filepath to the object
+			mainLazyPipeObj.forMatchingObj.path = filePath;
+
+			// find the config through the json and getting watch ; dest ; sourcemapp etc.
+			var matchingEntry = getMatchingEntryConfig(filePath, pathesTo);
+
+			// indicate what watch rule, the destination folder, and if there are sourcemaps.
+			mainLazyPipeObj.pathesDescr = matchingEntry;
+
+			// set the variant pipe part to the process. It will be wrapped in sourcemapps 
+			// and the transitivity will have to be calculate (not really needed here )
+			mainLazyPipeObj.process = obj.mainPipe;
+
+			// COMPUTE THE LAZYPIPE AND DYNAMIC BEHAVIORS -------------------------------------
+			consumePipeProcss(glob_transitivity, mainLazyPipeObj, [filePath]);
+		}
+	});
+}
+
+function runTaskProcessForPrecompiledFiles(athis, pathesTo, obj) {
+	logTaskPurpose(athis.currentTask.name);
+
+	var mainLazyPipeObj = createMainLazyPipeObject(pathesTo, "Processed     ", obj.module);
+
+	// watch every single file matching those paths
+	var wl = watchList(pathesTo);
+
+	// preconfigure a default "global" object for transitivity 
+	var glob_transitivity = getFreshTransitivity();
+
+	// passing the watch list
+	gulp.watch(wl, function(event) {
+
+		var filePath = event.path;
+
+		if (checkMultipleRules(filePath, obj.rules)) {
+
+			// set the filepath to the object 
+			mainLazyPipeObj.forMatchingObj.path = filePath;
+
+			// find the config through the json and getting watch ; dest ; sourcemapp etc.
+			var matchingEntry = getMatchingEntryConfig(filePath, pathesTo);
+
+			// LAZYPIPE : main pipeline to provide SASS service -------------------------------
+			mainLazyPipeObj.process = obj.mainPipe;
+
+			// focus on files importing other via @import
+			var realTargets = obj.realTargetsFunction(filePath, matchingEntry);
+
+			// COMPUTE THE LAZYPIPE AND DYNAMIC BEHAVIORS -------------------------------------
+			consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets);
+		}
+	});
+}
+
+function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
+
+	var sourceMappedProcess = transitiveAndSourcemappingWrap(glob_transitivity, mainLazyPipeObj);
+
+	// OVERWRITING DEFAULT DESTINATION ------------------------------------------------------------
+	mainLazyPipeObj.destCallBack = function() {
+		gloupslog('');
+		logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
+
+		var destPath = glob_transitivity != null ?
+			glob_transitivity.dest :
+			mainLazyPipeObj.pathesDescr.dest; // must be defined for non transitive services
+
+		return destPath;
+	};
+
+	// CONSUMMING ---------------------------------------------------------------------------------
+	gulp.src(realTargets)
+		.pipe(sourceMappedProcess())
+		.pipe(gulp.dest(mainLazyPipeObj.destCallBack()));
+}
+
+function logChangedRealTargetedFiles(mainLazyPipeObj, realTargets) {
+	var descr = mainLazyPipeObj.forMatchingObj.pathesDescr;
+	var pafn;
+	var actionOnFile = mainLazyPipeObj.message.action;
+
+	cpt = 0;
+	// call with logging of the time taken by the task
+	if (realTargets.length > 1) {
+		realTargets.forEach(function(file) {
+
+			// the next time, do not output the action since it is the same
+			if (cpt++ > 0)
+				actionOnFile = '              ';
+
+			// projectAndFileName
+			pafn = getProjectNameWithFileFromPathDesc(descr, file);
+
+			gloupslog(" {0} '{1}{2}'".format([actionOnFile, chalk.bgCyan(' ' + pafn.projectName + ' '), chalk.cyan(pafn.fileName + ' ')]));
+
+		});
+	} else {
+		var pathHackSlashed = realTargets[0].hackSlashes();
+
+		// projectAndFileName
+		pafn = getProjectNameWithFileFromPathDesc(descr, pathHackSlashed);
+
+		gloupslog(" {0} '{1}{2}'".format([actionOnFile, chalk.bgCyan(' ' + pafn.projectName + ' '), chalk.cyan(pafn.fileName + ' ')]));
+	}
+}
+
+function getProjectNameWithFileFromPathDesc(descr, file) {
+
+	var backedPath = /[^\/\\]*(\/.*)/.exec(file)[1];
+	backedPath = ".." + backedPath;
+	var projectName = '<PROJECT NM>';
+	var fileName;
+
+	for (var p in descr) {
+
+		var projectPathPaternString = descr[p].projectPath.split("/").join('\\/') + '(.*)$';
+		var projectPathPatern = new RegExp(projectPathPaternString, "g");
+		var match = null;
+
+		if ((match = projectPathPatern.exec(backedPath))) {
+			projectName = descr[p].projectName;
+			fileName = match[1];
+			break;
+		}
+	}
+
+	return {
+		'projectName': projectName,
+		'fileName': fileName
+	};
+}
+
+function transitiveAndSourcemappingWrap(glob_transitivity, mainLazyPipeObj) {
+
+	// UNBOXING -----------------------------------------------------------------------------------
+	var lazyPipeProcess = mainLazyPipeObj.process;
+	var forMatchingObj = mainLazyPipeObj.forMatchingObj,
+		path = forMatchingObj.path,
+		pathesDescription = forMatchingObj.pathesDescr; // pathesToJs/CSS/SASS/etc. ...;
+	var message = mainLazyPipeObj.message;
+
+	// find the config through the json and getting watch ; dest ; sourcemapp etc.
+	var matchingEntry = getMatchingEntryConfig(path, pathesDescription);
+
+	// LAZYPIPE wrapping transitivity and sourcemapping -------------------------------
+	var thinkTransitively = transitiveWrapAround(glob_transitivity, matchingEntry, path, lazyPipeProcess);
+	var sourceMappedProcess = setSourceMappingAndSign(thinkTransitively, matchingEntry, message);
+
+	return sourceMappedProcess;
+}
+
+function setSourceMappingAndSign(lazyPipeProcess, matchingEntry, sign) {
+	var sourcemapping = matchingEntry.sourcemaps;
+	return (M.lazyPipe)()
+
+		// if sourcemaps desired initialize them or do nothing
+		.pipe(sourcemapping ?
+			(M.sourcemaps).init :
+			(M.nop))
+
+		// transitivity handleing here in general
+		.pipe(lazyPipeProcess)
+
+		// put a sign after the end of the file stream to indicate it used Gloups and some modules
+		.pipe(insertSignatureAfter, sign.action, sign.module)
+
+		// if sourcemaps desired write them or do nothing
+		.pipe(sourcemapping ?
+			function() {
+				return (M.sourcemaps).write('./');
+			} :
+			(M.nop));
+}
+
+function transitiveWrapAround(glob_transitivity, matchingEntry, path, lazyPipeProcess) {
+
+	// do not let the default draft folder as a destination, change it straight away
+	if (glob_transitivity != null && glob_transitivity.dest == "draft") {
+		transitivitySetupCore(glob_transitivity, matchingEntry, path);
+	}
+
+	// if high leveled services, make a lazypipe where the transitivity is applied
+	var lzpTransitivityApplied = glob_transitivity != null ?
+		(M.lazyPipe)()
+		.pipe(transitivitySetup, glob_transitivity, matchingEntry, path) :
+
+		// else do nothing
+		(M.nop);
+
+	// if high leveled services, make a lazypipe compressed and suffixed
+	var lzpTransitivityCompression = glob_transitivity != null ?
+		(M.lazyPipe)()
+		.pipe(glob_transitivity.compressing)
+		.pipe(glob_transitivity.suffixing) :
+
+		// else do nothing
+		(M.nop);
+
+	return (M.lazyPipe)()
+		.pipe(lzpTransitivityApplied)
+		.pipe(lazyPipeProcess)
+		.pipe(lzpTransitivityCompression);
+}
+
+
+function transitivitySetup(transitivity, matchingEntry, path) {
+	return (M.through).obj(function(chunk, enc, callback) {
+		transitivitySetupCore(transitivity, matchingEntry, path);
+		callback(null, chunk);
+	});
+}
+
+function transitivitySetupCore(transitivity, matchingEntry, path) {
+	var shouldBeTransitive =
+		metAllArgs(['all', 'transitive']) ||
+
+		// CSS focused
+		metAllArgs(['sass', 'mincss', 'transitive']) ||
+		metAllArgs(['stylus', 'mincss', 'transitive']) ||
+		metAllArgs(['less', 'mincss', 'transitive']) ||
+
+		// JS focused
+		metAllArgs(['coffee', 'minjs', 'transitive']) ||
+		metAllArgs(['typescript', 'minjs', 'transitive']);
+
+	var found = false;
+
+	// by default the transitivity is set to the path the result should be the destination
+	transitivity.dest = matchingEntry.dest;
+
+	if (shouldBeTransitive) {
+		var fileName = (/^.*[\/](.*)$/g.exec(path.hackSlashes()))[1];
+		var focusedPathFileName = "{0}/{1}".format([matchingEntry.dest, fileName]);
+
+		// define if it has to be transitive about CSS or JS
+		// transitivityLike
+		var trLike = /.*[.](coffee|ts)$/.test(fileName) ? 'JS' :
+			/.*[.](scss|styl|less)$/.test(fileName) ? 'CSS' :
+			'UNDEFINED';
+
+		var pathesTo = trLike == 'JS' ? config.pathesToJs :
+			trLike == 'CSS' ? config.pathesToStyle :
+			null;
+
+		// get the B step matching configuration and check if there is a matching from 
+		// A step destination to B step wtching folder
+		var matchingEntryFinal = getMatchingEntryConfig(focusedPathFileName, pathesTo);
+
+		found = matchingEntryFinal != null;
+		transitivity.should = found;
+
+		if (found) {
+			transitivity.compressing =
+				trLike == 'JS' ? (M.uglify) :
+				trLike == 'CSS' ? cleanCssMinification :
+				(M.nop);
+
+			transitivity.suffixing = renameSuffixMin;
+
+			// substitution of matchingEntryConfig A step destination replaced by C step destination
+			transitivity.dest = matchingEntryFinal.dest;
+		}
+	}
+}
+
 function renameSuffixMin() {
-    return rename({
-        suffix: '.min'
-    });
+	return (M.rename)({
+		suffix: '.min'
+	});
 }
 
 function cleanCssMinification() {
-    return cleanCSS({
-        compatibility: 'ie8'
-    });
-}
-
-function typescripting(dest) {
-    return ts({
-        noImplicitAny: true
-    });
+	return (M.cleanCSS)({
+		compatibility: 'ie8'
+	});
 }
 
 function insertSignatureAfter(actionDone, thanksToModule) {
-    return insert.append("\n/* -- {0} with Gloups {1} | {2} using -- */".format([
+	return (M.insert).append("\n/* -- {0} with Gloups {1} | using {2} -- */".format([
         actionDone, GLOUPS_VERSION, thanksToModule
     ]));
 }
 
-function sourcemapInit(sourcemapping) {
-    return (sourcemapping ? sourcemaps.init : nop)();
-}
-
-function sourcemapWrite(sourcemapping) {
-    return sourcemapping ? sourcemaps.write('./') : nop();
-}
-
 function autoprefix() {
-    return autoprefixer({
-        browsers: AUTOPREFIXER_BROWSERS,
-        cascade: false
-    });
-}
-
-function serveCoffee() {
-    return coffee({
-        bare: true
-    });
-}
-
-function makeLess() {
-    return less({
-        paths: [path.join(__dirname, 'less', 'includes')]
-    });
-}
-
-function transitivitySetup(transitivity, matchingEntry, path) {
-    return through.obj(function(chunk, enc, callback) {
-        var shouldBeTransitive =
-            metAllArgs(['all', 'transitive']) ||
-            metAllArgs(['sass', 'mincss', 'transitive']) ||
-            metAllArgs(['less', 'mincss', 'transitive']);
-
-        var found = false;
-
-        // by default the transitivity is set to the path the result should be the destination
-        transitivity.dest = matchingEntry.dest;
-
-        if (shouldBeTransitive) {
-            var fileName = (/^.*[\/](.*)$/g.exec(path.hackSlashes()))[1];
-            var focusedPathFileName = "{0}/{1}".format([matchingEntry.dest, fileName]);
-            var matchingEntryFinal = getMatchingEntryConfig(focusedPathFileName, config.pathesToStyle);
-
-            found = matchingEntryFinal != null;
-            transitivity.should = found;
-
-            if (found) {
-                transitivity.compressing = cleanCssMinification;
-                transitivity.suffixing = renameSuffixMin;
-                transitivity.dest = matchingEntryFinal.dest;
-            }
-        }
-        callback(null, chunk);
-    });
-}
-function transitiveWrapAround(glob_transitivity, matchingEntry, path, lazyPipeProcess) {
-    return lazyPipe()
-        .pipe(transitivitySetup, glob_transitivity, matchingEntry, path)
-        .pipe(lazyPipeProcess)
-
-        // piping transformations when it should transit
-        .pipe(glob_transitivity.compressing)
-        .pipe(glob_transitivity.suffixing);
-}
-
-function setSourceMappingAndSign(lazyPipeProcess, matchingEntry, sign) {
-    var sourcemapping = matchingEntry.sourcemaps;
-    return lazyPipe()
-        .pipe(sourcemapInit, sourcemapping)
-        .pipe(lazyPipeProcess)
-        .pipe(insertSignatureAfter, sign.action, sign.module)
-        .pipe(sourcemapWrite, sourcemapping);
-}
-
-function appendFilesToLog(message, lazyPipeProcess, event) {
-    // -- end process logging -----------------------------------------------------
-    gulp.src(event.path)
-        // append files in order to output all files compressed at once
-        .pipe(through.obj(function(chunk, enc, cb) {
-            --message.k;
-            message.files.push(chunk.path);
-            cb(null, chunk);
-        }))
-
-        .pipe(lazyPipeProcess())
-
-        .pipe(wait(500))
-        // let the files be added by creating a race condition
-
-        // log final message when all files are done
-        .on('end', function() {
-            if (++message.k == 0) {
-                console.log(forNowShortLog(message.txt, []));
-                message.files.forEach(function(element, index) {
-                    console.log(logFilePath(element.hackSlashes()));
-                });
-                console.log();
-                message.files = [];
-            }
-        });
-}
-
-function consumePipeProcss(glob_transitivity, lasyPipeProcess, path, message) {
-    // find the config through the json and getting watch ; dest ; sourcemapp etc.
-    var matchingEntry = getMatchingEntryConfig(path, config.pathesToStyleLess);
-
-    // LAZYPIPE wrapping transitivity and sourcemapping -------------------------------
-    var thinkTransitively = transitiveWrapAround(glob_transitivity, matchingEntry, path, lasyPipeProcess);
-    var sourceMappedProcess = setSourceMappingAndSign(thinkTransitively, matchingEntry, message);
-
-    gulp.src(path)
-        .pipe(sourceMappedProcess())
-        .pipe(gulp.dest(glob_transitivity.dest));
-
-    // call with logging of the time taken by the task
-    console.log(forNowShortLog("Processed file version updated/created here :\n{0}> {1}", [breath(), logFilePath(matchingEntry.dest)]));
+	return (M.autoprefixer)({
+		browsers: AUTOPREFIXER_BROWSERS,
+		cascade: false
+	});
 }

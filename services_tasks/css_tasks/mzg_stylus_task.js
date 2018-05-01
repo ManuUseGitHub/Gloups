@@ -1,34 +1,31 @@
-gulp.task('sass', function() {
-	
+gulp.task('stylus', function() {
+
 	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
 	var obj = {
 
 		// says what modules gloups used to provide file compressions
-		'module': 'gulp-sass',
+		'module': 'gulp-stylus',
 
 		// defines what files extension are allowed to be processed
-		'rules': [/.*.scss$/],
+		'rules': [/.*.styl$/],
 
 		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
 		'mainPipe': (M.lazyPipe)()
 			.pipe(function() {
-				return (M.sass)({
-					indentedSyntax: false
-				}).on('error', (M.sass).logError);
+				return (M.stylus)({
+					'include css': true,
+					linenos: true
+				}) /*.on('error', sass.logError)*/ ;
 			})
 			.pipe(autoprefix)
 			.pipe((M.stylefmt)),
 
 		// tells how to handle importation within preprocessed/precompiled files
 		'realTargetsFunction': function(filePath, matchingEntry) {
-
-			// getting the fileName and checking if its a qualified file to be process 
-			// (not starting by undererscore "_.*");
-			// else getting files refering it via @import inside them
-			return getMatchingPrincipalSCSS(matchingEntry.projectPath, filePath.hackSlashes());
+			return [filePath];
 		}
 	};
 
 	// PROCESS WITH THE VARIANT CONFIGURATION
-	runTaskProcessForPrecompiledFiles(this, config.pathesToSass, obj);
+	runTaskProcessForPrecompiledFiles(this, config.pathesToStylus, obj);
 });

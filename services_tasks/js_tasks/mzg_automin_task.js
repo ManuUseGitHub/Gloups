@@ -1,32 +1,20 @@
-// configure which files to watch and what tasks to use on file changes
 gulp.task('automin', function() {
-    logTaskPurpose(this.currentTask.name);
+	
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToJs);
+		// says what modules gloups used to provide file compressions
+		'module': "gulp-uglify",
 
-    // passing the watch list
-    gulp.watch(wl, function(event) {
-        var regex = new RegExp(JS_REGEX_FILE_PATH_PATTERN, "g");
-        var match = regex.exec(event.path);
+		// defines what files extension are allowed to be processed
+		'rules': [JS_REGEX_FILE_PATH_PATTERN, ['!', /.*.min.js$/]],
 
-        // the file that fired the event change is a .min.js file
-        if (!/.*.min.js$/.test(event.path) && match) {
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe((M.uglify))
+			.pipe(renameSuffixMin)
+	};
 
-            var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToJs);
-            var sourcemapping = matchingEntry.sourcemaps;
-
-            gulp.src(event.path)
-                .pipe(sourcemapInit(sourcemapping))
-
-                .pipe(uglify())
-                .pipe(renameSuffixMin())
-                .pipe(insertSignatureAfter("Compressed", "gulp-uglify"))
-
-                .pipe(sourcemapWrite(sourcemapping))
-                .pipe(gulp.dest(matchingEntry.dest));
-
-            console.log(forNowShortLog("Compressed file version updated/created here :\n{0} > {1}", [breath(), logFilePath(matchingEntry.dest)]));
-        }
-    }, jshint);
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForCompression(this,config.pathesToJs, obj);
 });

@@ -26,6 +26,7 @@ var mzgFiles = [
 	'supports/rewriting/log_sections/mzg_log2.js', // section
 
 	'supports/basic/mzg_stable_funcs.js',
+	'supports/basic/mzg_modules_requesting.js',
 
 	'supports/rewriting/log_sections/mzg_log3.js', // section
 
@@ -51,8 +52,6 @@ var mzgFiles = [
 
 	// js
 	'services_tasks/js_tasks/mzg_automin_task.js',
-	'services_tasks/js_tasks/mzg_autodel_task.js',
-	'services_tasks/js_tasks/mzg_merg_all_minified_task.js',
 	'services_tasks/js_tasks/mzg_tyepscript_task.js',
 	'services_tasks/js_tasks/mzg_coffeescript_task.js',
 
@@ -63,15 +62,18 @@ var mzgFiles = [
 	'services_tasks/css_tasks/mzg_auto_format_css_task.js',
 	'services_tasks/css_tasks/mzg_less_task.js',
 	'services_tasks/css_tasks/mzg_sass_task.js',
+	'services_tasks/css_tasks/mzg_stylus_task.js',
 
 	'supports/rewriting/log_sections/mzg_log8.js', // section
 
 	// other
 	'services_tasks/mzg_other_oriented_tasks.js',
 
+	'supports/rewriting/log_sections/mzg_log16.js', // section
+	'supports/files/mzg_module_seeking_funcs.js',
+
 	'supports/rewriting/log_sections/mzg_log9.js', // section
 
-	// configuration of modules here
 	'services_tasks/mzg_tasks_micro_services.js',
 	'services_tasks/mzg_services_funcs.js',
 
@@ -107,9 +109,11 @@ var mzgFiles = [
 
 var distFiles = mzgFiles.slice();
 
-distFiles.splice(47, 3);
-distFiles.splice(34, 5);
-distFiles.splice(9, 1);
+distFiles.splice(49, 3);
+distFiles.splice(37, 6);
+distFiles.splice(32, 2);
+distFiles.splice(10, 1);
+distFiles.splice(6, 1);
 distFiles.splice(3, 1);
 
 isdist.NOT_DISTRIBUTION = true;

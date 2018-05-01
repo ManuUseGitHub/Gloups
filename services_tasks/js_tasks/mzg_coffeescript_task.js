@@ -1,26 +1,28 @@
-var coffee = require('gulp-coffee');
-
 gulp.task('coffeescript', function() {
-    logTaskPurpose(this.currentTask.name);
 
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToCoffee);
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
-    // passing the watch list
-    gulp.watch(wl, function(event) {
+		// says what modules gloups used to provide file compressions
+		'module': 'gulp-coffee',
 
-        var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToCoffee);
-        var sourcemapping = matchingEntry.sourcemaps;
+		// defines what files extension are allowed to be processed
+		'rules': [/.*.coffee$/],
 
-        gulp.src(event.path)
-            .pipe(sourcemapInit(sourcemapping))
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe(function() {
+				return (M.coffee)({
+					bare: true
+				});
+			}),
 
-            .pipe(serveCoffee())
-            .pipe(insertSignatureAfter("Served coffee", "gulp-coffee"))
+		// tells how to handle importation within preprocessed/precompiled files
+		'realTargetsFunction': function(filePath, matchingEntry) {
+			return [filePath];
+		}
+	};
 
-            .pipe(sourcemapWrite(sourcemapping))
-            .pipe(gulp.dest(matchingEntry.dest));
-
-        console.log(forNowShortLog("Compiled file version updated/created here :\n{0}> {1}", [breath(), logFilePath(matchingEntry.dest)]));
-    });
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForPrecompiledFiles(this, config.pathesToCoffee, obj);
 });

@@ -1,99 +1,96 @@
 function getConfig() {
-    return config ? config : {
-        // See 'serviceMapping' project setup task
-        "verbose": false, // true to enable set vars verbose
-
-        "pathesToJs": [],
-        "pathesToTs": [],
-        "pathesToCoffee": [],
-        "pathesToStyle": [],
-        "pathesToStyleLess": [],
-        "pathesToSass": [],
-        "projects": []
-    };
+	return config ? config : DEFAULT_CONFIG;
 }
 
 function readJsonConfig(filePath) {
-    var _data = fs.readFileSync(filePath, "utf8");
-    var reading = new classReading();
-    reading.initialize(_data, 0);
+	var _data = (M.fs).readFileSync(filePath, "utf8");
+	var reading = new classReading();
+	reading.initialize(_data, 0);
 
-    var m;
-    var l;
-    var commentBloc = 0;
-    var has_smthng = true;
-    var content = "";
-    m = /^(.*)(\.json)$/.exec(filePath);
-    var tempfile = m[1] + '.temp' + m[2];
+	var m;
+	var l;
+	var commentBloc = 0;
+	var has_smthng = true;
+	var content = "";
+	m = /^(.*)(\.json)$/.exec(filePath);
+	var tempfile = m[1] + '.temp' + m[2];
+    var tempfileVisual = m[1] + '2.temp' + m[2];
 
-    // at any line read, 
-    fssync.write(tempfile, '', 'utf8');
-    reading.readLines(function() {
+	// at any line read, 
+	(M.fssync).write(tempfile, '', 'utf8');
+	reading.readLines(function() {
 
-        // stripping comments ---------------------------------------------------------------------
-        l = reading.getLine();
-        if ((has_smthng = (m = /^(.*)\/\/.*$/g.exec(l)))) { // "(.. content ..) [//] .. .."
-            content = m[1];
-        } else if ((has_smthng = (m = /^(.*)\/\*$/g.exec(l)))) { // "(.. content ..) [/*] .. .."
-            content = m[1];
-            ++commentBloc;
-        } else if ((has_smthng = (m = /^.*\*\/(.*)$/g.exec(l)))) { // ".. .. [*/] (.. content ..)"
-            content = m[1];
-            --commentBloc;
-        } else if ((has_smthng = (commentBloc == 0))) {
-            content = l;
-        }
+		// stripping comments ---------------------------------------------------------------------
+		l = reading.getLine();
+		if ((has_smthng = (m = /^(.*)\/\/.*$/g.exec(l)))) { // "(.. content ..) [//] .. .."
+			content = m[1];
+		} else if ((has_smthng = (m = /^(.*)\/\*$/g.exec(l)))) { // "(.. content ..) [/*] .. .."
+			content = m[1];
+			++commentBloc;
+		} else if ((has_smthng = (m = /^.*\*\/(.*)$/g.exec(l)))) { // ".. .. [*/] (.. content ..)"
+			content = m[1];
+			--commentBloc;
+		} else if ((has_smthng = (commentBloc == 0))) {
+			content = l;
+		}
 
-        //                          every matching creates a candidate to write 
-        if (has_smthng) {
-            if (!/^[\s]*$/g.test(content)) { // white lines are ignored
-                fs.appendFileSync(tempfile, content + "\r\n", 'utf8');
+		//                          every matching creates a candidate to write 
+		if (has_smthng) {
+			if (!/^[\s]*$/g.test(content)) { // white lines are ignored
+                getModule(M.fs).appendFileSync(tempfileVisual, content + "\r\n", 'utf8');
+                getModule(M.fs).appendFileSync(tempfile, /^[\s\t]*((?:[^\s\t]*[\s\t]*[^\s\t])+)[\s\t]*$/.exec(content)[1], 'utf8');
             }
-        }
-        // ----------------------------------------------------------------------------------------
-    });
-    var temp = fs.readFileSync(tempfile, "utf8");
-    fssync.remove(tempfile);
-    return JSON.parse(temp);
+		}
+		// ----------------------------------------------------------------------------------------
+	});
+	
+    var temp = getModule(M.fs).readFileSync(tempfile, "utf8");
+    
+    getModule(M.fssync).remove(tempfile);
+    getModule(M.fssync).remove(tempfileVisual);
+
+    return JSON.parse(temp.replace(/}(,)]/g,'}]'));
 }
 
 function setConfig() {
-    config.projects = readJsonConfig("custom/config.json").projects;
+	config.projects = readJsonConfig("custom/config.json").projects;
 }
 
 function makePathesCoveringAllFilesFor(projectFolder, matchingForEntry, subpathToExtention, purpose) {
 
-    var addon = matchingForEntry.addon;
-    var entrySet = matchingForEntry.pathesToService;
+	var addon = matchingForEntry.addon;
+	var entrySet = matchingForEntry.pathesToService;
 
-    if (addon) {
-        for (var i = 0, t = addon.length; i < t; ++i) {
-            // concatenate /**/*.ext to the watch folder
-            addon[i].watch = addon[i].watch + subpathToExtention;
+	matchingForEntry.projectPath = projectFolder;
 
-            var pathes = [addon[i].watch, addon[i].dest];
+	if (addon) {
+		for (var i = 0, t = addon.length; i < t; ++i) {
+			// concatenate /**/*.ext to the watch folder
+			addon[i].watch = addon[i].watch + subpathToExtention;
 
-            if (0 < i) { // only the first time to avoid repeating the same purpose
-                purpose = "[SAME-PURPOSE]";
-            }
+			var pathes = [addon[i].watch, addon[i].dest];
 
-            logServiceActivatedPushed(purpose, projectFolder, addon[i]);
+			if (0 < i) { // only the first time to avoid repeating the same purpose
+				purpose = "[SAME-PURPOSE]";
+			}
 
-            // rebaseing the path to validate the watching
-            addon[i].watch = projectFolder + "/" + addon[i].watch;
-            addon[i].dest = projectFolder + "/" + addon[i].dest;
+			var projectName = getProjectNameFromRootPath(projectFolder);
 
-            if (matchingForEntry.projectPath){
-                addon[i].projectPath = projectFolder;
-            }
+			logServiceActivatedPushed(purpose, projectName, addon[i]);
 
-            entrySet = entrySet.concat(addon[i]);
-        }
-        if (config.verbose) {
-            console.log();
-        }
-    }
+			// rebaseing the path to validate the watching
+			addon[i].watch = projectFolder + "/" + addon[i].watch;
+			addon[i].dest = projectFolder + "/" + addon[i].dest;
+			addon[i].projectPath = projectFolder;
+			addon[i].projectName = projectName;
 
-    //pushing the addon to the entrySet an "entry" is a watching list for js or ts or coffee ... css ... etc."
-    return entrySet;
+			entrySet = entrySet.concat(addon[i]);
+		}
+		if (config.verbose) {
+			console.log();
+		}
+	}
+
+	//pushing the addon to the entrySet an "entry" is a watching list for js or ts or coffee ... css ... etc."
+	return entrySet;
 }

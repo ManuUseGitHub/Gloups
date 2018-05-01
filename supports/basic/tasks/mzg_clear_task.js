@@ -1,3 +1,3 @@
 gulp.task('clear', function() {
-	clear();
+	(M.clear)();
 });

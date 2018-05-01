@@ -53,6 +53,16 @@
 	}]
 	*/
 
+	// uncomment to enable service
+	/*
+
+	"stylus": [{
+		"watch": "Relative/to/root/folder/path/to/styl/folder",
+		"dest": "Relative/to/root/folder/path/to/result/css/folder",
+		"sourcemaps":false
+	}]
+	*/
+
 	/*
 	-- [HELPS] --
 	Mind paths ! Paths you put has to be relative to the project

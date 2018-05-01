@@ -1,25 +1,28 @@
 gulp.task('typescript', function() {
-    logTaskPurpose(this.currentTask.name);
 
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToTs);
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
-    // passing the watch list
-    gulp.watch(wl, function(event) {
+		// says what modules gloups used to provide file compressions
+		'module': 'gulp-typescript',
 
-        var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToTs);
-        var sourcemapping = matchingEntry.sourcemaps;
+		// defines what files extension are allowed to be processed
+		'rules': [/.*.ts$/],
 
-        gulp.src(event.path)
-            .pipe(sourcemapInit(sourcemapping))
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe(function() {
+				return (M.ts)({
+					noImplicitAny: true
+				});
+			}),
 
-            .pipe(typescripting(matchingEntry.dest))
-            .pipe(insertSignatureAfter("Compiled", "gulp-typescript"))
+		// tells how to handle importation within preprocessed/precompiled files
+		'realTargetsFunction': function(filePath, matchingEntry) {
+			return [filePath];
+		}
+	};
 
-            .pipe(sourcemapWrite(sourcemapping))
-            .pipe(gulp.dest(matchingEntry.dest));
-
-        console.log(forNowShortLog("Compressed file version updated/created here :\n{0}> {1}", [breath(), logFilePath(matchingEntry.dest)]));
-
-    });
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForPrecompiledFiles(this, config.pathesToTs, obj);
 });

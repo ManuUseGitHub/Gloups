@@ -13,3 +13,5 @@ dist/custom/*.*
 gulpfile_temp\.js
 
 draft/*
+
+*.docx

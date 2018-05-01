@@ -1,5 +1,5 @@
 var merging = function(event) {
-    clear();
+    (M.clear)();
     
     if (event) {
         modifiedMZGEvent = event;
@@ -38,6 +38,6 @@ var mergingOnChanges = function(beautifully, one_time) {
 };
 
 function getGulpfolderFromFileBase(file) {
-    var gulpfolder = /^(.*[\/\\](?:Gloups|gulp))[\/\\].*/.exec(file.base)[1];
+    var gulpfolder = /^(.*[\/\\](?:gloups|gulp|dist))[\/\\].*/.exec(file.base)[1];
     return gulpfolder;
 }

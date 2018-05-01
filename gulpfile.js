@@ -3,72 +3,58 @@
  	*************************************************************************************************************************************************************************************************/
 
 // -- [supports/basic/mzg_modules_importation.js] -- 
-// A ----------------------------------------------------------------------------------------------
-var argv = require('yargs').argv;
-var autoprefixer = require('gulp-autoprefixer');
-// B ----------------------------------------------------------------------------------------------
-// C ----------------------------------------------------------------------------------------------
-//https://www.npmjs.com/package/chalk
-var chalk = require('chalk');
-var cleanCSS = require('gulp-clean-css');
-var clear = require('clear');
-var coffee = require('gulp-coffee');
-//var combiner = require('stream-combiner');
-var concat = require('gulp-concat');
-// D ----------------------------------------------------------------------------------------------
-var del = require('del');
-// E ----------------------------------------------------------------------------------------------
-// F ----------------------------------------------------------------------------------------------
-// check file existance
-var fs = require("fs");
-var fssync = require("fs-sync");
-// G ----------------------------------------------------------------------------------------------
+// before loading modules -------------------------------------------------------------------------
+var GLOUPS_VERSION = "6.0";
+process.title = 'Gloups ' + GLOUPS_VERSION + ' | Chears !';
+// ------------------------------------------------------------------------------------------------
+
 var gulp = require('gulp');
-// H ----------------------------------------------------------------------------------------------
-// I ----------------------------------------------------------------------------------------------
-var insert = require('gulp-insert');
-// J ----------------------------------------------------------------------------------------------
-// error solved : http://kuebiko.blogspot.be/2016/01/gulp-jshint200-requires-peer-of.html
-var jshint = require('gulp-jshint');
-var jsValidate = require('gulp-jsvalidate');
-// K ----------------------------------------------------------------------------------------------
-// L ----------------------------------------------------------------------------------------------
-var lazyPipe = require('lazypipe');
-var less = require('gulp-less');
-var lessPluginAutoPrefix = require('less-plugin-autoprefix');
-var lessAutoprefix = new lessPluginAutoPrefix({browsers: ["last 2 versions"]});
-// M ----------------------------------------------------------------------------------------------
-// N ----------------------------------------------------------------------------------------------
-// for alternate manipulations where no operations is needed
-var nop = require('gulp-nop');
-// O ----------------------------------------------------------------------------------------------
-// P ----------------------------------------------------------------------------------------------
-var path = require('path');
-// Q ----------------------------------------------------------------------------------------------
-// R ----------------------------------------------------------------------------------------------
-var rename = require("gulp-rename");
-// S ----------------------------------------------------------------------------------------------
-var sass = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');
-var stylefmt = require('gulp-stylefmt');
-// T ----------------------------------------------------------------------------------------------
-// to write custom pipe functions
-var through = require('through2');
-var ts = require('gulp-typescript');
-// U ----------------------------------------------------------------------------------------------
-var uglify = require('gulp-uglify');
-var uglifyJs = require('uglify-js');
-// V ----------------------------------------------------------------------------------------------
-// W ----------------------------------------------------------------------------------------------
-var wait = require('gulp-wait');
-// X ----------------------------------------------------------------------------------------------
-// Y ----------------------------------------------------------------------------------------------
-// Z ----------------------------------------------------------------------------------------------
+var chalk = require('chalk'); //https://www.npmjs.com/package/chalk
+
+var M = {
+	// A ----------------------------------------------------------------------------------------------
+	autoprefixer: 'gulp-autoprefixer',
+	// C ----------------------------------------------------------------------------------------------
+	cleanCSS: 'gulp-clean-css',
+	clear: 'clear',
+	coffee: 'gulp-coffee',
+	concat: 'gulp-concat',
+	// D ----------------------------------------------------------------------------------------------
+	del: 'del',
+	// E ----------------------------------------------------------------------------------------------
+	exit: 'gulp-exit',
+	// F ----------------------------------------------------------------------------------------------
+	fs: "fs", // check file existance
+	fssync: "fs-sync",
+	// I ----------------------------------------------------------------------------------------------
+	insert: 'gulp-insert',
+	// J ----------------------------------------------------------------------------------------------
+	jsValidate: 'gulp-jsvalidate',
+	// L ----------------------------------------------------------------------------------------------
+	lazyPipe: 'lazypipe',
+	less: 'gulp-less',
+	// N ----------------------------------------------------------------------------------------------
+	nop: 'gulp-nop', // for alternate manipulations where no operations is needed
+	// P ----------------------------------------------------------------------------------------------
+	path: 'path',
+	// R ----------------------------------------------------------------------------------------------
+	rename: "gulp-rename",
+	replace: "gulp-replace",
+	// S ----------------------------------------------------------------------------------------------
+	sass: 'gulp-sass',
+	sourcemaps: 'gulp-sourcemaps',
+	stylefmt: 'gulp-stylefmt',
+	stylus: 'gulp-stylus',
+	// T ----------------------------------------------------------------------------------------------
+	through: 'through2', // to write custom pipe functions
+	ts: 'gulp-typescript',
+	// U ----------------------------------------------------------------------------------------------
+	uglify: 'gulp-uglify',
+	// W ----------------------------------------------------------------------------------------------
+	wait: 'gulp-wait',
+};
 
 // -- [supports/basic/mzg_vars.js] -- 
-// Sets things up to serve
-var config = getConfig();
-
 // Mapping of arguments for serve taks. arguments have one matching. 
 // An alias matches a service, as -l matches --less (less task)
 // A preset is a set of arguments that works legitimately together.
@@ -80,8 +66,6 @@ var config = getConfig();
 var SERVICES = {
 
 	// custom
-	'd': 'del',
-	'del': 'autodel',
 	'mj': 'minjs',
 	'minjs': 'automin',
 	'ts': 'typescript',
@@ -91,40 +75,73 @@ var SERVICES = {
 	'less': 'less',
 	's': 'sass',
 	'sass': 'sass',
+	'sts': 'stylus',
+	'stylus': 'stylus',
 	'mc': 'mincss',
 	'mincss': 'autominCss',
-	'tr':'transitive',
+	'tr': 'transitive',
+	'es': 'essential',
 
 	// presets
 	'a': 'all',
-	'all': 'automin autodel typescript coffeescript autominCss less sass',
+	'all': 'automin typescript coffeescript autominCss less sass stylus',
+
 	'st': 'style',
-	'style': 'autominCss less sass',
-	'jvs': 'autodel automin',
+	'style': 'autominCss less sass stylus',
+
+	'jvs': 'javascript',
+	'javascript' : 'automin typescript coffeescript',
+
 	'tps': 'typescript',
-	'typescript': 'autodel automin typescript',
+	'typescript': 'automin typescript',
+	
 	'cof': 'coffeescript',
-	'coffeescript': 'autodel automin coffeescript',
+	'coffeescript': 'automin coffeescript',
 };
 
-var PRESET_OPTIONS = "all|style|js|typescript|coffeescript";
-var SERVICES_OPTIONS = "del|minjs|ts|coffee|less|sass|mincss";
-var SERVICES_ADVANCED_OPTIONS = "transitive";
-var GLOUPS_VERSION = "4.5";
+var PRESET_OPTIONS = "all|style|jvs|typescript|coffeescript";
+var SERVICES_OPTIONS = "minjs|ts|coffee|less|sass|stylus|mincss";
+var SERVICES_ADVANCED_OPTIONS = "transitive|essential";
 
-var ALL_SERVICES_OPTIONS = PRESET_OPTIONS+'|'+SERVICES_OPTIONS+'|'+SERVICES_ADVANCED_OPTIONS;
+var ALL_SERVICES_OPTIONS = PRESET_OPTIONS + '|' + SERVICES_OPTIONS + '|' + SERVICES_ADVANCED_OPTIONS;
 
 var JS_REGEX_FILE_PATH_PATTERN = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";
 
-var GLOUPS_OPTIONS = SERVICES_OPTIONS+'|'+PRESET_OPTIONS;
+var GLOUPS_OPTIONS = SERVICES_OPTIONS + '|' + PRESET_OPTIONS;
 
 var SILENT_TASKS = "watch|vet|unit-test|integration-test";
 var ISALL = true;
 
-var isdist={};
+var isdist = {};
 
 // https://stackoverflow.com/questions/43064924/how-to-target-all-browsers-with-gulp-auto-prefixer
 var AUTOPREFIXER_BROWSERS = ['> 1%', 'last 2 versions', 'firefox >= 4', 'safari 7', 'safari 8', 'IE 8', 'IE 9', 'IE 10', 'IE 11'];
+
+var DEFAULT_CONFIG = {
+	// See 'serviceMapping' project setup task
+	"verbose": false, // true to enable set vars verbose
+
+	"pathesToJs": [],
+	"pathesToTs": [],
+	"pathesToCoffee": [],
+	"pathesToStyle": [],
+	"pathesToStyleLess": [],
+	"pathesToSass": [],
+	"pathesToStylus": [],
+	"projects": []
+};
+
+// Sets things up to serve
+var config = getConfig();
+
+var glob_found_modules = {
+	'fs': true
+};
+
+var glob_visited_elements = {
+	'infunc': {},
+	'intask': {}
+};
 
 // -- [supports/rewriting/mzg_rewriting_vars.js] -- 
 var bySetup = true; // messages will be displayed base on event fired by files.
@@ -155,6 +172,7 @@ var mzgFiles = [
 	'supports/rewriting/log_sections/mzg_log2.js', // section
 
 	'supports/basic/mzg_stable_funcs.js',
+	'supports/basic/mzg_modules_requesting.js',
 
 	'supports/rewriting/log_sections/mzg_log3.js', // section
 
@@ -180,8 +198,6 @@ var mzgFiles = [
 
 	// js
 	'services_tasks/js_tasks/mzg_automin_task.js',
-	'services_tasks/js_tasks/mzg_autodel_task.js',
-	'services_tasks/js_tasks/mzg_merg_all_minified_task.js',
 	'services_tasks/js_tasks/mzg_tyepscript_task.js',
 	'services_tasks/js_tasks/mzg_coffeescript_task.js',
 
@@ -192,15 +208,18 @@ var mzgFiles = [
 	'services_tasks/css_tasks/mzg_auto_format_css_task.js',
 	'services_tasks/css_tasks/mzg_less_task.js',
 	'services_tasks/css_tasks/mzg_sass_task.js',
+	'services_tasks/css_tasks/mzg_stylus_task.js',
 
 	'supports/rewriting/log_sections/mzg_log8.js', // section
 
 	// other
 	'services_tasks/mzg_other_oriented_tasks.js',
 
+	'supports/rewriting/log_sections/mzg_log16.js', // section
+	'supports/files/mzg_module_seeking_funcs.js',
+
 	'supports/rewriting/log_sections/mzg_log9.js', // section
 
-	// configuration of modules here
 	'services_tasks/mzg_tasks_micro_services.js',
 	'services_tasks/mzg_services_funcs.js',
 
@@ -236,9 +255,11 @@ var mzgFiles = [
 
 var distFiles = mzgFiles.slice();
 
-distFiles.splice(47, 3);
-distFiles.splice(34, 5);
-distFiles.splice(9, 1);
+distFiles.splice(49, 3);
+distFiles.splice(37, 6);
+distFiles.splice(32, 2);
+distFiles.splice(10, 1);
+distFiles.splice(6, 1);
 distFiles.splice(3, 1);
 
 isdist.NOT_DISTRIBUTION = true;
@@ -316,6 +337,56 @@ if (ISALL || new RegExp("^(({0})(:.*)?)$".format([SILENT_TASKS])).test(cmd)) {
 		firstCall = true;
 	});
 }
+
+function getModule(module) {
+
+	if (typeof module == "string") {
+		for (var name in M) {
+			if (M[name] == module) {
+				var dStart = new Date();
+				M[name] = require(module);
+				// logging the time elapsed
+				var dResult = ms2Time(new Date() - dStart);
+
+				if (isdist.NOT_DISTRIBUTION) {
+					console.log(forNowShortLog(" {0}{1} loaded after {2}".format([
+						chalk.bgMagenta(' M:'),
+						chalk.bgMagenta(module + ' '),
+						chalk.magenta(dResult)
+					])));
+				}
+				return M[name];
+			}
+		}
+	}
+	return module;
+}
+
+var logOrig = console.log;
+
+function gloupslog(args){
+	logOrig(args);
+}
+
+var mayLogEssentials = metAllArgs(['essential']);
+
+if(mayLogEssentials){
+	console.log=function(){};
+	gloupslog(forNowShortLog(chalk.bgRed(' Logging only essential messages ')));
+}
+
+
+// -- [supports/basic/mzg_modules_requesting.js] -- 
+// gloups commandes
+if (process.argv[2] == '--gulpfile') {
+	if (process.argv[4] && !/^serve|rewrite$/.test(process.argv[4])) {
+		importNeededModules('intask', process.argv[4]);
+	}
+} else {
+	if (process.argv[2] && !/^serve|rewrite$/.test(process.argv[2])) {
+		importNeededModules('intask', process.argv[2]);
+	}
+}
  /*	*************************************************************************************************************************************************************************************************
 	*                                 							PROJECT TASKS : Tasks used to manage and setup custom configuration project 														*
  	*************************************************************************************************************************************************************************************************/
@@ -327,24 +398,28 @@ gulp.task('default',["setParams"]);
 
 // -- [supports/basic/tasks/mzg_clear_task.js] -- 
 gulp.task('clear', function() {
-	clear();
+	(M.clear)();
 });
 
 // -- [supports/basic/tasks/mzg_externalize_config_task.js] -- 
 gulp.task('externalizeConfig', function(cb){
-  fs.writeFile('config.json', JSON.stringify(config,null,4), cb);
+  (M.fs).writeFile('config.json', JSON.stringify(config,null,4), cb);
 });
 
 // -- [projects_setup_tasks/mzg_set_vars_task.js] -- 
 gulp.task('setVars', function() {
     setConfig();
+    if (isdist.NOT_DISTRIBUTION) {
+        getModule(M.path);
+    }
+
     if (!config.verbose) {
         logTaskPurpose(this.currentTask.name);
     }
     for (var p_path in config.projects) {
         var project = config.projects[p_path];
-        if (fssync.exists(project.path + '\\config.mzg.json')) {
-            console.log("{0} - OK".format([chalk.green(project.project)]));
+        if (M.fssync.exists(project.path + '\\config.mzg.json')) {
+            console.log(' '+chalk.bgGreen(' '+project.project+' '));
             if (project.checked) {
                 setUpProjectWatchingPaths(project.path);
             }
@@ -357,16 +432,16 @@ gulp.task('setVars', function() {
     for (p_path in config.pathesToSass) {
         var watchPathForSass = config.pathesToSass[p_path].watch;
         var projectPath = config.pathesToSass[p_path].projectPath;
-        mappSassMatching(projectPath,watchPathForSass);
+        mappSassMatching(projectPath, watchPathForSass);
     }
 
     // gulp.task("externalizeConfig") is never undefined
     // so check if a NOT_DISTRIBUTION key is found or not
-    if (isdist.NOT_DISTRIBUTION) { 
-        if (!config.verbose){
+    if (isdist.NOT_DISTRIBUTION) {
+        if (!config.verbose) {
             console.log(forNowLongLog("{0}\n", ["config externalized under config.json"]));
         }
-            
+
         gulp.start("externalizeConfig");
     }
 
@@ -379,31 +454,44 @@ gulp.task('setVars', function() {
 // -- [supports/basic/tasks/mzg_set_params_task.js] -- 
 gulp.task('setParams', function() {
 
-    var firstTaskName = this.seq.slice(-1)[0];
-    var tasks;
+	var firstTaskName = this.seq.slice(-1)[0];
+	var tasks;
 
-    // the fisrt task met is defalut : gulp (...)
-    if (/^default$/.test(firstTaskName)) {
-        tasks = tasksToRunOnArgvs();
-        gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
+	// the fisrt task met is defalut : gulp (...)
+	if (/^default$/.test(firstTaskName)) {
+		tasks = tasksToRunOnArgvs();
+		gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
 
-    } else if (/^serve$/.test(firstTaskName)) {
-        tasks = tasksToRunOnArgvs();
-        gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
+	} else if (/^serve$/.test(firstTaskName)) {
+		process.title = 'Gloups {0} | {1}'.format([GLOUPS_VERSION, 'Serve']);
+		tasks = tasksToRunOnArgvs();
 
-        // the fisrt task met is rewrite
-    } else if (/^rewrite$/.test(firstTaskName)) {
-        var _services = configurationOfRewriteOnArvs();
-        var stayBeautiful = !/^ugly$/.test(_services.uglyness);
-        var watchOnce = !/^multiple$/.test(_services.times);
+		if (isdist.NOT_DISTRIBUTION) {
+			getAllNeededModules(tasks.concat(['setVars']));
+		}
 
-        logTaskName(
-            (stayBeautiful ? "imBeauty" : "imUgly") +
-            (watchOnce ? "AtOnce" : "imBeauty")
-        );
-        mergingOnChanges(stayBeautiful, watchOnce);
-        (stayBeautiful ? logTaskEndBeauy : logTaskEndUgly)(watchOnce);
-    }
+		gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
+
+		// the fisrt task met is rewrite
+	} else if (/^rewrite$/.test(firstTaskName)) {
+		process.title = 'Gloups {0} | {1}'.format([GLOUPS_VERSION, 'Rewrite']);
+		var _services = configurationOfRewriteOnArvs();
+		var stayBeautiful = !/^ugly$/.test(_services.uglyness);
+		var watchOnce = !/^multiple$/.test(_services.times);
+
+		if (isdist.NOT_DISTRIBUTION) {
+			getAllNeededModules(['rewrite', 'writeTemp', 'writeDist', 'applyTemp', 'applyDist']);
+		}
+		//getModule(M.nop);
+
+		logTaskName("rewrite {0}-{1} mode".format([
+				(stayBeautiful ? "imBeauty" : "imUgly"),
+				(watchOnce ? "one shot" : "watching")
+			])
+		);
+		mergingOnChanges(stayBeautiful, watchOnce);
+		(stayBeautiful ? logTaskEndBeauty : logTaskEndUgly)(watchOnce);
+	}
 });
 
 // -- [supports/basic/tasks/mzg_jshint_task.js] -- 
@@ -426,10 +514,10 @@ gulp.task('scanProjects', function() {
     logTaskPurpose(this.currentTask.name);
     setConfig();
     config.projects.forEach(function(project) {
-        if (!fssync.exists(project.path + '\\config.mzg.json')) {
+        if (!M.fssync.exists(project.path + '\\config.mzg.json')) {
             console.log("file :" + logFilePath(project.path + '\\config.mzg.json') + ' does not exist ... creation very soon');
             gulp.src('custom/config_model.json')
-                .pipe(rename('config.mzg.json'))
+                .pipe((M.rename)('config.mzg.json'))
                 .pipe(gulp.dest(project.path));
         }
     });
@@ -452,143 +540,85 @@ gulp.task('serve',['setParams']);
  	*************************************************************************************************************************************************************************************************/
 
 // -- [services_tasks/js_tasks/mzg_automin_task.js] -- 
-// configure which files to watch and what tasks to use on file changes
 gulp.task('automin', function() {
-    logTaskPurpose(this.currentTask.name);
+	
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToJs);
+		// says what modules gloups used to provide file compressions
+		'module': "gulp-uglify",
 
-    // passing the watch list
-    gulp.watch(wl, function(event) {
-        var regex = new RegExp(JS_REGEX_FILE_PATH_PATTERN, "g");
-        var match = regex.exec(event.path);
+		// defines what files extension are allowed to be processed
+		'rules': [JS_REGEX_FILE_PATH_PATTERN, ['!', /.*.min.js$/]],
 
-        // the file that fired the event change is a .min.js file
-        if (!/.*.min.js$/.test(event.path) && match) {
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe((M.uglify))
+			.pipe(renameSuffixMin)
+	};
 
-            var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToJs);
-            var sourcemapping = matchingEntry.sourcemaps;
-
-            gulp.src(event.path)
-                .pipe(sourcemapInit(sourcemapping))
-
-                .pipe(uglify())
-                .pipe(renameSuffixMin())
-                .pipe(insertSignatureAfter("Compressed", "gulp-uglify"))
-
-                .pipe(sourcemapWrite(sourcemapping))
-                .pipe(gulp.dest(matchingEntry.dest));
-
-            console.log(forNowShortLog("Compressed file version updated/created here :\n{0} > {1}", [breath(), logFilePath(matchingEntry.dest)]));
-        }
-    }, jshint);
-});
-
-// -- [services_tasks/js_tasks/mzg_autodel_task.js] -- 
-gulp.task('autodel', function(event) {
-    logTaskPurpose(this.currentTask.name);
-
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToJs);
-
-    // passing the watch list
-    gulp.watch(wl, function(event) {
-        var regex = new RegExp(JS_REGEX_FILE_PATH_PATTERN, "g");
-        var match = regex.exec(event.path);
-
-        if (event.type === "deleted" && match) {
-
-            // process compression of js files
-            var process = function() {
-                var dest = getMatchingEntryConfig(event.path, config.pathesToJs);
-
-                // select in all case file.min.js destination file
-                var destFileName = (dest + '/' + match[2]).replace(/.min.js$/g, ".js");
-                var destMinFileName = destFileName.replace(/.js$/g, ".min.js");
-
-                // delete the compressed file (.min.js file) if the base file (.js) does not exist
-                fs.stat(destMinFileName, function(error, stat) {
-                    if (!error)
-                        del(destMinFileName, {
-                            force: true
-                        });
-                    console.log(forNowShortLog("source folder here :\n{0}> {1}",[breath(),logFilePath(dest)]));
-                });
-            };
-
-            // call with logging of the time taken by the task
-            logProcessCompleteOnFile([match[2].replace(/.js$/g, ".min.js")], 'deleted', process);
-
-        }
-    }, jshint);
-});
-
-// -- [services_tasks/js_tasks/mzg_merg_all_minified_task.js] -- 
-// merge all js script into one big js uglyfied
-gulp.task('mergeAllMinified', function() {
-    gulp.watch(config.pathesToJs, function() {
-        //gulp.src(['./lib/file3.js', './lib/file1.js', './lib/file2.js'])
-        gulp.src(config.pathesToJs + "/scirpt/*.min.js")
-            .pipe(concat('js_stack.min.js'))
-            .pipe(uglify())
-            .pipe(gulp.dest('../uglified'));
-    });
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForCompression(this,config.pathesToJs, obj);
 });
 
 // -- [services_tasks/js_tasks/mzg_tyepscript_task.js] -- 
 gulp.task('typescript', function() {
-    logTaskPurpose(this.currentTask.name);
 
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToTs);
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
-    // passing the watch list
-    gulp.watch(wl, function(event) {
+		// says what modules gloups used to provide file compressions
+		'module': 'gulp-typescript',
 
-        var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToTs);
-        var sourcemapping = matchingEntry.sourcemaps;
+		// defines what files extension are allowed to be processed
+		'rules': [/.*.ts$/],
 
-        gulp.src(event.path)
-            .pipe(sourcemapInit(sourcemapping))
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe(function() {
+				return (M.ts)({
+					noImplicitAny: true
+				});
+			}),
 
-            .pipe(typescripting(matchingEntry.dest))
-            .pipe(insertSignatureAfter("Compiled", "gulp-typescript"))
+		// tells how to handle importation within preprocessed/precompiled files
+		'realTargetsFunction': function(filePath, matchingEntry) {
+			return [filePath];
+		}
+	};
 
-            .pipe(sourcemapWrite(sourcemapping))
-            .pipe(gulp.dest(matchingEntry.dest));
-
-        console.log(forNowShortLog("Compressed file version updated/created here :\n{0}> {1}", [breath(), logFilePath(matchingEntry.dest)]));
-
-    });
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForPrecompiledFiles(this, config.pathesToTs, obj);
 });
 
 // -- [services_tasks/js_tasks/mzg_coffeescript_task.js] -- 
-var coffee = require('gulp-coffee');
-
 gulp.task('coffeescript', function() {
-    logTaskPurpose(this.currentTask.name);
 
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToCoffee);
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
-    // passing the watch list
-    gulp.watch(wl, function(event) {
+		// says what modules gloups used to provide file compressions
+		'module': 'gulp-coffee',
 
-        var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToCoffee);
-        var sourcemapping = matchingEntry.sourcemaps;
+		// defines what files extension are allowed to be processed
+		'rules': [/.*.coffee$/],
 
-        gulp.src(event.path)
-            .pipe(sourcemapInit(sourcemapping))
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe(function() {
+				return (M.coffee)({
+					bare: true
+				});
+			}),
 
-            .pipe(serveCoffee())
-            .pipe(insertSignatureAfter("Served coffee", "gulp-coffee"))
+		// tells how to handle importation within preprocessed/precompiled files
+		'realTargetsFunction': function(filePath, matchingEntry) {
+			return [filePath];
+		}
+	};
 
-            .pipe(sourcemapWrite(sourcemapping))
-            .pipe(gulp.dest(matchingEntry.dest));
-
-        console.log(forNowShortLog("Compiled file version updated/created here :\n{0}> {1}", [breath(), logFilePath(matchingEntry.dest)]));
-    });
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForPrecompiledFiles(this, config.pathesToCoffee, obj);
 });
 /*	*************************************************************************************************************************************************************************************************
 	*                                 													OTHER ORIENTED TASKS 																						*
@@ -596,40 +626,25 @@ gulp.task('coffeescript', function() {
 
 // -- [services_tasks/css_tasks/mzg_automin_css_task.js] -- 
 gulp.task('autominCss', function() {
-    logTaskPurpose(this.currentTask.name);
 
-    var message = getOneFeedBackForAll("Are compressed: \n");
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
+		// says what modules gloups used to provide file compressions
+		'module': "gulp-clean-css",
 
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToStyle);
+		// defines what files extension are allowed to be processed
+		'rules': [/^.*.css$/, ['!', /^(?:.*.min.css|.*.less|.*.scss|.*.map)$/]],
 
-    gulp.watch(wl, function(event) {
-        if (event.type !== "deleted" && !/^(.*.min.css|.*.less|.*.scss|.*.map)$/.test(event.path)) {
-            if (/^.*.css$/.test(event.path)) {
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe(autoprefix)
+			.pipe(cleanCssMinification)
+			.pipe(renameSuffixMin)
+	};
 
-                var mainProcess = lazyPipe()
-
-                    .pipe(autoprefix)
-                    .pipe(cleanCssMinification)
-                    .pipe(renameSuffixMin);
-
-                var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToStyle);
-                var sourceMappedProcess =
-                    setSourceMappingAndSign(mainProcess, matchingEntry, {
-                        'action': "Compressed",
-                        'module': "gulp-clean-css"
-                    });
-
-                var destinatedProcess = sourceMappedProcess
-                    .pipe(function() {
-                        return gulp.dest(matchingEntry.dest);
-                    });
-
-                appendFilesToLog(message, destinatedProcess, event);
-            }
-        }
-    });
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForCompression(this, config.pathesToStyle, obj);
 });
 
 // -- [services_tasks/css_tasks/mzg_auto_format_css_task.js] -- 
@@ -651,81 +666,103 @@ gulp.task('autoformatCss', function() {
 
 // -- [services_tasks/css_tasks/mzg_less_task.js] -- 
 gulp.task('less', function() {
-    logTaskPurpose(this.currentTask.name);
 
-    // watch every single file matching those paths
-    var wl = watchList(config.pathesToStyleLess);
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
-    var glob_transitivity = getFreshTransitivity();
-    // passing the watch list
-    gulp.watch(wl, function(event) {
-        if (/.*.less$/.test(event.path)) {
+		// says what modules gloups used to provide file compressions
+		'module': 'gulp-less',
 
-            // LAZYPIPE : main pipeline to provide SASS service -------------------------------
-            var mainProcess = lazyPipe()
-                .pipe(function() {
-                    return sass(less({
-                        plugins: [lessAutoprefix]
-                    })); //.on('error', less.logError);
-                })
-                .pipe(autoprefix)
-                .pipe(stylefmt);
+		// defines what files extension are allowed to be processed
+		'rules': [/.*.less$/],
 
-            var message = {
-                'action': "Processed",
-                'module': "gulp-less"
-            };
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe(function() {
+				return (M.less)({
+					paths: [(M.path).join(__dirname, 'less', 'includes')]
+				});
+			})
+			.pipe(autoprefix)
+			.pipe((M.stylefmt)),
 
-            consumePipeProcss(glob_transitivity, mainProcess, event.path, message);
-        }
-    });
+		// tells how to handle importation within preprocessed/precompiled files
+		'realTargetsFunction': function(filePath, matchingEntry) {
+			return [filePath];
+		}
+	};
+
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForPrecompiledFiles(this, config.pathesToStyleLess, obj);
 });
 
 // -- [services_tasks/css_tasks/mzg_sass_task.js] -- 
 gulp.task('sass', function() {
-	logTaskPurpose(this.currentTask.name);
+	
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
 
-	// watch every single file matching those paths
-	var wl = watchList(config.pathesToSass);
+		// says what modules gloups used to provide file compressions
+		'module': 'gulp-sass',
 
-	var glob_transitivity = getFreshTransitivity();
-	// passing the watch list
-	gulp.watch(wl, function(event) {
-		if (/.*.scss$/.test(event.path)) {
-			var message = {
-				'action': "Processed",
-				'module': "gulp-sass"
-			};
-			// find the config through the json and getting watch ; dest ; sourcemapp etc.
-			var matchingEntry = getMatchingEntryConfig(event.path, config.pathesToSass);
+		// defines what files extension are allowed to be processed
+		'rules': [/.*.scss$/],
+
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe(function() {
+				return (M.sass)({
+					indentedSyntax: false
+				}).on('error', (M.sass).logError);
+			})
+			.pipe(autoprefix)
+			.pipe((M.stylefmt)),
+
+		// tells how to handle importation within preprocessed/precompiled files
+		'realTargetsFunction': function(filePath, matchingEntry) {
 
 			// getting the fileName and checking if its a qualified file to be process 
 			// (not starting by undererscore "_.*");
 			// else getting files refering it via @import inside them
-			realTargets = getMatchingPrincipalSCSS(matchingEntry.projectPath, event.path.hackSlashes());
-
-			var process = function() {
-				// LAZYPIPE : main pipeline to provide SASS service -------------------------------
-				var mainProcess = lazyPipe()
-					.pipe(function() {
-						return sass({indentedSyntax: false}).on('error', sass.logError);
-					})
-					.pipe(autoprefix)
-					.pipe(stylefmt);
-
-				// LAZYPIPE wrapping transitivity and sourcemapping -------------------------------
-				var thinkTransitively = transitiveWrapAround(glob_transitivity, matchingEntry, event.path, mainProcess);
-				var sourceMappedProcess = setSourceMappingAndSign(thinkTransitively, matchingEntry, message);
-
-				gulp.src(realTargets)
-					.pipe(sourceMappedProcess())
-					.pipe(gulp.dest(glob_transitivity.dest));
-			};
-
-			// call with logging of the time taken by the task
-			logProcessCompleteOnFile(realTargets, 'Processing', process);
+			return getMatchingPrincipalSCSS(matchingEntry.projectPath, filePath.hackSlashes());
 		}
-	});
+	};
+
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForPrecompiledFiles(this, config.pathesToSass, obj);
+});
+
+// -- [services_tasks/css_tasks/mzg_stylus_task.js] -- 
+gulp.task('stylus', function() {
+
+	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
+	var obj = {
+
+		// says what modules gloups used to provide file compressions
+		'module': 'gulp-stylus',
+
+		// defines what files extension are allowed to be processed
+		'rules': [/.*.styl$/],
+
+		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
+		'mainPipe': (M.lazyPipe)()
+			.pipe(function() {
+				return (M.stylus)({
+					'include css': true,
+					linenos: true
+				}) /*.on('error', sass.logError)*/ ;
+			})
+			.pipe(autoprefix)
+			.pipe((M.stylefmt)),
+
+		// tells how to handle importation within preprocessed/precompiled files
+		'realTargetsFunction': function(filePath, matchingEntry) {
+			return [filePath];
+		}
+	};
+
+	// PROCESS WITH THE VARIANT CONFIGURATION
+	runTaskProcessForPrecompiledFiles(this, config.pathesToStylus, obj);
 });
 /*	*************************************************************************************************************************************************************************************************
 	*                                 										module configurations 																			*
@@ -734,250 +771,679 @@ gulp.task('sass', function() {
 // -- [services_tasks/mzg_other_oriented_tasks.js] -- 
 
 /*	*************************************************************************************************************************************************************************************************
+	*                                 								SYNTAXICS :	module seeking in gulpfile to optimize importation 																	*
+ 	*************************************************************************************************************************************************************************************************/
+
+// -- [supports/files/mzg_module_seeking_funcs.js] -- 
+function getAllNeededModules(tasks) {
+	gloupslog("\n SYNTAXICALY {1} FROM {0} ...".format([logFilePath("gulpfile.js"), chalk.bgMagenta(' IMPORTING MODULES ')]));
+	console.log('\n');
+
+	getModule(M.fs);
+	seekInFoundElements('intask', JSON.stringify(tasks));
+
+	importModulesFromFoundModules();
+}
+
+function importModulesFromFoundModules() {
+	var dStart = new Date();
+
+	Object.keys(glob_found_modules).forEach(function(element) {
+		getModule(M[element]);
+	});
+
+	// logging the time elapsed
+	var dResult = ms2Time(new Date() - dStart);
+
+	console.log('\n');
+	gloupslog(" SYNTAXICAL  {1} DONE IN {0}".format([chalk.magenta(dResult), chalk.bgMagenta(' IMPORT ')]));
+	console.log('\n');
+}
+
+function importNeededModules(kind, search) {
+	var match = /^(?:[\-]+(.*)|(.*))$/.exec(search);
+	search = match[1] ? match[1] : match[2];
+
+	console.log('\n');
+	gloupslog(" SYNTAXICALY  {1} FROM {0} ...".format([logFilePath("gulpfile.js"), chalk.bgMagenta(' IMPORT MODULES ')]));
+	console.log('\n');
+
+	getModule(M.fs);
+
+	var analyser = getAnalyser();
+	var reading = initReading(analyser.file);
+
+	Macro_Seek_Modules(reading, analyser, kind, search);
+
+	importModulesFromFoundModules();
+}
+
+gulp.task('mapFonction', function() {
+	importNeededModules();
+});
+
+function Macro_Seek_Modules(reading, analyser, kind, search) {
+	var line, enc = 0;
+
+	reading.readLines(function() {
+		line = reading.getLine().replace(/\r?\n|\r/g, '');
+
+		// while analysing syntaxicaly the file, say if wa encountered the function / task
+		// and say via the analyser object if we are in a task or a function by its fields
+		defineMatchingElement(analyser, line, search);
+
+		// if we are in a function or a task we are searching ! and not another. 
+		// If so, explore that element (read inside curlybraces of kind [in a task or in a funct])
+		// matched
+		if (analyser[kind] && search == {
+				'intask': analyser.taskMatched,
+				'infunc': analyser.functMatched
+			}[kind]) {
+
+			// opening and closing curlybraces
+			if ((enc = (line.split("{").length - 1) + (line.split("}").length - 1)) % 2 == 0 && enc > 0) {
+				whenModuleMatched(line);
+
+				// not equal amount of opening and closing curlybraces ... need to dig deeper
+			} else {
+
+				// say when the count of opening and closing curlybraces equals to zero to tel
+				// if we reached the end of a function or a task definition.
+				defineLimits(analyser, line, enc);
+
+				whenElementMatched(line);
+			}
+		}
+	});
+}
+
+function getAnalyser() {
+	return {
+		'file': "gulpfile.js",
+		'intask': false,
+		'infunc': false,
+		'taskMatched': '',
+		'functMatched': '',
+		'encounter': 0,
+	};
+}
+
+function initReading(path) {
+	var reading = new classReading();
+	var _data = (M.fs).readFileSync(path, "utf8");
+	reading.initialize(_data, 0);
+	return reading;
+}
+
+function defineMatchingElement(analyser, line, search) {
+	var match;
+	// EX. MATCH >var funcName = function(...< OR >funcName function(...<
+	if ((match = /^(?:(?:var[\s]+(\b.*\b)[\s=]+function[(].*)|(?:.*[\s]?function[\s]([^\s(]+).*))$/.exec(line))) {
+		analyser.functMatched = match[1] ? match[1] : match[2];
+		analyser.infunc = true;
+
+	} else if ((match = /^gulp[.]task[(]["']([^\[\]]*)["'][,\s]*([\[](?:["'][\w]+["'][,\s]*)+[\]])?.*$/.exec(line))) {
+		analyser.taskMatched = match[1];
+
+		analyser.intask = true;
+
+		if ((line.split("{").length - 1) == 0 && match[2] && search == match[1]) {
+			analyser.intask = false;
+			seekInFoundElements('intask', match[2]);
+		}
+
+		//analyser.intask = (enc = line.split("{").length - 1) > 0;
+	}
+}
+
+function defineLimits(analyser, line, enc) {
+	if ((enc = (line.split("{").length - 1)) > 0) {
+		analyser.encounter += enc;
+	}
+	if ((enc = (line.split("}").length - 1)) > 0) {
+
+		analyser.encounter -= enc;
+
+		if (analyser.encounter == 0) {
+			analyser.infunc = false;
+		}
+	}
+}
+
+function whenElementMatched(line) {
+	if (whenModuleMatched(line)) {
+		// DONE, nothing to do here ... 
+	} else if ((match = /^.*[\.]pipe[(]([\w]+).*$/.exec(line))) {
+		if (!/^function|gulp$/.test(match[1])) {
+			seekInFoundElements('infunc', match[1]);
+		}
+	} else if ((match = /^.*gulp[\.]start[(](?:(?:.*([\[](?:["'][\w]+["'],?)+[\]]))|(?:.*["']([\w]+)["'])).*$/.exec(line))) {
+		seekInFoundElements('intask', match[1] ? match[1] : match[2]);
+
+	} else if ((match = /^[^\"]*[^\.]+(\b[^\.]+\b)[(].*$/.exec(line))) {
+		seekInFoundElements('infunc', match[1]);
+	}
+}
+
+function whenModuleMatched(line) {
+	var match;
+	var result;
+	if ((result = /^.*M[\.]([\w]+).*$/.exec(line))) {
+
+		var regex = /M[\.]([\w]+)/g;
+		while (match = regex.exec(line)) {
+			if (!glob_found_modules[match[1]]) {
+				glob_found_modules[match[1]] = true;
+			}
+		}
+	}
+	return result;
+}
+
+/**
+ * @param  {String} elements : name(s) of functions or tasks. 
+ * Multiple elements have to follow the array JSON string format => '["e1","e2","eN"]'
+ */
+function seekInFoundElements(kind, elements) {
+	var list = [];
+
+	// multiple elements (an array JSON string formated) 
+	// EX.MATCH >["e1","e2","eN"]<
+	if (/^([\[](?:["'][\w]+["'][,\s]*)+[\]])$/.test(elements)) {
+
+		elements = elements.replace(/[\']/g, '"');
+		list = JSON.parse(elements);
+
+		// single element (a string)
+	} else {
+		list.push(elements);
+	}
+
+	list.forEach(function(element) {
+		if (!glob_visited_elements[kind][element]) {
+			glob_visited_elements[kind][element] = true;
+			var analyser = getAnalyser();
+			var r = initReading(analyser.file);
+
+			// recursion if called by Macro_Seek_Modules. Check the matched function(s) or task(s).
+			Macro_Seek_Modules(r, analyser, kind, element);
+		}
+	});
+}
+/*	*************************************************************************************************************************************************************************************************
 	*                                 										REWRITING TASKS : Tasks Changing gulpfile.js 																			*
  	*************************************************************************************************************************************************************************************************/
 
 // -- [services_tasks/mzg_tasks_micro_services.js] -- 
+function runTaskProcessForCompression(athis, pathesTo, obj) {
+	logTaskPurpose(athis.currentTask.name);
+
+	var mainLazyPipeObj = createMainLazyPipeObject(pathesTo, "Compressed    ", obj.module);
+
+	// watch every single file matching those paths
+	var wl = watchList(pathesTo);
+
+	// no transitivity for compression because the compression is a B step out of ABC
+	// where A is the first and C the last step
+	var glob_transitivity = null;
+
+	gulp.watch(wl, function(event) {
+
+		var filePath = event.path;
+
+		// checking for extensions matching
+		if (checkMultipleRules(filePath, [event.type !== "deleted"].concat(obj.rules))) {
+
+			// set the filepath to the object
+			mainLazyPipeObj.forMatchingObj.path = filePath;
+
+			// find the config through the json and getting watch ; dest ; sourcemapp etc.
+			var matchingEntry = getMatchingEntryConfig(filePath, pathesTo);
+
+			// indicate what watch rule, the destination folder, and if there are sourcemaps.
+			mainLazyPipeObj.pathesDescr = matchingEntry;
+
+			// set the variant pipe part to the process. It will be wrapped in sourcemapps 
+			// and the transitivity will have to be calculate (not really needed here )
+			mainLazyPipeObj.process = obj.mainPipe;
+
+			// COMPUTE THE LAZYPIPE AND DYNAMIC BEHAVIORS -------------------------------------
+			consumePipeProcss(glob_transitivity, mainLazyPipeObj, [filePath]);
+		}
+	});
+}
+
+function runTaskProcessForPrecompiledFiles(athis, pathesTo, obj) {
+	logTaskPurpose(athis.currentTask.name);
+
+	var mainLazyPipeObj = createMainLazyPipeObject(pathesTo, "Processed     ", obj.module);
+
+	// watch every single file matching those paths
+	var wl = watchList(pathesTo);
+
+	// preconfigure a default "global" object for transitivity 
+	var glob_transitivity = getFreshTransitivity();
+
+	// passing the watch list
+	gulp.watch(wl, function(event) {
+
+		var filePath = event.path;
+
+		if (checkMultipleRules(filePath, obj.rules)) {
+
+			// set the filepath to the object 
+			mainLazyPipeObj.forMatchingObj.path = filePath;
+
+			// find the config through the json and getting watch ; dest ; sourcemapp etc.
+			var matchingEntry = getMatchingEntryConfig(filePath, pathesTo);
+
+			// LAZYPIPE : main pipeline to provide SASS service -------------------------------
+			mainLazyPipeObj.process = obj.mainPipe;
+
+			// focus on files importing other via @import
+			var realTargets = obj.realTargetsFunction(filePath, matchingEntry);
+
+			// COMPUTE THE LAZYPIPE AND DYNAMIC BEHAVIORS -------------------------------------
+			consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets);
+		}
+	});
+}
+
+function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
+
+	var sourceMappedProcess = transitiveAndSourcemappingWrap(glob_transitivity, mainLazyPipeObj);
+
+	// OVERWRITING DEFAULT DESTINATION ------------------------------------------------------------
+	mainLazyPipeObj.destCallBack = function() {
+		gloupslog('');
+		logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
+
+		var destPath = glob_transitivity != null ?
+			glob_transitivity.dest :
+			mainLazyPipeObj.pathesDescr.dest; // must be defined for non transitive services
+
+		return destPath;
+	};
+
+	// CONSUMMING ---------------------------------------------------------------------------------
+	gulp.src(realTargets)
+		.pipe(sourceMappedProcess())
+		.pipe(gulp.dest(mainLazyPipeObj.destCallBack()));
+}
+
+function logChangedRealTargetedFiles(mainLazyPipeObj, realTargets) {
+	var descr = mainLazyPipeObj.forMatchingObj.pathesDescr;
+	var pafn;
+	var actionOnFile = mainLazyPipeObj.message.action;
+
+	cpt = 0;
+	// call with logging of the time taken by the task
+	if (realTargets.length > 1) {
+		realTargets.forEach(function(file) {
+
+			// the next time, do not output the action since it is the same
+			if (cpt++ > 0)
+				actionOnFile = '              ';
+
+			// projectAndFileName
+			pafn = getProjectNameWithFileFromPathDesc(descr, file);
+
+			gloupslog(" {0} '{1}{2}'".format([actionOnFile, chalk.bgCyan(' ' + pafn.projectName + ' '), chalk.cyan(pafn.fileName + ' ')]));
+
+		});
+	} else {
+		var pathHackSlashed = realTargets[0].hackSlashes();
+
+		// projectAndFileName
+		pafn = getProjectNameWithFileFromPathDesc(descr, pathHackSlashed);
+
+		gloupslog(" {0} '{1}{2}'".format([actionOnFile, chalk.bgCyan(' ' + pafn.projectName + ' '), chalk.cyan(pafn.fileName + ' ')]));
+	}
+}
+
+function getProjectNameWithFileFromPathDesc(descr, file) {
+
+	var backedPath = /[^\/\\]*(\/.*)/.exec(file)[1];
+	backedPath = ".." + backedPath;
+	var projectName = '<PROJECT NM>';
+	var fileName;
+
+	for (var p in descr) {
+
+		var projectPathPaternString = descr[p].projectPath.split("/").join('\\/') + '(.*)$';
+		var projectPathPatern = new RegExp(projectPathPaternString, "g");
+		var match = null;
+
+		if ((match = projectPathPatern.exec(backedPath))) {
+			projectName = descr[p].projectName;
+			fileName = match[1];
+			break;
+		}
+	}
+
+	return {
+		'projectName': projectName,
+		'fileName': fileName
+	};
+}
+
+function transitiveAndSourcemappingWrap(glob_transitivity, mainLazyPipeObj) {
+
+	// UNBOXING -----------------------------------------------------------------------------------
+	var lazyPipeProcess = mainLazyPipeObj.process;
+	var forMatchingObj = mainLazyPipeObj.forMatchingObj,
+		path = forMatchingObj.path,
+		pathesDescription = forMatchingObj.pathesDescr; // pathesToJs/CSS/SASS/etc. ...;
+	var message = mainLazyPipeObj.message;
+
+	// find the config through the json and getting watch ; dest ; sourcemapp etc.
+	var matchingEntry = getMatchingEntryConfig(path, pathesDescription);
+
+	// LAZYPIPE wrapping transitivity and sourcemapping -------------------------------
+	var thinkTransitively = transitiveWrapAround(glob_transitivity, matchingEntry, path, lazyPipeProcess);
+	var sourceMappedProcess = setSourceMappingAndSign(thinkTransitively, matchingEntry, message);
+
+	return sourceMappedProcess;
+}
+
+function setSourceMappingAndSign(lazyPipeProcess, matchingEntry, sign) {
+	var sourcemapping = matchingEntry.sourcemaps;
+	return (M.lazyPipe)()
+
+		// if sourcemaps desired initialize them or do nothing
+		.pipe(sourcemapping ?
+			(M.sourcemaps).init :
+			(M.nop))
+
+		// transitivity handleing here in general
+		.pipe(lazyPipeProcess)
+
+		// put a sign after the end of the file stream to indicate it used Gloups and some modules
+		.pipe(insertSignatureAfter, sign.action, sign.module)
+
+		// if sourcemaps desired write them or do nothing
+		.pipe(sourcemapping ?
+			function() {
+				return (M.sourcemaps).write('./');
+			} :
+			(M.nop));
+}
+
+function transitiveWrapAround(glob_transitivity, matchingEntry, path, lazyPipeProcess) {
+
+	// do not let the default draft folder as a destination, change it straight away
+	if (glob_transitivity != null && glob_transitivity.dest == "draft") {
+		transitivitySetupCore(glob_transitivity, matchingEntry, path);
+	}
+
+	// if high leveled services, make a lazypipe where the transitivity is applied
+	var lzpTransitivityApplied = glob_transitivity != null ?
+		(M.lazyPipe)()
+		.pipe(transitivitySetup, glob_transitivity, matchingEntry, path) :
+
+		// else do nothing
+		(M.nop);
+
+	// if high leveled services, make a lazypipe compressed and suffixed
+	var lzpTransitivityCompression = glob_transitivity != null ?
+		(M.lazyPipe)()
+		.pipe(glob_transitivity.compressing)
+		.pipe(glob_transitivity.suffixing) :
+
+		// else do nothing
+		(M.nop);
+
+	return (M.lazyPipe)()
+		.pipe(lzpTransitivityApplied)
+		.pipe(lazyPipeProcess)
+		.pipe(lzpTransitivityCompression);
+}
+
+
+function transitivitySetup(transitivity, matchingEntry, path) {
+	return (M.through).obj(function(chunk, enc, callback) {
+		transitivitySetupCore(transitivity, matchingEntry, path);
+		callback(null, chunk);
+	});
+}
+
+function transitivitySetupCore(transitivity, matchingEntry, path) {
+	var shouldBeTransitive =
+		metAllArgs(['all', 'transitive']) ||
+
+		// CSS focused
+		metAllArgs(['sass', 'mincss', 'transitive']) ||
+		metAllArgs(['stylus', 'mincss', 'transitive']) ||
+		metAllArgs(['less', 'mincss', 'transitive']) ||
+
+		// JS focused
+		metAllArgs(['coffee', 'minjs', 'transitive']) ||
+		metAllArgs(['typescript', 'minjs', 'transitive']);
+
+	var found = false;
+
+	// by default the transitivity is set to the path the result should be the destination
+	transitivity.dest = matchingEntry.dest;
+
+	if (shouldBeTransitive) {
+		var fileName = (/^.*[\/](.*)$/g.exec(path.hackSlashes()))[1];
+		var focusedPathFileName = "{0}/{1}".format([matchingEntry.dest, fileName]);
+
+		// define if it has to be transitive about CSS or JS
+		// transitivityLike
+		var trLike = /.*[.](coffee|ts)$/.test(fileName) ? 'JS' :
+			/.*[.](scss|styl|less)$/.test(fileName) ? 'CSS' :
+			'UNDEFINED';
+
+		var pathesTo = trLike == 'JS' ? config.pathesToJs :
+			trLike == 'CSS' ? config.pathesToStyle :
+			null;
+
+		// get the B step matching configuration and check if there is a matching from 
+		// A step destination to B step wtching folder
+		var matchingEntryFinal = getMatchingEntryConfig(focusedPathFileName, pathesTo);
+
+		found = matchingEntryFinal != null;
+		transitivity.should = found;
+
+		if (found) {
+			transitivity.compressing =
+				trLike == 'JS' ? (M.uglify) :
+				trLike == 'CSS' ? cleanCssMinification :
+				(M.nop);
+
+			transitivity.suffixing = renameSuffixMin;
+
+			// substitution of matchingEntryConfig A step destination replaced by C step destination
+			transitivity.dest = matchingEntryFinal.dest;
+		}
+	}
+}
+
 function renameSuffixMin() {
-    return rename({
-        suffix: '.min'
-    });
+	return (M.rename)({
+		suffix: '.min'
+	});
 }
 
 function cleanCssMinification() {
-    return cleanCSS({
-        compatibility: 'ie8'
-    });
-}
-
-function typescripting(dest) {
-    return ts({
-        noImplicitAny: true
-    });
+	return (M.cleanCSS)({
+		compatibility: 'ie8'
+	});
 }
 
 function insertSignatureAfter(actionDone, thanksToModule) {
-    return insert.append("\n/* -- {0} with Gloups {1} | {2} using -- */".format([
+	return (M.insert).append("\n/* -- {0} with Gloups {1} | using {2} -- */".format([
         actionDone, GLOUPS_VERSION, thanksToModule
     ]));
 }
 
-function sourcemapInit(sourcemapping) {
-    return (sourcemapping ? sourcemaps.init : nop)();
-}
-
-function sourcemapWrite(sourcemapping) {
-    return sourcemapping ? sourcemaps.write('./') : nop();
-}
-
 function autoprefix() {
-    return autoprefixer({
-        browsers: AUTOPREFIXER_BROWSERS,
-        cascade: false
-    });
-}
-
-function serveCoffee() {
-    return coffee({
-        bare: true
-    });
-}
-
-function makeLess() {
-    return less({
-        paths: [path.join(__dirname, 'less', 'includes')]
-    });
-}
-
-function transitivitySetup(transitivity, matchingEntry, path) {
-    return through.obj(function(chunk, enc, callback) {
-        var shouldBeTransitive =
-            metAllArgs(['all', 'transitive']) ||
-            metAllArgs(['sass', 'mincss', 'transitive']) ||
-            metAllArgs(['less', 'mincss', 'transitive']);
-
-        var found = false;
-
-        // by default the transitivity is set to the path the result should be the destination
-        transitivity.dest = matchingEntry.dest;
-
-        if (shouldBeTransitive) {
-            var fileName = (/^.*[\/](.*)$/g.exec(path.hackSlashes()))[1];
-            var focusedPathFileName = "{0}/{1}".format([matchingEntry.dest, fileName]);
-            var matchingEntryFinal = getMatchingEntryConfig(focusedPathFileName, config.pathesToStyle);
-
-            found = matchingEntryFinal != null;
-            transitivity.should = found;
-
-            if (found) {
-                transitivity.compressing = cleanCssMinification;
-                transitivity.suffixing = renameSuffixMin;
-                transitivity.dest = matchingEntryFinal.dest;
-            }
-        }
-        callback(null, chunk);
-    });
-}
-function transitiveWrapAround(glob_transitivity, matchingEntry, path, lazyPipeProcess) {
-    return lazyPipe()
-        .pipe(transitivitySetup, glob_transitivity, matchingEntry, path)
-        .pipe(lazyPipeProcess)
-
-        // piping transformations when it should transit
-        .pipe(glob_transitivity.compressing)
-        .pipe(glob_transitivity.suffixing);
-}
-
-function setSourceMappingAndSign(lazyPipeProcess, matchingEntry, sign) {
-    var sourcemapping = matchingEntry.sourcemaps;
-    return lazyPipe()
-        .pipe(sourcemapInit, sourcemapping)
-        .pipe(lazyPipeProcess)
-        .pipe(insertSignatureAfter, sign.action, sign.module)
-        .pipe(sourcemapWrite, sourcemapping);
-}
-
-function appendFilesToLog(message, lazyPipeProcess, event) {
-    // -- end process logging -----------------------------------------------------
-    gulp.src(event.path)
-        // append files in order to output all files compressed at once
-        .pipe(through.obj(function(chunk, enc, cb) {
-            --message.k;
-            message.files.push(chunk.path);
-            cb(null, chunk);
-        }))
-
-        .pipe(lazyPipeProcess())
-
-        .pipe(wait(500))
-        // let the files be added by creating a race condition
-
-        // log final message when all files are done
-        .on('end', function() {
-            if (++message.k == 0) {
-                console.log(forNowShortLog(message.txt, []));
-                message.files.forEach(function(element, index) {
-                    console.log(logFilePath(element.hackSlashes()));
-                });
-                console.log();
-                message.files = [];
-            }
-        });
-}
-
-function consumePipeProcss(glob_transitivity, lasyPipeProcess, path, message) {
-    // find the config through the json and getting watch ; dest ; sourcemapp etc.
-    var matchingEntry = getMatchingEntryConfig(path, config.pathesToStyleLess);
-
-    // LAZYPIPE wrapping transitivity and sourcemapping -------------------------------
-    var thinkTransitively = transitiveWrapAround(glob_transitivity, matchingEntry, path, lasyPipeProcess);
-    var sourceMappedProcess = setSourceMappingAndSign(thinkTransitively, matchingEntry, message);
-
-    gulp.src(path)
-        .pipe(sourceMappedProcess())
-        .pipe(gulp.dest(glob_transitivity.dest));
-
-    // call with logging of the time taken by the task
-    console.log(forNowShortLog("Processed file version updated/created here :\n{0}> {1}", [breath(), logFilePath(matchingEntry.dest)]));
+	return (M.autoprefixer)({
+		browsers: AUTOPREFIXER_BROWSERS,
+		cascade: false
+	});
 }
 
 // -- [services_tasks/mzg_services_funcs.js] -- 
 function contains(a, obj) {
-    var i = a.length;
-    while (i--) {
-       if (a[i] === obj) {
-           return true;
-       }
-    }
-    return false;
+	var i = a.length;
+	while (i--) {
+		if (a[i] === obj) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function getMatchingPrincipalSCSS(projectPath, path) {
-    var m = null;
-    m = /^.*[\/\\](.*)$/.exec(path);
+	var m = null;
+	m = /^.*[\/\\](.*)$/.exec(path);
 
-    // filter to not let pass files starting by underscores "_.*"
-    if (m && m[1] && /^_.*$/.test(m[1])) {
+	// filter to not let pass files starting by underscores "_.*"
+	if (m && m[1] && /^_.*$/.test(m[1])) {
 
-        // removing the underscor and the extension to match the import definition and 
-        // then the value in configuration
-        m = /^(.*[\\\/])_?(.*)[.].*$/g.exec(path);
-        var normalized = m[1] + m[2];       
+		// removing the underscor and the extension to match the import definition and 
+		// then the value in configuration
+		m = /^(.*[\\\/])_?(.*)[.].*$/g.exec(path);
+		var normalized = m[1] + m[2];
 
-        var ppl = projectPath.length; // path to project length
-        var lpp = path.substr(ppl); // local path to the partial 
+		var ppl = projectPath.length; // path to project length
+		var lpp = path.substr(ppl); // local path to the partial 
 
-        // ellipsizing the path to get a match with
-        ellipsedPath = pathEllipzizeing(normalized, 0, (lpp.split("/").length));
+		// ellipsizing the path to get a match with
+		ellipsedPath = pathEllipzizeing(normalized, 0, (lpp.split("/").length));
 
-        var matchings = [];
-        var matchingDef = config.sassMaching;
-        for (var i in matchingDef){
+		var matchings = [];
+		var matchingDef = config.sassMaching;
+		for (var i in matchingDef) {
 
-            // if an ellipsized path match for a project, ad the filepath targeting.
-            if(contains(matchingDef[i].partials,ellipsedPath)){
-                matchings.push(matchingDef[i].target);
-            }            
-        }
-        return matchings;
-    }
-    return [path];
+			// if an ellipsized path match for a project, ad the filepath targeting.
+			if (contains(matchingDef[i].partials, ellipsedPath)) {
+				matchings.push(matchingDef[i].target);
+			}
+		}
+		return matchings;
+	}
+	return [path];
 }
 
 function getFreshTransitivity() {
-    return {
-        'should': false,
-        'dest': 'draft',
-        'compressing': nop,
-        'suffixing': nop
-    };
+	return {
+		'should': false,
+		'dest': 'draft',
+		'compressing': (M.nop),
+		'suffixing': (M.nop)
+	};
+}
+
+function createMainLazyPipeObject(pathesDescript, action, thanksModules) {
+	return {
+		'process': null,
+		'destCallBack': function() {
+			//use <this> to refere to forMatchingObj here or into rewriting of callbacks 
+			return gulp.dest("draft");
+		},
+		'forMatchingObj': {
+			'path': null,
+			'pathesDescr': pathesDescript
+		},
+		'message': {
+			'action': action,
+			'module': thanksModules,
+			'files': []
+		}
+	};
+}
+
+function checkMultipleRules(inputString, mixinRulesArr, index) {
+	index = index != undefined ? index : 0;
+
+	var rule = mixinRulesArr[index];
+	var result = true;
+
+	// undefined or false if it is the result of a boolean
+	if (rule != undefined) {
+		if (typeof rule == 'boolean') {
+			result = result && (rule ? checkMultipleRules(inputString, mixinRulesArr, ++index) : false);
+		}
+		// an array is used to store inverter and a rule
+		else if (typeof rule == 'object') {
+			if (rule instanceof Array) {
+				if (typeof rule[1] == "string") {
+					rule[1] = new RegExp(rule[1], 'g');
+				}
+                result = rule[0] == '!' && !rule[1].test(inputString);
+
+			} else if (rule instanceof RegExp) {
+				result = result && (result ? checkMultipleRules(inputString, mixinRulesArr, ++index) : false);
+			} else {
+				gloupslog(chalk.red('undefined case ...'));
+				return false;
+			}
+
+		} else if (typeof rule == 'string') {
+			result = new RegExp(rule, 'g').test(inputString);
+			result = result && (result ? checkMultipleRules(inputString, mixinRulesArr, ++index) : false);
+
+		} else {
+			gloupslog(chalk.red('undefined case ...'));
+			return false;
+		}
+	}
+	return result;
 }
 
 // -- [supports/rewriting/tasks/mzg_apply_temp_task.js] -- 
 gulp.task('applyTemp', function() {
     gulp.watch(gulpFileTempPath, function(event) {
-        if (gulp.src(gulpFileTempPath).pipe(jsValidate())) {
+        if (gulp.src(gulpFileTempPath).pipe((M.jsValidate)())) {
             console.log(forNowShortLog("{0} is {1}", [logFilePath("gulpfile.js"), chalk.green('validate')]));
             var dStart = new Date();
 
             gulp.src(gulpFileTempPath)
-                .pipe(rename('gulpfile.js'))
+                .pipe((M.rename)('gulpfile.js'))
                 .pipe(gulp.dest(function(file) {
 
                     var dResult = ms2Time(new Date() - dStart);
-                    console.log(forNowShortLog("{0} replaced after {1}", [chalk.cyan("gulpfile.js"), chalk.magenta(dResult)]));
+                    gloupslog(forNowShortLog("{0} replaced after {1}", [chalk.cyan("gulpfile.js"), chalk.magenta(dResult)]));
 
                     //gulp folder
                     var folder = getGulpfolderFromFileBase(file);
                     return folder;
-                }));
+                }))
+                .pipe((RewriteServices.times == 'multiple' ?(M.nop) : (M.exit))());
         }
     });
 });
 
 // -- [supports/rewriting/tasks/mzg_apply_dist_task.js] -- 
 gulp.task('applyDist', function() {
-    gulp.watch(gulpFileTempPath2, function(event) {
 
-        if (gulp.src(gulpFileTempPath2).pipe(jsValidate())) {
-            var dStart = new Date();
+	gulp.watch(gulpFileTempPath2, function(event) {
 
-            gulp.src(gulpFileTempPath2)
-                .pipe(rename('gulpfile.js'))
-                .pipe(gulp.dest(function(file) {
-                    var folder = getGulpfolderFromFileBase(file);
-                    var dResult = ms2Time(new Date() - dStart);
-                    console.log(forNowShortLog("Gulp project distribution generated under {0} after {1}",[logFilePath(folder + '/dist'),chalk.magenta(dResult)]));
-                    return folder + '/dist';
-                }));
+		if (gulp.src(gulpFileTempPath2).pipe((M.jsValidate)())) {
+			var dStart = new Date();
 
-            fssync.copy('help.md', 'dist/help.md');
+			gulp.src(gulpFileTempPath2)
+				.pipe((M.rename)('gulpfile.js'))
+				.pipe(gulp.dest(function(file) {
+					var folder = getGulpfolderFromFileBase(file);
+					var dResult = ms2Time(new Date() - dStart);
+					console.log(forNowShortLog("Gulp project distribution generated under {0} after {1}", [logFilePath(folder + '/dist'), chalk.magenta(dResult)]));
+					return folder + '/dist';
+				}))
+				.pipe((M.through).obj(function(chunk, enc, cb) {
+					M.fssync.copy('help.md', 'dist/help.md');
 
-            fssync.copy('custom/project_mapping_model.json', 'dist/custom/config.json');
-            fssync.copy('custom/config_model.json', 'dist/custom/config_model.json');
-            fssync.copy('package.json', 'dist/package.json');
-        }
-    });
+					M.fssync.copy('custom/project_mapping_model.json', 'dist/custom/config.json');
+					M.fssync.copy('custom/config_model.json', 'dist/custom/config_model.json');
+					M.fssync.copy('package.json', 'dist/package.json');
+					M.fssync.copy('gloups.bat', 'dist/gloups.bat');
+					cb(null, chunk);
+				}));
+		}
+	});
 });
 
 // -- [supports/rewriting/tasks/mzg_write_temp_task.js] -- 
@@ -985,18 +1451,18 @@ gulp.task('writeTemp', function() {
     var dStart = new Date();
 
     var pathfile = '';
-    if (gulp.src(mzgFiles).pipe(jsValidate())) {
+    if (gulp.src(mzgFiles).pipe((M.jsValidate)())) {
         gulp.src(mzgFiles)
-            .pipe(insert.prepend(function(file) {
-                pathfile = /^.*[\/\\](?:Gloups|gulp)[\/\\](.*)/.exec(file.path)[1];
+            .pipe((M.insert).prepend(function(file) {
+                pathfile = /^.*[\/\\](?:gloups|gulp|dist)[\/\\](.*)/.exec(file.path)[1];
 
                 // outputing a comment with the file path if not a log_section file
                 return !/^.*log_sections.*$/.test(pathfile) ?
                     // a path or nothing 
                     "\n// -- [{0}] -- \n".format([pathfile.hackSlashes()]) : "";
             }))
-            .pipe(concat(gulpFileTempPath))
-            .pipe((stayBeautiful ? nop : uglify)())
+            .pipe((M.concat)(gulpFileTempPath))
+            .pipe((stayBeautiful ? (M.nop) : (M.uglify))())
             .pipe(gulp.dest(function(file) {
                 var dResult = ms2Time(new Date() - dStart);
                 console.log(forNowShortLog("{0} writen after {1}", [logFilePath(gulpFileTempPath), chalk.magenta(dResult)]));
@@ -1008,20 +1474,28 @@ gulp.task('writeTemp', function() {
 
 // -- [supports/rewriting/tasks/mzg_write_dist_task.js] -- 
 gulp.task('writeDist', function() {
-    var dStart = new Date();
+	var dStart = new Date();
 
-    if (gulp.src(distFiles).pipe(jsValidate())) {
+	if (gulp.src(distFiles).pipe((M.jsValidate)())) {
 
-        gulp.src(distFiles)
-            .pipe(concat(gulpFileTempPath2))
-            .pipe(uglify())
-            .pipe(gulp.dest(function(file) {
-                var dResult = ms2Time(new Date() - dStart);
-                console.log(forNowShortLog("{0} writen after {1}", [logFilePath(gulpFileTempPath2), chalk.magenta(dResult)]));
+		gulp.src(distFiles)
+			.pipe((M.concat)(gulpFileTempPath2))
+			.pipe((M.replace)(/(getModule[(]M[\.][\w]+[)]+)/g, function(m) {
+				var match = /(M[\.][\w]+)/g.exec(m)[1];
+				return match;
+			}))
+			.pipe((M.replace)(/(M[\.][\w]+)/g, function(m) {
+				return "getModule({0})".format([m]);
+			}))
+			.pipe((M.uglify)())
+            .pipe(insertSignatureAfter("Provided", "gulp- uglify, replace, concat, insert"))
+			.pipe(gulp.dest(function(file) {
+				var dResult = ms2Time(new Date() - dStart);
+				console.log(forNowShortLog("{0} writen after {1}", [logFilePath(gulpFileTempPath2), chalk.magenta(dResult)]));
 
-                return getGulpfolderFromFileBase(file);
-            }));
-    }
+				return getGulpfolderFromFileBase(file);
+			}));
+	}
 });
 
 // -- [supports/rewriting/tasks/mzg_rewrite_task.js] -- 
@@ -1042,103 +1516,100 @@ gulp.Gulp.prototype._runTask = function(task) {
 
 // -- [supports/files/configurationSetting/mzg_config_funcs.js] -- 
 function getConfig() {
-    return config ? config : {
-        // See 'serviceMapping' project setup task
-        "verbose": false, // true to enable set vars verbose
-
-        "pathesToJs": [],
-        "pathesToTs": [],
-        "pathesToCoffee": [],
-        "pathesToStyle": [],
-        "pathesToStyleLess": [],
-        "pathesToSass": [],
-        "projects": []
-    };
+	return config ? config : DEFAULT_CONFIG;
 }
 
 function readJsonConfig(filePath) {
-    var _data = fs.readFileSync(filePath, "utf8");
-    var reading = new classReading();
-    reading.initialize(_data, 0);
+	var _data = (M.fs).readFileSync(filePath, "utf8");
+	var reading = new classReading();
+	reading.initialize(_data, 0);
 
-    var m;
-    var l;
-    var commentBloc = 0;
-    var has_smthng = true;
-    var content = "";
-    m = /^(.*)(\.json)$/.exec(filePath);
-    var tempfile = m[1] + '.temp' + m[2];
+	var m;
+	var l;
+	var commentBloc = 0;
+	var has_smthng = true;
+	var content = "";
+	m = /^(.*)(\.json)$/.exec(filePath);
+	var tempfile = m[1] + '.temp' + m[2];
+    var tempfileVisual = m[1] + '2.temp' + m[2];
 
-    // at any line read, 
-    fssync.write(tempfile, '', 'utf8');
-    reading.readLines(function() {
+	// at any line read, 
+	(M.fssync).write(tempfile, '', 'utf8');
+	reading.readLines(function() {
 
-        // stripping comments ---------------------------------------------------------------------
-        l = reading.getLine();
-        if ((has_smthng = (m = /^(.*)\/\/.*$/g.exec(l)))) { // "(.. content ..) [//] .. .."
-            content = m[1];
-        } else if ((has_smthng = (m = /^(.*)\/\*$/g.exec(l)))) { // "(.. content ..) [/*] .. .."
-            content = m[1];
-            ++commentBloc;
-        } else if ((has_smthng = (m = /^.*\*\/(.*)$/g.exec(l)))) { // ".. .. [*/] (.. content ..)"
-            content = m[1];
-            --commentBloc;
-        } else if ((has_smthng = (commentBloc == 0))) {
-            content = l;
-        }
+		// stripping comments ---------------------------------------------------------------------
+		l = reading.getLine();
+		if ((has_smthng = (m = /^(.*)\/\/.*$/g.exec(l)))) { // "(.. content ..) [//] .. .."
+			content = m[1];
+		} else if ((has_smthng = (m = /^(.*)\/\*$/g.exec(l)))) { // "(.. content ..) [/*] .. .."
+			content = m[1];
+			++commentBloc;
+		} else if ((has_smthng = (m = /^.*\*\/(.*)$/g.exec(l)))) { // ".. .. [*/] (.. content ..)"
+			content = m[1];
+			--commentBloc;
+		} else if ((has_smthng = (commentBloc == 0))) {
+			content = l;
+		}
 
-        //                          every matching creates a candidate to write 
-        if (has_smthng) {
-            if (!/^[\s]*$/g.test(content)) { // white lines are ignored
-                fs.appendFileSync(tempfile, content + "\r\n", 'utf8');
+		//                          every matching creates a candidate to write 
+		if (has_smthng) {
+			if (!/^[\s]*$/g.test(content)) { // white lines are ignored
+                getModule(M.fs).appendFileSync(tempfileVisual, content + "\r\n", 'utf8');
+                getModule(M.fs).appendFileSync(tempfile, /^[\s\t]*((?:[^\s\t]*[\s\t]*[^\s\t])+)[\s\t]*$/.exec(content)[1], 'utf8');
             }
-        }
-        // ----------------------------------------------------------------------------------------
-    });
-    var temp = fs.readFileSync(tempfile, "utf8");
-    fssync.remove(tempfile);
-    return JSON.parse(temp);
+		}
+		// ----------------------------------------------------------------------------------------
+	});
+	
+    var temp = getModule(M.fs).readFileSync(tempfile, "utf8");
+    
+    getModule(M.fssync).remove(tempfile);
+    getModule(M.fssync).remove(tempfileVisual);
+
+    return JSON.parse(temp.replace(/}(,)]/g,'}]'));
 }
 
 function setConfig() {
-    config.projects = readJsonConfig("custom/config.json").projects;
+	config.projects = readJsonConfig("custom/config.json").projects;
 }
 
 function makePathesCoveringAllFilesFor(projectFolder, matchingForEntry, subpathToExtention, purpose) {
 
-    var addon = matchingForEntry.addon;
-    var entrySet = matchingForEntry.pathesToService;
+	var addon = matchingForEntry.addon;
+	var entrySet = matchingForEntry.pathesToService;
 
-    if (addon) {
-        for (var i = 0, t = addon.length; i < t; ++i) {
-            // concatenate /**/*.ext to the watch folder
-            addon[i].watch = addon[i].watch + subpathToExtention;
+	matchingForEntry.projectPath = projectFolder;
 
-            var pathes = [addon[i].watch, addon[i].dest];
+	if (addon) {
+		for (var i = 0, t = addon.length; i < t; ++i) {
+			// concatenate /**/*.ext to the watch folder
+			addon[i].watch = addon[i].watch + subpathToExtention;
 
-            if (0 < i) { // only the first time to avoid repeating the same purpose
-                purpose = "[SAME-PURPOSE]";
-            }
+			var pathes = [addon[i].watch, addon[i].dest];
 
-            logServiceActivatedPushed(purpose, projectFolder, addon[i]);
+			if (0 < i) { // only the first time to avoid repeating the same purpose
+				purpose = "[SAME-PURPOSE]";
+			}
 
-            // rebaseing the path to validate the watching
-            addon[i].watch = projectFolder + "/" + addon[i].watch;
-            addon[i].dest = projectFolder + "/" + addon[i].dest;
+			var projectName = getProjectNameFromRootPath(projectFolder);
 
-            if (matchingForEntry.projectPath){
-                addon[i].projectPath = projectFolder;
-            }
+			logServiceActivatedPushed(purpose, projectName, addon[i]);
 
-            entrySet = entrySet.concat(addon[i]);
-        }
-        if (config.verbose) {
-            console.log();
-        }
-    }
+			// rebaseing the path to validate the watching
+			addon[i].watch = projectFolder + "/" + addon[i].watch;
+			addon[i].dest = projectFolder + "/" + addon[i].dest;
+			addon[i].projectPath = projectFolder;
+			addon[i].projectName = projectName;
 
-    //pushing the addon to the entrySet an "entry" is a watching list for js or ts or coffee ... css ... etc."
-    return entrySet;
+			entrySet = entrySet.concat(addon[i]);
+		}
+		if (config.verbose) {
+			console.log();
+		}
+	}
+
+	//pushing the addon to the entrySet an "entry" is a watching list for js or ts or coffee ... css ... etc."
+	return entrySet;
 }
 
 // -- [supports/projects/mzg_projects_funcs.js] -- 
@@ -1181,11 +1652,14 @@ function setUpProjectWatchingPaths(project_path) {
     }, '/**/*.less', 'Compile .less files into .css files');
 
     config.pathesToSass = makePathesCoveringAllFilesFor(project_path, {
-        'projectPath': project_path,
         'pathesToService': (config.pathesToSass),
         'addon': projectServices.sass
     }, '/**/*.scss', 'Compile .scss files into .css files');
 
+    config.pathesToStylus = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToStylus),
+        'addon': projectServices.stylus
+    }, '/**/*.styl', 'Compile .styl files into .css files');
 }
 
 function getMatchingEntryConfig(filePath, configTab) {
@@ -1200,6 +1674,7 @@ function getMatchingEntryConfig(filePath, configTab) {
         var watch = entry.watch.hackSlashes();
         var dest = entry.dest.hackSlashes();
 
+        // EX. >abc/efg/hij/klm/nop<
         var pattern = '^([^\\\\/*]+).([^\\*]+)([\\/]?[\\/*]+[\\/]?)(.*)$';
         var base = (new RegExp(pattern, "g").exec(watch))[2];
         var matching = (new RegExp('^.*(?:' + base + ').*$', "g").exec(filePath));
@@ -1220,6 +1695,20 @@ function watchList(configTab) {
     return list;
 }
 
+function watchListLight(configTab) {
+    var list = [];
+
+    configTab.forEach( function(element) {
+        var watch = element.watch;
+
+        var ppl = element.projectPath.length; // path to project length
+        var lpp = watch.substr(ppl); // local path to the partial 
+
+        list.push({'project':element.projectName,'watch':lpp});
+    });
+    return list;
+}
+
 function mappSassMatching(projectRootPath, watchPathForSass) {
     // ===========================================================================================================
     // the configuration is set to look into every folder under the watch path ?
@@ -1230,14 +1719,14 @@ function mappSassMatching(projectRootPath, watchPathForSass) {
         var pathsToSCSSPrimary = walkSync(m[1], [], new RegExp("^.*[\\\/](_.*)$", 'i'));
         var i = 0;
 
-        pathsToSCSSPrimary.forEach(function(styleSheet){
+        pathsToSCSSPrimary.forEach(function(styleSheet) {
             config.sassMaching.push({
                 identifier: styleSheet.fileName,
                 target: styleSheet.path,
                 partials: []
             });
 
-            pushEllipsizedPartials(projectRootPath, styleSheet,i++);
+            pushEllipsizedPartials(projectRootPath, styleSheet, i++);
         });
     }
     // ===========================================================================================================
@@ -1246,12 +1735,12 @@ function mappSassMatching(projectRootPath, watchPathForSass) {
 function pushEllipsizedPartials(projectRootPath, styleSheet, index) {
 
     var reading = new classReading();
-    var _data = fs.readFileSync(styleSheet.path, "utf8");
+    var _data = (M.fs).readFileSync(styleSheet.path, "utf8");
     reading.initialize(_data, 0);
 
     var ppl = projectRootPath.length; // project path Length
-    var l,m;
-    
+    var l, m;
+
     reading.readLines(function() {
         l = reading.getLine();
         if ((m = /^@import[\s].*["](.*)["]/.exec(l)) && m[1]) {
@@ -1278,11 +1767,11 @@ function pathEllipzizeing(path, sub, sup) {
 // https://gist.github.com/kethinov/6658166
 // List all files in a directory in Node.js recursively in a synchronous fashion
 var walkSync = function(dir, filelist, regexFilter) {
-    var files = fs.readdirSync(dir);
+    var files = (M.fs).readdirSync(dir);
     filelist = filelist || [];
     files.forEach(function(file) {
-        if (fs.statSync(path.join(dir, file)).isDirectory()) {
-            filelist = walkSync(path.join(dir, file), filelist, regexFilter);
+        if ((M.fs).statSync((M.path).join(dir, file)).isDirectory()) {
+            filelist = walkSync(M.path.join(dir, file), filelist, regexFilter);
         } else {
             if (!regexFilter.test(dir + '/' + file))
                 filelist.push({
@@ -1294,6 +1783,18 @@ var walkSync = function(dir, filelist, regexFilter) {
     });
     return filelist;
 };
+
+function getProjectNameFromRootPath(projectRootPath){
+    var projects = getConfig().projects;
+    for(var p in projects){
+        if(projectRootPath == projects[p].path){
+            return projects[p].project;
+        }        
+    }
+
+    // default
+    return projectRootPath;
+}
 
 // -- [supports/mzg_argument_funcs.js] -- 
 function translateAliassesInArgs(argvs, serviceArgs) {
@@ -1411,7 +1912,7 @@ function checkPresetsOverdose(optionsCount, service) {
 
 // -- [supports/rewriting/mzg_rewriting_funcs.js] -- 
 var merging = function(event) {
-    clear();
+    (M.clear)();
     
     if (event) {
         modifiedMZGEvent = event;
@@ -1450,7 +1951,7 @@ var mergingOnChanges = function(beautifully, one_time) {
 };
 
 function getGulpfolderFromFileBase(file) {
-    var gulpfolder = /^(.*[\/\\](?:Gloups|gulp))[\/\\].*/.exec(file.base)[1];
+    var gulpfolder = /^(.*[\/\\](?:gloups|gulp|dist))[\/\\].*/.exec(file.base)[1];
     return gulpfolder;
 }
 
@@ -1483,11 +1984,11 @@ function configurationOfRewriteOnArvs() {
 
 // -- [supports/mzg_logging.js] -- 
 function breath() {
-    return '           ';
+	return '           ';
 }
 
 function logFilePath(filePath) {
-    return "'{0}'".format([chalk.cyan(filePath)]);
+	return "'{0}'".format([chalk.cyan(filePath)]);
 }
 
 /**
@@ -1496,53 +1997,53 @@ function logFilePath(filePath) {
  * formated with colors to make more sens to the commun user.
  */
 function logHelp() {
-    var _data = fs.readFileSync("help.md", "utf8");
-    var reading = new classReading();
-    reading.initialize(_data, 0);
-    var match, line;
+	var _data = (M.fs).readFileSync("help.md", "utf8");
+	var reading = new classReading();
+	reading.initialize(_data, 0);
+	var match, line;
 
-    var cpt = 0;
+	var cpt = 0;
 
-    console.log("\n\n");
-    reading.readLines(function() {
-        line = reading.getLine().replace(/\r?\n|\r/g, '');
+	console.log("\n\n");
+	reading.readLines(function() {
+		line = reading.getLine().replace(/\r?\n|\r/g, '');
 
-        // reading the help.md file [MARKDOWN]
-        // Titles are cyan
-        if ((match = /^([\s]*[#]+.*)$/.exec(line))) {
-            console.log(chalk.cyan(match[1]));
+		// reading the help.md file [MARKDOWN]
+		// Titles are cyan
+		if ((match = /^([\s]*[#]+.*)$/.exec(line))) {
+			console.log(chalk.cyan(match[1]));
 
-            // commands explanations see $ gulp helpMe +[void]+ effects ...
-        } else if ((match = /^([\s]*)([$](?:[\s][^\s]+)+)([\s]{2,}.*|.*)$/.exec(line))) {
-            console.log("{0}{1}{2}".format([chalk.grey(match[1]), match[2], chalk.green(match[3])]));
+			// commands explanations see $ gulp helpMe +[void]+ effects ...
+		} else if ((match = /^([\s]*)([$](?:[\s][^\s]+)+)([\s]{2,}.*|.*)$/.exec(line))) {
+			console.log("{0}{1}{2}".format([chalk.grey(match[1]), match[2], chalk.green(match[3])]));
 
-            // Commentq are green
-        } else if ((match = /^([\s]*[>].*)$/.exec(line))) {
-            console.log(chalk.green(match[1]));
+			// Commentq are green
+		} else if ((match = /^([\s]*[>].*)$/.exec(line))) {
+			console.log(chalk.green(match[1]));
 
-            // Alternation between extensions (magenta) and regular text (grey) ... (2 extensions)
-        } else if ((match = /^([\s]*)([\-]+[^\s,]+)([^\-.]*)((?:[\s][\-]+[^\s]+)+)([^\-.]*)((?:[.][^.\s]+)+|)([^\-.]*)((?:[.][^.\s]+)+|)(.*)$/.exec(line))) {
-            console.log("{0}{1}{2}{3}{4}{5}{6}{7}{8}".format([chalk.grey(match[1]), match[2], chalk.grey(match[3]), match[4], chalk.grey(match[5]), chalk.magenta(match[6]), chalk.grey(match[7]), chalk.magenta(match[8]), chalk.grey(match[9])]));
+			// Alternation between extensions (magenta) and regular text (grey) ... (2 extensions)
+		} else if ((match = /^([\s]*)([\-]+[^\s,]+)([^\-.]*)((?:[\s][\-]+[^\s]+)+)([^\-.]*)((?:[.][^.\s]+)+|)([^\-.]*)((?:[.][^.\s]+)+|)(.*)$/.exec(line))) {
+			console.log("{0}{1}{2}{3}{4}{5}{6}{7}{8}".format([chalk.grey(match[1]), match[2], chalk.grey(match[3]), match[4], chalk.grey(match[5]), chalk.magenta(match[6]), chalk.grey(match[7]), chalk.magenta(match[8]), chalk.grey(match[9])]));
 
-            // Alternation between extensions (magenta) and regular text (grey) ... (1 extension)
-        } else if ((match = /^([^\-]*)((?:[\-]+[^\s]+[\s]?)+)([\s]?.*)$/.exec(line))) {
-            console.log("{0}{1}{2}".format([chalk.grey(match[1]), match[2], chalk.grey(match[3])]));
+			// Alternation between extensions (magenta) and regular text (grey) ... (1 extension)
+		} else if ((match = /^([^\-]*)((?:[\-]+[^\s]+[\s]?)+)([\s]?.*)$/.exec(line))) {
+			console.log("{0}{1}{2}".format([chalk.grey(match[1]), match[2], chalk.grey(match[3])]));
 
-            // Reguar text are grey
-        } else if (line.length > 0) {
-            console.log(chalk.grey(line));
+			// Reguar text are grey
+		} else if (line.length > 0) {
+			console.log(chalk.grey(line));
 
-            // when two wite line are count, the dev wanted to put a real line feed
-        } else if (++cpt % 3 == 2) {
-            console.log(line);
-        }
+			// when two wite line are count, the dev wanted to put a real line feed
+		} else if (++cpt % 3 == 2) {
+			console.log(line);
+		}
 
-        /* Each time a line is not blank (no length), count it as a real line because the reading 
-        process reeds line feeds as a lines which is not excpected*/
-        if (line.length > 0) {
-            cpt = 0;
-        }
-    });
+		/* Each time a line is not blank (no length), count it as a real line because the reading 
+		process reeds line feeds as a lines which is not excpected*/
+		if (line.length > 0) {
+			cpt = 0;
+		}
+	});
 }
 
 /**
@@ -1554,104 +2055,107 @@ function logHelp() {
  * @param  {array[String]}
  */
 function logErrorsOnTaskArgvs(errors) {
-    if (errors.length > 0) {
-        console.log("{0}\n{1}\n{2}\n{3}".format(chalk.red(errors.join('\n'))), [
+	if (errors.length > 0) {
+		console.log("{0}\n{1}\n{2}\n{3}".format(chalk.red(errors.join('\n'))), [
             "WARNING \n\nYou may have made mistakes in shoosing wrong options.",
             "call the folowing command to have more info of what options are valid",
             "gulp --help"
         ]);
-    }
+	}
 }
 
 function logProjectErrored(project) {
-    console.log(
-        "{0}  - SOMETING IS WRONG\n    {1}\n    {2} {3}\n{4}\n{5}\n    > {6}".format([
-            chalk.red(project.project),
+    gloupslog(" {0}  - SOMETING IS WRONG".format([chalk.bgRed(' '+project.project+' ')]));
+	console.log(
+		"\n    {0}\n    {1} {2}\n\n {3}\n {4}\n    > {5}\n\n".format([
             'this project seems to have no configuration .INI file defined',
             logFilePath(project.path + '\\config.mzg.ini'), chalk.red(': MISSING'),
-            'SOLUTION:',
-            'run the command to setup projects local configuraitons:',
+            chalk.gray.inverse(' SOLUTION '),
+            '    run the command to setup projects local configuraitons:',
             chalk.grey('$ gulp scanProjects')
         ]));
 }
 
 function logProcessCompleteOnFile(files, realAction, process) {
-    try {
-        // run the process treatment
-        var dStart = new Date();
-        process();
+	try {
+		// run the process treatment
+		var dStart = new Date();
+		process();
 
-        // logging the time elapsed
-        var dResult = ms2Time(new Date() - dStart);
-        
-        if(files.length > 1){
-            console.log(forNowShortLog("{0} of these files:\n".format([realAction])));
-                files.forEach( function(file) {
-                    console.log(logFilePath(file));
-                });
-            console.log();
-            console.log(forNowShortLog("after {0}".format([chalk.magenta(dResult)])));
-        }else{
-            console.log(forNowShortLog("{0} {1} after {2}".format([logFilePath(files), realAction, chalk.magenta(dResult)])));    
-        }
-        
-    } catch (err) {
+		// logging the time elapsed
+		var dResult = ms2Time(new Date() - dStart);
 
-        //logging eventual errors
-        console.log(chalk.red(err));
-    }
+		if (files.length > 1) {
+			console.log(forNowShortLog("{0} of these files:\n".format([realAction])));
+			files.forEach(function(file) {
+				console.log(logFilePath(file));
+			});
+			console.log();
+			console.log(forNowShortLog("after {0}".format([chalk.magenta(dResult)])));
+		} else {
+			console.log(forNowShortLog("{0} {1} after {2}".format([logFilePath(files), realAction, chalk.magenta(dResult)])));
+		}
+
+	} catch (err) {
+
+		//logging eventual errors
+		console.log(chalk.red(err));
+	}
 }
 
 function ms2Time(ms) {
-    //https://stackoverflow.com/questions/1210701/compute-elapsed-time#16344621
-    var secs, minutes, hours;
+	//https://stackoverflow.com/questions/1210701/compute-elapsed-time#16344621
+	var secs, minutes, hours;
 
-    hours =
-        Math.floor((minutes = Math.floor((secs = Math.floor(((ms = Math.floor(ms % 1000)) / 1000) % 60)) % 60)) % 24);
+	hours =
+		Math.floor((minutes = Math.floor((secs = Math.floor(((ms = Math.floor(ms % 1000)) / 1000) % 60)) % 60)) % 24);
 
-    return [(hours ? hours + "h " : ""), (minutes ? minutes + "min " : ""), (secs ? secs + "sec " : ""), ms, "ms"].join("");
+	return [(hours ? hours + "h " : ""), (minutes ? minutes + "min " : ""), (secs ? secs + "sec " : ""), ms, "ms"].join("");
 }
 
 function dateComputed() {
-    var date = new Date();
+	var date = new Date();
 
-    var days = ["Mon", "Tues", "Wednes", "Thirth", "Fri", "Satur", "Sun"];
-    return [days[date.getDay() - 1], "day,", [date.getMonth() + 1, date.getDate(), date.getFullYear()].join("-")].join("");
+	var days = ["Mon", "Tues", "Wednes", "Thirth", "Fri", "Satur", "Sun"];
+	return [days[date.getDay() - 1], "day,", [date.getMonth() + 1, date.getDate(), date.getFullYear()].join("-")].join("");
 }
 
 function timeComputed() {
-    var date = new Date();
+	var date = new Date();
 
-    return [date.getHours(), date.getMinutes(), date.getSeconds()].join(":");
+	return [date.getHours(), date.getMinutes(), date.getSeconds()].join(":");
 }
 
 function forNowLongLog(fmt, messageComponents) {
-    return "[{0}] {1}".format([chalk.gray(dateComputed()), fmt.format(messageComponents)]);
+	return "[{0}] {1}".format([chalk.gray(dateComputed()), fmt.format(messageComponents)]);
 }
 
 function forNowShortLog(fmt, messageComponents) {
-    var transformed = fmt.format(messageComponents);
-    return "[{0}] {1}".format([chalk.gray(timeComputed()), transformed]);
+	var transformed = fmt.format(messageComponents);
+	return "[{0}] {1}".format([chalk.gray(timeComputed()), transformed]);
 }
 
-function logServiceActivatedPushed(purpose, project, addon) {
-    if (config.verbose) {
-        var match;
+function logServiceActivatedPushed(purpose, projectName, addon) {
+	if (config.verbose) {
+		var match;
 
-        if ((match = /^([^.]+)([.][^\s]*)([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose))) {
-            console.log("{0}{1}{2}{3}{4}".format([chalk.grey(match[1]), chalk.magenta(match[2]), chalk.grey(match[3]), chalk.magenta(match[4]), chalk.grey(match[5])]));
+		if ((match = /^([^.]+)([.][^\s]*)([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose))) {
+			console.log("{0}{1}{2}{3}{4}".format([chalk.grey(match[1]), chalk.magenta(match[2]), chalk.grey(match[3]), chalk.magenta(match[4]), chalk.grey(match[5])]));
 
-        } else if ((match = /^([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose))) {
-            console.log("{0}{1}{2}".format([chalk.grey(match[1]), chalk.magenta(match[2]), chalk.grey(match[3])]));
-        }
+		} else if ((match = /^([^.]+)([.][^\s]*)([^.]+)$/.exec(purpose))) {
+			console.log("{0}{1}{2}".format([chalk.grey(match[1]), chalk.magenta(match[2]), chalk.grey(match[3])]));
+		}
 
-        console.log("Watch :{0} - Dest. :{1}".format([logFilePath('[..]/' + addon.watch), logFilePath('[..]/' + addon.dest)]));
+		console.log(" Watch :'{0}{1}'\n Dest. :'{2}{3}'".format([
+            chalk.bgCyan(' ' + projectName+' '), chalk.cyan('/' + addon.watch + ' '),
+            chalk.bgCyan(' ' + projectName+' '), chalk.cyan('/' + addon.dest + ' ')
+        ]));
 
-        var sourcemaps = addon.sourcemaps;
-        if (sourcemaps !== undefined) {
-            console.log(sourcemaps ? chalk.green("Sourcemaps !") : chalk.grey("no sourcemaps"));
-        }
-    }
+		var sourcemaps = addon.sourcemaps;
+		if (sourcemaps !== undefined) {
+			console.log(sourcemaps ? '         '+chalk.bgGreen(" Sourcemaps ! ") : '');
+		}
+	}
 }
 
 /**
@@ -1665,89 +2169,83 @@ function logServiceActivatedPushed(purpose, project, addon) {
  * @param  {string}
  */
 function logTaskPurpose(taskName) {
-    logTaskName(taskName);
-    var tasks = {
-        "setVars": "" +
-            "  Sets configuration variables \n" +
-            '  See the .INI file of project mapping to set Gloups ready to serve your projects here :\n' +
-            '  > ' + logFilePath('custom/config.mzg.ini') + ':\n',
-        "automin": "" +
-            "  Will uglify .js files matching the folowing path(s):\n",
-        "autodel": "" +
-            "  Delete " + logFilePath(".min.js orphan files") + " when " + logFilePath(".js files model") + " are deleted\n",
-        "typescript": "" +
-            "  Will compile .ts files matching the folowing path(s):\n",
-        "coffeescript": "" +
-            "  Will compile .coffee files matching the folowing path(s):\n",
-        "autominCss": "" +
-            "  Will compress .css files matching the folowing path(s):\n",
-        "less": "" +
-            "  Will compile .less files matching the folowing path(s):\n",
-        "sass": "" +
-            "  Will compile .sass files matching the folowing path(s):\n",
-        "scanProjects": "" +
-            "  Creates configuration file in every project root folder\n"
-    };
+	logTaskName(taskName);
+	var tasks = {
+		"setVars": "" +
+			"  Sets configuration variables \n" +
+			'  See the .INI file of project mapping to set Gloups ready to serve your projects here :\n' +
+			'  > ' + logFilePath('custom/config.mzg.ini') + ':\n',
+		"automin": "" +
+			"  Will uglify .js files matching the folowing path(s):\n",
+		"typescript": "" +
+			"  Will compile .ts files matching the folowing path(s):\n",
+		"coffeescript": "" +
+			"  Will compile .coffee files matching the folowing path(s):\n",
+		"autominCss": "" +
+			"  Will compress .css files matching the folowing path(s):\n",
+		"less": "" +
+			"  Will process .less files matching the folowing path(s):\n",
+		"sass": "" +
+			"  Will process .sass files matching the folowing path(s):\n",
+        "stylus": "" +
+            "  Will process .styl files matching the folowing path(s):\n",
+		"scanProjects": "" +
+			"  Creates configuration file in every project root folder\n"
+	};
 
 
-    if (tasks[taskName]) {
-        console.log(tasks[taskName]);
-        logWatchList(taskName);
-    } else {
-        console.log(chalk.yellow("  no information provided \n"));
-    }
+	if (tasks[taskName]) {
+		console.log(tasks[taskName]);
+		logWatchList(taskName);
+	} else {
+		console.log(chalk.yellow("  no information provided \n"));
+	}
 }
 
 function logWatchList(taskName) {
 
-    var associations = {
-        "automin": config.pathesToJs,
-        "typescript": config.pathesToTs,
-        "coffeescript": config.pathesToCoffee,
-        "autominCss": config.pathesToStyle,
-        "less": config.pathesToStyleLess,
-        "sass": config.pathesToSass
-    };
+	var associations = {
+		"automin": config.pathesToJs,
+		"typescript": config.pathesToTs,
+		"coffeescript": config.pathesToCoffee,
+		"autominCss": config.pathesToStyle,
+		"less": config.pathesToStyleLess,
+		"sass": config.pathesToSass,
+        "stylus": config.pathesToStylus
+	};
 
-    if (associations[taskName]) {
-        var wl = watchList(associations[taskName]);
-        wl.forEach(function(t) {
-            console.log("    " + logFilePath(t));
-        });
-        console.log();
-    }
+	if (associations[taskName]) {
+		var wl = watchListLight(associations[taskName]);
+
+		wl.forEach(function(p, i) {
+			console.log("    '{0}{1}'".format([chalk.bgCyan(' ' + p.project), chalk.cyan(p.watch + ' ')]));
+		});
+		console.log();
+	}
 }
 
 function logTaskName(taskName) {
-    console.log(".............................................................");
-    console.log("[Task] " + chalk.red(taskName) + ":");
+	console.log("\n {0}{1}\n".format(
+        [chalk.bgWhite.black(' T:'), chalk.bgWhite.black(taskName + ' ')]
+	));
 }
 
 function logTaskEndUgly(one_time) {
-    console.log("      > which is uglyfied " + chalk.red("for performances"));
-    if (one_time) {
-        console.log("  once: " + chalk.red("not watching specific files") + "\n");
-    } else {
-        console.log();
-    }
+	console.log("      > which is uglyfied " + chalk.red("for performances"));
+	if (one_time) {
+		console.log("  once: " + chalk.red("not watching specific files") + "\n");
+	} else {
+		console.log();
+	}
 }
 
-function logTaskEndBeauy(one_time) {
-    console.log("      > which is beautifull " + chalk.red("for debugging") + "\n");
-    if (one_time) {
-        console.log("  once: " + chalk.red("not watching specific files") + "\n");
-    } else {
-        console.log();
-    }
-}
-
-
-function getOneFeedBackForAll(intro){
-    return {
-        'files': [],
-        'txt': intro,
-        'k': 0
-    };
+function logTaskEndBeauty(one_time) {
+	console.log("      > which is beautifull " + chalk.red("for debugging") + "\n");
+	if (one_time) {
+		console.log("  once: " + chalk.red("not watching specific files") + "\n");
+	} else {
+		console.log();
+	}
 }
 /*	*************************************************************************************************************************************************************************************************
 	*                                 										CLASSES : Classes for configuration purpose 																			*

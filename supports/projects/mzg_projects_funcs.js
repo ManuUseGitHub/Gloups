@@ -37,11 +37,14 @@ function setUpProjectWatchingPaths(project_path) {
     }, '/**/*.less', 'Compile .less files into .css files');
 
     config.pathesToSass = makePathesCoveringAllFilesFor(project_path, {
-        'projectPath': project_path,
         'pathesToService': (config.pathesToSass),
         'addon': projectServices.sass
     }, '/**/*.scss', 'Compile .scss files into .css files');
 
+    config.pathesToStylus = makePathesCoveringAllFilesFor(project_path, {
+        'pathesToService': (config.pathesToStylus),
+        'addon': projectServices.stylus
+    }, '/**/*.styl', 'Compile .styl files into .css files');
 }
 
 function getMatchingEntryConfig(filePath, configTab) {
@@ -56,6 +59,7 @@ function getMatchingEntryConfig(filePath, configTab) {
         var watch = entry.watch.hackSlashes();
         var dest = entry.dest.hackSlashes();
 
+        // EX. >abc/efg/hij/klm/nop<
         var pattern = '^([^\\\\/*]+).([^\\*]+)([\\/]?[\\/*]+[\\/]?)(.*)$';
         var base = (new RegExp(pattern, "g").exec(watch))[2];
         var matching = (new RegExp('^.*(?:' + base + ').*$', "g").exec(filePath));
@@ -76,6 +80,20 @@ function watchList(configTab) {
     return list;
 }
 
+function watchListLight(configTab) {
+    var list = [];
+
+    configTab.forEach( function(element) {
+        var watch = element.watch;
+
+        var ppl = element.projectPath.length; // path to project length
+        var lpp = watch.substr(ppl); // local path to the partial 
+
+        list.push({'project':element.projectName,'watch':lpp});
+    });
+    return list;
+}
+
 function mappSassMatching(projectRootPath, watchPathForSass) {
     // ===========================================================================================================
     // the configuration is set to look into every folder under the watch path ?
@@ -86,14 +104,14 @@ function mappSassMatching(projectRootPath, watchPathForSass) {
         var pathsToSCSSPrimary = walkSync(m[1], [], new RegExp("^.*[\\\/](_.*)$", 'i'));
         var i = 0;
 
-        pathsToSCSSPrimary.forEach(function(styleSheet){
+        pathsToSCSSPrimary.forEach(function(styleSheet) {
             config.sassMaching.push({
                 identifier: styleSheet.fileName,
                 target: styleSheet.path,
                 partials: []
             });
 
-            pushEllipsizedPartials(projectRootPath, styleSheet,i++);
+            pushEllipsizedPartials(projectRootPath, styleSheet, i++);
         });
     }
     // ===========================================================================================================
@@ -102,12 +120,12 @@ function mappSassMatching(projectRootPath, watchPathForSass) {
 function pushEllipsizedPartials(projectRootPath, styleSheet, index) {
 
     var reading = new classReading();
-    var _data = fs.readFileSync(styleSheet.path, "utf8");
+    var _data = (M.fs).readFileSync(styleSheet.path, "utf8");
     reading.initialize(_data, 0);
 
     var ppl = projectRootPath.length; // project path Length
-    var l,m;
-    
+    var l, m;
+
     reading.readLines(function() {
         l = reading.getLine();
         if ((m = /^@import[\s].*["](.*)["]/.exec(l)) && m[1]) {
@@ -134,11 +152,11 @@ function pathEllipzizeing(path, sub, sup) {
 // https://gist.github.com/kethinov/6658166
 // List all files in a directory in Node.js recursively in a synchronous fashion
 var walkSync = function(dir, filelist, regexFilter) {
-    var files = fs.readdirSync(dir);
+    var files = (M.fs).readdirSync(dir);
     filelist = filelist || [];
     files.forEach(function(file) {
-        if (fs.statSync(path.join(dir, file)).isDirectory()) {
-            filelist = walkSync(path.join(dir, file), filelist, regexFilter);
+        if ((M.fs).statSync((M.path).join(dir, file)).isDirectory()) {
+            filelist = walkSync(M.path.join(dir, file), filelist, regexFilter);
         } else {
             if (!regexFilter.test(dir + '/' + file))
                 filelist.push({
@@ -150,3 +168,15 @@ var walkSync = function(dir, filelist, regexFilter) {
     });
     return filelist;
 };
+
+function getProjectNameFromRootPath(projectRootPath){
+    var projects = getConfig().projects;
+    for(var p in projects){
+        if(projectRootPath == projects[p].path){
+            return projects[p].project;
+        }        
+    }
+
+    // default
+    return projectRootPath;
+}
