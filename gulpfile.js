@@ -1199,7 +1199,6 @@ function transitiveWrapAround(glob_transitivity, matchingEntry, path, lazyPipePr
 		.pipe(lzpTransitivityCompression);
 }
 
-
 function transitivitySetup(transitivity, matchingEntry, path) {
 	return (M.through).obj(function(chunk, enc, callback) {
 		transitivitySetupCore(transitivity, matchingEntry, path);

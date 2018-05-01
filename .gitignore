@@ -8,9 +8,10 @@ config.json
 
 custom/*.*
 
-dist/custom/*.*
+supports/rewriting/gulpfile_temp\.js
+supports/rewriting/gulpfile_temp2\.js
 
-gulpfile_temp\.js
+dist/custom/*.*
 
 draft/*
 
