@@ -1,5 +1,5 @@
 ![logo](images/mzg2.ico)
-# Gloups
+# Gloups V6.0
 License
 
 [![MIT license][license-badge]][license-link]
@@ -9,7 +9,7 @@ Main modules
 [![uglify service][uglify-badge]][uglify-link] [![typescript service][typescript-badge]][typescript-link] [![coffeescript service][coffee-badge]][coffee-link] [![less service][less-badge]][less-link] [![sass service][sass-badge]][sass-link] [![clean css service][cleanCSS-badge]][cleanCSS-link]
 
 ## A Gulp implementation once and for all
-Gloups is a tool that uses the gulp ecosystem and provides services like compression of scripts (CSS and JS), compilation/processing LESS, SASS, TS, JS, CoffeeScript. The difference between Gloups and simply using gulp is that Gloups is set globally from a root path like C:\ folder on Windows systems or Home folder on Unix systems once and watch for multiple projects.
+Gloups is a tool that uses the gulp ecosystem and provides services like compression of scripts (<b>CSS</b> and <b>JS</b>), compilation/processing <b>LESS</b>, <b>SASS</b>, <b>TS</b>, <b>JS</b>, <b>CoffeeScript</b>. The difference between Gloups and simply using gulp is that Gloups is set globally from a root path like C:\ folder on Windows systems or Home folder on Unix systems once and watches for multiple projects.
 
 ### Purpose
 The purpose is to avoid installing gulp in every project and reprogramming it dozens of time the same way for the same purposes. 
@@ -49,7 +49,7 @@ With Gloups, Just configure file paths to the root folder of your projects, a co
 
         $ gulp scanProjects 
 
-    The effect of that command is to create config.mzg.json a file in project root folders you specified in the custom/config.json file.
+    The effect of that command is to create a <b>config.mzg.json</b> file in project root folders you specified in the custom/config.json file.
 
     > config.mzg.json files are not blank and have instructions.
     > In these files, uncomment what services you want to enable.
