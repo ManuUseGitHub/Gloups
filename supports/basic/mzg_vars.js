@@ -9,19 +9,19 @@
 var SERVICES = {
 
 	// custom
-	'mj': 'minjs',
-	'minjs': 'automin',
-	'ts': 'typescript',
-	'c': 'coffee',
-	'coffee': 'coffeescript',
-	'l': 'less',
-	'less': 'less',
-	's': 'sass',
-	'sass': 'sass',
-	'sts': 'stylus',
-	'stylus': 'stylus',
-	'mc': 'mincss',
-	'mincss': 'autominCss',
+	't': 'typescript',
+	'c': 'coffeescript',
+
+	// styles
+	's1': 'less',
+	's2': 'sass',
+	's3': 'stylus',
+
+	// minifications
+	'minj': 'automin',
+	'minc': 'autominCss',
+
+	// advanced 
 	'tr': 'transitive',
 	'es': 'essential',
 
@@ -29,21 +29,13 @@ var SERVICES = {
 	'a': 'all',
 	'all': 'automin typescript coffeescript autominCss less sass stylus',
 
-	'st': 'style',
-	'style': 'autominCss less sass stylus',
+	'styles': 'autominCss less sass stylus',
 
-	'jvs': 'javascript',
-	'javascript' : 'automin typescript coffeescript',
-
-	'tps': 'typescript',
-	'typescript': 'automin typescript',
-	
-	'cof': 'coffeescript',
-	'coffeescript': 'automin coffeescript',
+	'js': 'automin typescript coffeescript'
 };
 
-var PRESET_OPTIONS = "all|style|jvs|typescript|coffeescript";
-var SERVICES_OPTIONS = "minjs|ts|coffee|less|sass|stylus|mincss";
+var PRESET_OPTIONS = "all|styles|js";
+var SERVICES_OPTIONS = "automin|autominCss|typescript|coffeescript|less|sass|stylus";
 var SERVICES_ADVANCED_OPTIONS = "transitive|essential";
 
 var ALL_SERVICES_OPTIONS = PRESET_OPTIONS + '|' + SERVICES_OPTIONS + '|' + SERVICES_ADVANCED_OPTIONS;

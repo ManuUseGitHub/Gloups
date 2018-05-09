@@ -11,9 +11,14 @@ function cleanCssMinification() {
 }
 
 function insertSignatureAfter(actionDone, thanksToModule) {
-	return (M.insert).append("\n/* -- {0} with Gloups {1} | using {2} -- */".format([
-        actionDone.replace(/[\s]+$/, ''), GLOUPS_VERSION, thanksToModule
-    ]));
+	return (M.insert).append("\n/* -- {1} wth Gloups v {2} - {3} | thanks to {4} -- */".format(
+		[
+			actionDone.replace(/[\s]+$/, ''),
+			GLOUPS_VERSION,
+			shortDateComputed(),
+			thanksToModule
+		]
+	));
 }
 
 function autoprefix() {

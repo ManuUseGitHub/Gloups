@@ -1,6 +1,8 @@
 function configurationOfRewriteOnArvs() {
     var argvs = translateAliassesInArgs(process.argv, RewriteServices);
     var subAr = getSliceOfMatchingOptions(argvs, "ugly|beauty|once|multiple");
+    var matchOption;
+
     subAr.forEach(function(serv) {
         try {
             var opt = (/^--(.*)$/.exec(serv));
@@ -10,9 +12,7 @@ function configurationOfRewriteOnArvs() {
                 RewriteServices.times = matchOption == 'multiple' ? matchOption : RewriteServices.times;
             }
 
-        } catch (err) {
-            errors.push(err + " Error with option: ");
-        }
+        } catch (err) {/* nothing */}
     });
 
     return {

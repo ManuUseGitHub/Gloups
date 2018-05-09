@@ -1,5 +1,5 @@
 gulp.task('sass', function() {
-	
+
 	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
 	var obj = {
 
@@ -9,15 +9,11 @@ gulp.task('sass', function() {
 		// defines what files extension are allowed to be processed
 		'rules': [/.*.scss$/],
 
+		// gathers comments that define lisences
+		'lisences': null,
+
 		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
-		'mainPipe': (M.lazyPipe)()
-			.pipe(function() {
-				return (M.sass)({
-					indentedSyntax: false
-				}).on('error', (M.sass).logError);
-			})
-			.pipe(autoprefix)
-			.pipe((M.stylefmt)),
+		'mainPipe': null,
 
 		// tells how to handle importation within preprocessed/precompiled files
 		'realTargetsFunction': function(filePath, matchingEntry) {
@@ -28,6 +24,15 @@ gulp.task('sass', function() {
 			return getMatchingPrincipalSCSS(matchingEntry.projectPath, filePath.hackSlashes());
 		}
 	};
+
+	obj.mainPipe = (M.lazyPipe)()
+		.pipe(function() {
+			return (M.sass)({
+				indentedSyntax: false
+			}).on('error', (M.sass).logError);
+		})
+		.pipe(autoprefix)
+		.pipe((M.stylefmt));
 
 	// PROCESS WITH THE VARIANT CONFIGURATION
 	runTaskProcessForPrecompiledFiles(this, config.pathesToSass, obj);

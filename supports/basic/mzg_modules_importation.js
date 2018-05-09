@@ -1,5 +1,6 @@
-// before loading modules -------------------------------------------------------------------------
-var GLOUPS_VERSION = "6.0";
+// before loading other modules -----------------------------------------------------------------------
+var pjson = require('./package.json');
+var GLOUPS_VERSION = pjson.version;
 process.title = 'Gloups ' + GLOUPS_VERSION + ' | Chears !';
 // ------------------------------------------------------------------------------------------------
 
@@ -9,6 +10,8 @@ var chalk = require('chalk'); //https://www.npmjs.com/package/chalk
 var M = {
 	// A ----------------------------------------------------------------------------------------------
 	autoprefixer: 'gulp-autoprefixer',
+	// B ----------------------------------------------------------------------------------------------
+	//babel : 'gulp-babel', // for fixing uglify with ES6 version
 	// C ----------------------------------------------------------------------------------------------
 	cleanCSS: 'gulp-clean-css',
 	clear: 'clear',
@@ -44,7 +47,7 @@ var M = {
 	through: 'through2', // to write custom pipe functions
 	ts: 'gulp-typescript',
 	// U ----------------------------------------------------------------------------------------------
-	uglify: 'gulp-uglify',
+	uglify: 'gulp-uglifyes',
 	// W ----------------------------------------------------------------------------------------------
 	wait: 'gulp-wait',
 };

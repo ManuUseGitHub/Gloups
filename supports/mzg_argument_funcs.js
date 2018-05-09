@@ -70,7 +70,6 @@ function tasksToRunOnArgvs() {
 
     // strips all non options or presets arguments
     var subAr = getSliceOfMatchingOptions(subs, GLOUPS_OPTIONS);
-    var subAdvAr = getSliceOfMatchingOptions(subs, SERVICES_ADVANCED_OPTIONS);
 
     for (var service in subAr) {
         try {
@@ -85,7 +84,7 @@ function tasksToRunOnArgvs() {
                 effectiveServices = SERVICES[service].split(' ');
 
             } else {
-                effectiveServices.push(SERVICES[service]);
+                effectiveServices.push(service);
             }
         } catch (err) {
             errors.push(err + " Error with option: ");

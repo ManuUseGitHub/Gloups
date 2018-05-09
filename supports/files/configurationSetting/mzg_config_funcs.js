@@ -21,7 +21,7 @@ function readJsonConfig(filePath) {
 	reading.readLines(function() {
 
 		// stripping comments ---------------------------------------------------------------------
-		l = reading.getLine();
+		l = reading.line;
 		if ((has_smthng = (m = /^(.*)\/\/.*$/g.exec(l)))) { // "(.. content ..) [//] .. .."
 			content = m[1];
 		} else if ((has_smthng = (m = /^(.*)\/\*$/g.exec(l)))) { // "(.. content ..) [/*] .. .."

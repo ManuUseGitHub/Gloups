@@ -55,7 +55,7 @@ if (ISALL || new RegExp("^(({0})(:.*)?)$".format([SILENT_TASKS])).test(cmd)) {
 			if (isWatching) {
 				// Clear console
 				// Ref: https://stackoverflow.com/questions/5367068/clear-the-ubuntu-bash-screen-for-real
-				process.stdout.write('\033c');
+				process.stdout.write('\x1B');
 			}
 
 			//console.log('Started task');

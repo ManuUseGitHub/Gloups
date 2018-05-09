@@ -9,8 +9,7 @@ function contains(a, obj) {
 }
 
 function getMatchingPrincipalSCSS(projectPath, path) {
-	var m = null;
-	m = /^.*[\/\\](.*)$/.exec(path);
+	var m = /^.*[\/\\](.*)$/.exec(path);
 
 	// filter to not let pass files starting by underscores "_.*"
 	if (m && m[1] && /^_.*$/.test(m[1])) {
@@ -24,7 +23,7 @@ function getMatchingPrincipalSCSS(projectPath, path) {
 		var lpp = path.substr(ppl); // local path to the partial 
 
 		// ellipsizing the path to get a match with
-		ellipsedPath = pathEllipzizeing(normalized, 0, (lpp.split("/").length));
+		var ellipsedPath = pathEllipzizeing(normalized, 0, (lpp.split("/").length));
 
 		var matchings = [];
 		var matchingDef = config.sassMaching;

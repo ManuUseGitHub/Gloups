@@ -21,7 +21,7 @@ function logHelp() {
 
 	console.log("\n\n");
 	reading.readLines(function() {
-		line = reading.getLine().replace(/\r?\n|\r/g, '');
+		line = reading.line.replace(/\r?\n|\r/g, '');
 
 		// reading the help.md file [MARKDOWN]
 		// Titles are cyan
@@ -80,15 +80,25 @@ function logErrorsOnTaskArgvs(errors) {
 }
 
 function logProjectErrored(project) {
-    gloupslog(" {0}  - SOMETING IS WRONG".format([chalk.bgRed(' '+project.project+' ')]));
+	// terminalCols
+	gloupslog(" {0}  - SOMETHING IS WRONG \n".format([chalk.bgRed(' ' + project.project + ' ')]));
+	gloupslog(" {0} {1}\n".format([logFilePath(project.path + '/config.mzg.json'), chalk.red(': MISMATCH')]));
+
 	console.log(
-		"\n    {0}\n    {1} {2}\n\n {3}\n {4}\n    > {5}\n\n".format([
-            'this project seems to have no configuration .INI file defined',
-            logFilePath(project.path + '\\config.mzg.ini'), chalk.red(': MISSING'),
-            chalk.gray.inverse(' SOLUTION '),
-            '    run the command to setup projects local configuraitons:',
-            chalk.grey('$ gulp scanProjects')
-        ]));
+		(getColoredParagraph(" The path to that folder does not match to an actual project root folder containing a config.mzg.json file.",chalk.bgRed)) +
+		("\n\n {0}\n".format([chalk.bgWhite.black(' SOLUTION ')])) +
+		('\n' + getColoredParagraph(" ", chalk.bgWhite.grey)) +
+		(getColoredParagraph(" Check the path to see if there is no mistake and fix it in the project definition.", chalk.bgWhite.grey)) +
+		('\n' + getColoredParagraph(" ", chalk.bgWhite.grey)) +
+		(getColoredParagraph(" You can otherwise run the command to set up a configuration file at this path and also create nonexistent folders :", chalk.bgWhite.grey)) +
+		('\n' + getColoredParagraph(" $ gulp scanProjects", chalk.bgWhite.black)) +
+		(getColoredParagraph(" ", chalk.bgWhite.grey))
+	);
+}
+
+function getColoredParagraph(paragraph, chalkColor) {
+	var tc = process.stdout.columns;
+	return chalkColor(paragraph + Array(tc - paragraph.length % tc).join(' '));
 }
 
 function logProcessCompleteOnFile(files, realAction, process) {
@@ -131,8 +141,18 @@ function ms2Time(ms) {
 function dateComputed() {
 	var date = new Date();
 
-	var days = ["Mon", "Tues", "Wednes", "Thirth", "Fri", "Satur", "Sun"];
+	var days = ["Mon", "Tues", "Wednes", "Thurth", "Fri", "Satur", "Sun"];
 	return [days[date.getDay() - 1], "day,", [date.getMonth() + 1, date.getDate(), date.getFullYear()].join("-")].join("");
+}
+
+function twodigits(num) {
+	return ("0" + num).slice(-2)
+}
+
+function shortDateComputed() {
+	var date = new Date();
+
+	return [twodigits(date.getMonth() + 1), twodigits(date.getDate()), date.getFullYear()].join("-");
 }
 
 function timeComputed() {
@@ -162,13 +182,13 @@ function logServiceActivatedPushed(purpose, projectName, addon) {
 		}
 
 		console.log(" Watch :'{0}{1}'\n Dest. :'{2}{3}'".format([
-            chalk.bgCyan(' ' + projectName+' '), chalk.cyan('/' + addon.watch + ' '),
-            chalk.bgCyan(' ' + projectName+' '), chalk.cyan('/' + addon.dest + ' ')
+            chalk.bgCyan(' ' + projectName + ' '), chalk.cyan('/' + addon.watch + ' '),
+            chalk.bgCyan(' ' + projectName + ' '), chalk.cyan('/' + addon.dest + ' ')
         ]));
 
 		var sourcemaps = addon.sourcemaps;
 		if (sourcemaps !== undefined) {
-			console.log(sourcemaps ? '         '+chalk.bgGreen(" Sourcemaps ! ") : '');
+			console.log(sourcemaps ? '         ' + chalk.bgGreen(" Sourcemaps ! ") : '');
 		}
 	}
 }
@@ -188,7 +208,7 @@ function logTaskPurpose(taskName) {
 	var tasks = {
 		"setVars": "" +
 			"  Sets configuration variables \n" +
-			'  See the .INI file of project mapping to set Gloups ready to serve your projects here :\n' +
+			'  See the mapping file to set Gloups able to serve your projects here :\n' +
 			'  > ' + logFilePath('custom/config.mzg.ini') + ':\n',
 		"automin": "" +
 			"  Will uglify .js files matching the folowing path(s):\n",
@@ -202,8 +222,8 @@ function logTaskPurpose(taskName) {
 			"  Will process .less files matching the folowing path(s):\n",
 		"sass": "" +
 			"  Will process .sass files matching the folowing path(s):\n",
-        "stylus": "" +
-            "  Will process .styl files matching the folowing path(s):\n",
+		"stylus": "" +
+			"  Will process .styl files matching the folowing path(s):\n",
 		"scanProjects": "" +
 			"  Creates configuration file in every project root folder\n"
 	};
@@ -226,7 +246,7 @@ function logWatchList(taskName) {
 		"autominCss": config.pathesToStyle,
 		"less": config.pathesToStyleLess,
 		"sass": config.pathesToSass,
-        "stylus": config.pathesToStylus
+		"stylus": config.pathesToStylus
 	};
 
 	if (associations[taskName]) {

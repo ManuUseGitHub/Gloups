@@ -7,14 +7,19 @@ gulp.task('autominCss', function() {
 		'module': "gulp-clean-css",
 
 		// defines what files extension are allowed to be processed
-		'rules': [/^.*.css$/, ['!', /^(?:.*.min.css|.*.less|.*.scss|.*.map)$/]],
+		'rules': [/^.*.css$/, ['!', /^.*(?:.min.css|.lisence.css|.less|.scss|.map)$/]],
+
+		// gathers comments that define lisences
+		'lisences': null,
 
 		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
-		'mainPipe': (M.lazyPipe)()
-			.pipe(autoprefix)
-			.pipe(cleanCssMinification)
-			.pipe(renameSuffixMin)
+		'mainPipe': null
 	};
+
+	obj.mainPipe = (M.lazyPipe)()
+		.pipe(autoprefix)
+		.pipe(cleanCssMinification)
+		.pipe(renameSuffixMin);
 
 	// PROCESS WITH THE VARIANT CONFIGURATION
 	runTaskProcessForCompression(this, config.pathesToStyle, obj);

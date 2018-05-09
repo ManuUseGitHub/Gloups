@@ -1,3 +1,4 @@
+/*jshint esversion:6*/
 class classReading {
     constructor() {
         this.line_ = null;

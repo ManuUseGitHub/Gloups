@@ -1,10 +1,26 @@
+"use strict";
+
+// -- [supports/basic/mzg_jshint_specifications.js] -- 
+/*jshint node:true*/
+/*jshint esversion: 6 */
+
+/*!
+ * copyright !
+ * gvghvggc
+ * ghvnfchfc
+ * gfhdhfdbdfxbdf
+ */
+
+/*!ghvjgfchfcbdfxbdxvdswdswcswshfc gvjfhrtxgrdxgdx yjtdhertdgdxgbdxgbdxg fhfcbfcbfdxgfbdx*/
+
 /*	*************************************************************************************************************************************************************************************************
 	*                                 								VARIABLES :	module requirement    &    Configuration VARIABLES 																	*
  	*************************************************************************************************************************************************************************************************/
 
 // -- [supports/basic/mzg_modules_importation.js] -- 
-// before loading modules -------------------------------------------------------------------------
-var GLOUPS_VERSION = "6.0";
+// before loading other modules -----------------------------------------------------------------------
+var pjson = require('./package.json');
+var GLOUPS_VERSION = pjson.version;
 process.title = 'Gloups ' + GLOUPS_VERSION + ' | Chears !';
 // ------------------------------------------------------------------------------------------------
 
@@ -14,6 +30,8 @@ var chalk = require('chalk'); //https://www.npmjs.com/package/chalk
 var M = {
 	// A ----------------------------------------------------------------------------------------------
 	autoprefixer: 'gulp-autoprefixer',
+	// B ----------------------------------------------------------------------------------------------
+	//babel : 'gulp-babel', // for fixing uglify with ES6 version
 	// C ----------------------------------------------------------------------------------------------
 	cleanCSS: 'gulp-clean-css',
 	clear: 'clear',
@@ -49,7 +67,7 @@ var M = {
 	through: 'through2', // to write custom pipe functions
 	ts: 'gulp-typescript',
 	// U ----------------------------------------------------------------------------------------------
-	uglify: 'gulp-uglify',
+	uglify: 'gulp-uglifyes',
 	// W ----------------------------------------------------------------------------------------------
 	wait: 'gulp-wait',
 };
@@ -66,19 +84,19 @@ var M = {
 var SERVICES = {
 
 	// custom
-	'mj': 'minjs',
-	'minjs': 'automin',
-	'ts': 'typescript',
-	'c': 'coffee',
-	'coffee': 'coffeescript',
-	'l': 'less',
-	'less': 'less',
-	's': 'sass',
-	'sass': 'sass',
-	'sts': 'stylus',
-	'stylus': 'stylus',
-	'mc': 'mincss',
-	'mincss': 'autominCss',
+	't': 'typescript',
+	'c': 'coffeescript',
+
+	// styles
+	's1': 'less',
+	's2': 'sass',
+	's3': 'stylus',
+
+	// minifications
+	'minj': 'automin',
+	'minc': 'autominCss',
+
+	// advanced 
 	'tr': 'transitive',
 	'es': 'essential',
 
@@ -86,21 +104,13 @@ var SERVICES = {
 	'a': 'all',
 	'all': 'automin typescript coffeescript autominCss less sass stylus',
 
-	'st': 'style',
-	'style': 'autominCss less sass stylus',
+	'styles': 'autominCss less sass stylus',
 
-	'jvs': 'javascript',
-	'javascript' : 'automin typescript coffeescript',
-
-	'tps': 'typescript',
-	'typescript': 'automin typescript',
-	
-	'cof': 'coffeescript',
-	'coffeescript': 'automin coffeescript',
+	'js': 'automin typescript coffeescript'
 };
 
-var PRESET_OPTIONS = "all|style|jvs|typescript|coffeescript";
-var SERVICES_OPTIONS = "minjs|ts|coffee|less|sass|stylus|mincss";
+var PRESET_OPTIONS = "all|styles|js";
+var SERVICES_OPTIONS = "automin|autominCss|typescript|coffeescript|less|sass|stylus";
 var SERVICES_ADVANCED_OPTIONS = "transitive|essential";
 
 var ALL_SERVICES_OPTIONS = PRESET_OPTIONS + '|' + SERVICES_OPTIONS + '|' + SERVICES_ADVANCED_OPTIONS;
@@ -162,26 +172,29 @@ var RewriteServices = {
 };
 
 var mzgFiles = [
+	'supports/basic/mzg_jshint_specifications.js',
 	'supports/rewriting/log_sections/mzg_log1.js', // section
 
 	'supports/basic/mzg_modules_importation.js',
 	'supports/basic/mzg_vars.js',
 
-	'supports/rewriting/mzg_rewriting_vars.js', // rewrite 
+	'supports/rewriting/mzg_rewriting_vars.js', // rewrite // 4
+
+	'supports/rewriting/log_sections/mzg_log15.js', // section
+	'supports/files/mzg_stable_reading_file_class.js',
 
 	'supports/rewriting/log_sections/mzg_log2.js', // section
 
 	'supports/basic/mzg_stable_funcs.js',
-	'supports/basic/mzg_modules_requesting.js',
+	'supports/basic/mzg_modules_requesting.js', // 9
 
 	'supports/rewriting/log_sections/mzg_log3.js', // section
 
 	'supports/basic/tasks/mzg_default_task.js',
 	'supports/basic/tasks/mzg_clear_task.js',
-	'supports/basic/tasks/mzg_externalize_config_task.js',
+	'supports/basic/tasks/mzg_externalize_config_task.js', // 13
 	'projects_setup_tasks/mzg_set_vars_task.js',
 	'supports/basic/tasks/mzg_set_params_task.js',
-	'supports/basic/tasks/mzg_jshint_task.js',
 	'supports/basic/tasks/mzg_help_me_task.js',
 
 	'supports/rewriting/log_sections/mzg_log4.js', // section
@@ -199,13 +212,12 @@ var mzgFiles = [
 	// js
 	'services_tasks/js_tasks/mzg_automin_task.js',
 	'services_tasks/js_tasks/mzg_tyepscript_task.js',
-	'services_tasks/js_tasks/mzg_coffeescript_task.js',
+	'services_tasks/js_tasks/mzg_coffeescript_task.js', // 25
 
 	'supports/rewriting/log_sections/mzg_log7.js', // section
 
 	// css
 	'services_tasks/css_tasks/mzg_automin_css_task.js',
-	'services_tasks/css_tasks/mzg_auto_format_css_task.js',
 	'services_tasks/css_tasks/mzg_less_task.js',
 	'services_tasks/css_tasks/mzg_sass_task.js',
 	'services_tasks/css_tasks/mzg_stylus_task.js',
@@ -215,13 +227,20 @@ var mzgFiles = [
 	// other
 	'services_tasks/mzg_other_oriented_tasks.js',
 
-	'supports/rewriting/log_sections/mzg_log16.js', // section
-	'supports/files/mzg_module_seeking_funcs.js',
+	'supports/rewriting/log_sections/mzg_log16.js', // section // 33
+	'supports/files/mzg_module_seeking_funcs.js', // 34
 
 	'supports/rewriting/log_sections/mzg_log9.js', // section
 
-	'services_tasks/mzg_tasks_micro_services.js',
-	'services_tasks/mzg_services_funcs.js',
+	// services : consumming + lazyprocess + wrapping + lisencing
+	'services_tasks/funcs/mzg_run_task_process_for.js',
+	'services_tasks/funcs/mzg_main_pipe_wrapping.js',
+	'services_tasks/funcs/mzg_tasks_micro_services.js',
+
+	'supports/mzg_changed_files_logging.js',
+
+	'services_tasks/funcs/mzg_lisences_handeling.js',
+	'services_tasks/funcs/mzg_services_funcs.js',
 
 	'supports/rewriting/log_sections/mzg_log10.js', // section
 
@@ -231,13 +250,13 @@ var mzgFiles = [
 	'supports/rewriting/tasks/mzg_write_dist_task.js',
 	'supports/rewriting/tasks/mzg_rewrite_task.js',
 
-	'supports/rewriting/log_sections/mzg_log11.js', // section
+	'supports/rewriting/log_sections/mzg_log11.js', // section 
 
-	'supports/mzg_runtask.js',
+	'supports/mzg_runtask.js', 
 
-	'supports/rewriting/log_sections/mzg_log12.js', // section
+	'supports/rewriting/log_sections/mzg_log12.js', // section // 50
 
-	'supports/files/configurationSetting/mzg_config_funcs.js',
+	'supports/files/configurationSetting/mzg_config_funcs.js', 
 	'supports/projects/mzg_projects_funcs.js',
 	'supports/mzg_argument_funcs.js',
 
@@ -247,22 +266,113 @@ var mzgFiles = [
 	'supports/rewriting/mzg_rewrite_arguments_func.js',
 
 	'supports/rewriting/log_sections/mzg_log14.js', // section
-	'supports/mzg_logging.js',
-
-	'supports/rewriting/log_sections/mzg_log15.js', // section
-	'supports/files/mzg_stable_reading_file_class.js'
+	'supports/mzg_logging.js'
 ];
 
 var distFiles = mzgFiles.slice();
 
-distFiles.splice(49, 3);
-distFiles.splice(37, 6);
-distFiles.splice(32, 2);
-distFiles.splice(10, 1);
-distFiles.splice(6, 1);
-distFiles.splice(3, 1);
+distFiles.splice(54, 3);
+distFiles.splice(39, 6);
+distFiles.splice(33, 2);
+distFiles.splice(13, 1);
+distFiles.splice(9, 1);
+distFiles.splice(4, 1);
 
 isdist.NOT_DISTRIBUTION = true;
+/*	*************************************************************************************************************************************************************************************************
+	*                                 										CLASSES : Classes for configuration purpose 																			*
+ 	*************************************************************************************************************************************************************************************************/
+
+// -- [supports/files/mzg_stable_reading_file_class.js] -- 
+class classReading {
+    constructor() {
+        this.line_ = null;
+        this.data_ = null;
+        this.iter_ = null;
+        this.stopped_ = false;
+    }
+
+    initialize(data, iter) {
+        this.data_ = data + ' ';
+        this.iter_ = iter;
+        this.line_ = [];
+    }
+
+    readLines(processingLine) {
+        var c;
+        while ((!this.stopped) && (c = this.getNextChar())) {
+
+            // the line feed is encontoured 
+            if (/^[\n\r]$/g.test(c) || this.isEndReached()) {
+                this.toLine();
+                processingLine(this.line);
+                this.resetLine();
+            }
+
+            // just add the character
+            else {
+                this.feed(c);
+            }
+        }
+    }
+
+    stop() {
+        this.stopped = true;
+    }
+
+    get stopped() {
+        return this.stopped_;
+    }
+
+    set stopped(stopped) {
+        this.stopped_ = stopped;
+    }
+
+    get iter() {
+        return this.iter_;
+    }
+
+    set iter(iter) {
+        this.iter_ = iter;
+    }
+
+    get data() {
+        return this.data_;
+    }
+
+    set data(data) {
+        this.data_ = data;
+    }
+
+    get line() {
+        return this.line_;
+    }
+
+    set line(line) {
+        this.line_ = line;
+    }
+
+    toLine() {
+        this.line = this.line.join("");
+        this.line = this.line.replace(/^[\n\r]$/g, '');
+    }
+
+    resetLine() {
+        this.line = [];
+    }
+
+    getNextChar() {
+        return this.data[this.iter++];
+    }
+
+    isEndReached() {
+        return !this.data[this.iter];
+    }
+
+    feed(char) {
+        this.line_.push(char);
+    }
+}
 /*	*************************************************************************************************************************************************************************************************
 	*                                 												PARAMETERIZING and DEFAULT TASK 																				*
  	*************************************************************************************************************************************************************************************************/
@@ -325,7 +435,7 @@ if (ISALL || new RegExp("^(({0})(:.*)?)$".format([SILENT_TASKS])).test(cmd)) {
 			if (isWatching) {
 				// Clear console
 				// Ref: https://stackoverflow.com/questions/5367068/clear-the-ubuntu-bash-screen-for-real
-				process.stdout.write('\033c');
+				process.stdout.write('\x1B');
 			}
 
 			//console.log('Started task');
@@ -394,7 +504,7 @@ if (process.argv[2] == '--gulpfile') {
 
 // -- [supports/basic/tasks/mzg_default_task.js] -- 
 // define the default task and add the watch task to it
-gulp.task('default',["setParams"]);
+gulp.task('default', ["setParams"]);
 
 // -- [supports/basic/tasks/mzg_clear_task.js] -- 
 gulp.task('clear', function() {
@@ -494,13 +604,6 @@ gulp.task('setParams', function() {
 	}
 });
 
-// -- [supports/basic/tasks/mzg_jshint_task.js] -- 
-gulp.task('jshint', function() {
-    return gulp.src(config.pathesToJs)
-        .pipe(jshint())
-        .pipe(jshint.reporter('jshint-stylish'));
-});
-
 // -- [supports/basic/tasks/mzg_help_me_task.js] -- 
 gulp.task('helpMe', function() {
     logHelp();
@@ -541,7 +644,7 @@ gulp.task('serve',['setParams']);
 
 // -- [services_tasks/js_tasks/mzg_automin_task.js] -- 
 gulp.task('automin', function() {
-	
+
 	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
 	var obj = {
 
@@ -549,16 +652,21 @@ gulp.task('automin', function() {
 		'module': "gulp-uglify",
 
 		// defines what files extension are allowed to be processed
-		'rules': [JS_REGEX_FILE_PATH_PATTERN, ['!', /.*.min.js$/]],
+		'rules': [JS_REGEX_FILE_PATH_PATTERN, ['!', /.*(?:.min.js|.lisence.js)$/]],
+
+		// gathers comments that define lisences
+		'lisences': null,
 
 		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
-		'mainPipe': (M.lazyPipe)()
-			.pipe((M.uglify))
-			.pipe(renameSuffixMin)
+		'mainPipe': null
 	};
 
+	obj.mainPipe = (M.lazyPipe)()
+		.pipe((M.uglify))
+		.pipe(renameSuffixMin);
+
 	// PROCESS WITH THE VARIANT CONFIGURATION
-	runTaskProcessForCompression(this,config.pathesToJs, obj);
+	runTaskProcessForCompression(this, config.pathesToJs, obj);
 });
 
 // -- [services_tasks/js_tasks/mzg_tyepscript_task.js] -- 
@@ -634,34 +742,22 @@ gulp.task('autominCss', function() {
 		'module': "gulp-clean-css",
 
 		// defines what files extension are allowed to be processed
-		'rules': [/^.*.css$/, ['!', /^(?:.*.min.css|.*.less|.*.scss|.*.map)$/]],
+		'rules': [/^.*.css$/, ['!', /^.*(?:.min.css|.lisence.css|.less|.scss|.map)$/]],
+
+		// gathers comments that define lisences
+		'lisences': null,
 
 		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
-		'mainPipe': (M.lazyPipe)()
-			.pipe(autoprefix)
-			.pipe(cleanCssMinification)
-			.pipe(renameSuffixMin)
+		'mainPipe': null
 	};
+
+	obj.mainPipe = (M.lazyPipe)()
+		.pipe(autoprefix)
+		.pipe(cleanCssMinification)
+		.pipe(renameSuffixMin);
 
 	// PROCESS WITH THE VARIANT CONFIGURATION
 	runTaskProcessForCompression(this, config.pathesToStyle, obj);
-});
-
-// -- [services_tasks/css_tasks/mzg_auto_format_css_task.js] -- 
-gulp.task('autoformatCss', function() {
-    gulp.watch(config.pathesToStyleLess, function(event) {
-        if (!/^(.*.min.css)$/.test(event.path)) {
-            console.log("try");
-            gulp.src(event.path)
-                .pipe(cssbeautify({
-                    format: 'beautify',
-                }))
-                .pipe(gulp.dest(function(file) {
-                    return file.base;
-                }));
-            console.log("done");
-        }
-    });
 });
 
 // -- [services_tasks/css_tasks/mzg_less_task.js] -- 
@@ -676,15 +772,11 @@ gulp.task('less', function() {
 		// defines what files extension are allowed to be processed
 		'rules': [/.*.less$/],
 
+		// gathers comments that define lisences
+		'lisences': null,
+
 		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
-		'mainPipe': (M.lazyPipe)()
-			.pipe(function() {
-				return (M.less)({
-					paths: [(M.path).join(__dirname, 'less', 'includes')]
-				});
-			})
-			.pipe(autoprefix)
-			.pipe((M.stylefmt)),
+		'mainPipe': null,
 
 		// tells how to handle importation within preprocessed/precompiled files
 		'realTargetsFunction': function(filePath, matchingEntry) {
@@ -692,13 +784,22 @@ gulp.task('less', function() {
 		}
 	};
 
+	obj.mainPipe = (M.lazyPipe)()
+		.pipe(function() {
+			return (M.less)({
+				paths: [(M.path).join(__dirname, 'less', 'includes')]
+			});
+		})
+		.pipe(autoprefix)
+		.pipe((M.stylefmt));
+
 	// PROCESS WITH THE VARIANT CONFIGURATION
 	runTaskProcessForPrecompiledFiles(this, config.pathesToStyleLess, obj);
 });
 
 // -- [services_tasks/css_tasks/mzg_sass_task.js] -- 
 gulp.task('sass', function() {
-	
+
 	// ONLY VARIANT CONFIGURATION FOR COMPRESSION IS IN THIS OBJECT BELOW ... !
 	var obj = {
 
@@ -708,15 +809,11 @@ gulp.task('sass', function() {
 		// defines what files extension are allowed to be processed
 		'rules': [/.*.scss$/],
 
+		// gathers comments that define lisences
+		'lisences': null,
+
 		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
-		'mainPipe': (M.lazyPipe)()
-			.pipe(function() {
-				return (M.sass)({
-					indentedSyntax: false
-				}).on('error', (M.sass).logError);
-			})
-			.pipe(autoprefix)
-			.pipe((M.stylefmt)),
+		'mainPipe': null,
 
 		// tells how to handle importation within preprocessed/precompiled files
 		'realTargetsFunction': function(filePath, matchingEntry) {
@@ -727,6 +824,15 @@ gulp.task('sass', function() {
 			return getMatchingPrincipalSCSS(matchingEntry.projectPath, filePath.hackSlashes());
 		}
 	};
+
+	obj.mainPipe = (M.lazyPipe)()
+		.pipe(function() {
+			return (M.sass)({
+				indentedSyntax: false
+			}).on('error', (M.sass).logError);
+		})
+		.pipe(autoprefix)
+		.pipe((M.stylefmt));
 
 	// PROCESS WITH THE VARIANT CONFIGURATION
 	runTaskProcessForPrecompiledFiles(this, config.pathesToSass, obj);
@@ -826,7 +932,7 @@ function Macro_Seek_Modules(reading, analyser, kind, search) {
 	var line, enc = 0;
 
 	reading.readLines(function() {
-		line = reading.getLine().replace(/\r?\n|\r/g, '');
+		line = reading.line.replace(/\r?\n|\r/g, '');
 
 		// while analysing syntaxicaly the file, say if wa encountered the function / task
 		// and say via the analyser object if we are in a task or a function by its fields
@@ -911,6 +1017,7 @@ function defineLimits(analyser, line, enc) {
 }
 
 function whenElementMatched(line) {
+	var match;
 	if (whenModuleMatched(line)) {
 		// DONE, nothing to do here ... 
 	} else if ((match = /^.*[\.]pipe[(]([\w]+).*$/.exec(line))) {
@@ -931,7 +1038,7 @@ function whenModuleMatched(line) {
 	if ((result = /^.*M[\.]([\w]+).*$/.exec(line))) {
 
 		var regex = /M[\.]([\w]+)/g;
-		while (match = regex.exec(line)) {
+		while ((match = regex.exec(line))) {
 			if (!glob_found_modules[match[1]]) {
 				glob_found_modules[match[1]] = true;
 			}
@@ -971,10 +1078,10 @@ function seekInFoundElements(kind, elements) {
 	});
 }
 /*	*************************************************************************************************************************************************************************************************
-	*                                 										REWRITING TASKS : Tasks Changing gulpfile.js 																			*
+	*                                 										SERVICES FUNCS : functions used in services 																			*
  	*************************************************************************************************************************************************************************************************/
 
-// -- [services_tasks/mzg_tasks_micro_services.js] -- 
+// -- [services_tasks/funcs/mzg_run_task_process_for.js] -- 
 function runTaskProcessForCompression(athis, pathesTo, obj) {
 	logTaskPurpose(athis.currentTask.name);
 
@@ -1006,6 +1113,8 @@ function runTaskProcessForCompression(athis, pathesTo, obj) {
 			// set the variant pipe part to the process. It will be wrapped in sourcemapps 
 			// and the transitivity will have to be calculate (not really needed here )
 			mainLazyPipeObj.process = obj.mainPipe;
+
+			mainLazyPipeObj.source_kind = 'simple';
 
 			// COMPUTE THE LAZYPIPE AND DYNAMIC BEHAVIORS -------------------------------------
 			consumePipeProcss(glob_transitivity, mainLazyPipeObj, [filePath]);
@@ -1043,6 +1152,8 @@ function runTaskProcessForPrecompiledFiles(athis, pathesTo, obj) {
 			// focus on files importing other via @import
 			var realTargets = obj.realTargetsFunction(filePath, matchingEntry);
 
+			mainLazyPipeObj.source_kind = 'complex';
+
 			// COMPUTE THE LAZYPIPE AND DYNAMIC BEHAVIORS -------------------------------------
 			consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets);
 		}
@@ -1054,9 +1165,12 @@ function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
 	var sourceMappedProcess = transitiveAndSourcemappingWrap(glob_transitivity, mainLazyPipeObj);
 
 	// OVERWRITING DEFAULT DESTINATION ------------------------------------------------------------
-	mainLazyPipeObj.destCallBack = function() {
-		gloupslog('');
-		logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
+	mainLazyPipeObj.destCallBack = function(haslog) {
+
+		if (haslog) {
+			gloupslog('');
+			logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
+		}
 
 		var destPath = glob_transitivity != null ?
 			glob_transitivity.dest :
@@ -1068,15 +1182,209 @@ function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
 	// CONSUMMING ---------------------------------------------------------------------------------
 	gulp.src(realTargets)
 		.pipe(sourceMappedProcess())
-		.pipe(gulp.dest(mainLazyPipeObj.destCallBack()));
+		.pipe(applyLicenceSplitting(mainLazyPipeObj))
+		.pipe(gulp.dest(mainLazyPipeObj.destCallBack(true)));
 }
 
+
+// -- [services_tasks/funcs/mzg_main_pipe_wrapping.js] -- 
+function transitiveAndSourcemappingWrap(glob_transitivity, mainLazyPipeObj) {
+
+	// UNBOXING -----------------------------------------------------------------------------------
+	var forMatchingObj = mainLazyPipeObj.forMatchingObj,
+		path = forMatchingObj.path,
+		pathesDescription = forMatchingObj.pathesDescr; // pathesToJs/CSS/SASS/etc. ...;
+	var message = mainLazyPipeObj.message;
+
+	// find the config through the json and getting watch ; dest ; sourcemapp etc.
+	var matchingEntry = getMatchingEntryConfig(path, pathesDescription);
+
+	// LAZYPIPE wrapping transitivity and sourcemapping -------------------------------
+	var thinkTransitively = transitiveWrapAround(glob_transitivity, matchingEntry, path, mainLazyPipeObj);
+	var sourceMappedProcess = setSourceMappingAndSign(thinkTransitively, matchingEntry, message);
+
+	return sourceMappedProcess;
+}
+
+function setSourceMappingAndSign(lazyPipeProcess, matchingEntry, sign) {
+	var sourcemapping = matchingEntry.sourcemaps;
+	return (M.lazyPipe)()
+
+		// if sourcemaps desired initialize them or do nothing
+		.pipe(sourcemapping ?
+			(M.sourcemaps).init :
+			(M.nop))
+
+		// transitivity handleing here in general
+		.pipe(lazyPipeProcess)
+
+		// put a sign after the end of the file stream to indicate it used Gloups and some modules
+		.pipe(insertSignatureAfter, sign.action, sign.module)
+
+		// if sourcemaps desired write them or do nothing
+		.pipe(sourcemapping ?
+			function() {
+				return (M.sourcemaps).write('./');
+			} :
+			(M.nop));
+}
+
+function transitiveWrapAround(glob_transitivity, matchingEntry, path, mainLazyPipeObj) {
+
+	// do not let the default draft folder as a destination, change it straight away
+	if (glob_transitivity != null && glob_transitivity.dest == "draft") {
+		transitivitySetupCore(glob_transitivity, matchingEntry, path);
+	}
+
+	// if high leveled services, make a lazypipe where the transitivity is applied
+	var lzpTransitivityApplied = glob_transitivity != null ?
+		(M.lazyPipe)()
+		.pipe(transitivitySetup, glob_transitivity, matchingEntry, path) :
+
+		// else do nothing
+		(M.nop);
+
+	// if high leveled services, make a lazypipe compressed and suffixed
+	var lzpTransitivityCompression = glob_transitivity != null ?
+		(M.lazyPipe)()
+		.pipe(glob_transitivity.suffixing)
+		.pipe(glob_transitivity.compressing) :
+
+		// else do nothing
+		(M.nop);
+
+	return applyLazyPipeSet({
+		opening: lzpTransitivityApplied,
+		closing: lzpTransitivityCompression,
+		main: mainLazyPipeObj
+	});
+}
+
+function applyLazyPipeSet(obj) {
+	var lazyPipeProcess = obj.main.process;
+	var source_kind = obj.main.source_kind;
+
+	if (source_kind == 'simple') {
+		return (M.lazyPipe)()
+			.pipe(obj.opening)
+			.pipe(lisencesSetup(lazyPipeProcess))
+			.pipe(separateLisences(lazyPipeProcess))
+			.pipe(lazyPipeProcess)
+			.pipe(separatePrehamptedLisences(lazyPipeProcess))
+			.pipe(obj.closing);
+
+	} else if (source_kind == 'complex') {
+		var istransitive = metAllArgs(['transitive']);
+
+		return (M.lazyPipe)()
+			.pipe(obj.opening)
+			.pipe(lisencesSetup(lazyPipeProcess))
+			.pipe(lazyPipeProcess)
+			.pipe(separateLisences(lazyPipeProcess, istransitive))
+			.pipe(obj.closing);
+	}
+}
+
+function transitivitySetup(transitivity, matchingEntry, path) {
+	return (M.through).obj(function(chunk, enc, callback) {
+		transitivitySetupCore(transitivity, matchingEntry, path);
+		callback(null, chunk);
+	});
+}
+
+function transitivitySetupCore(transitivity, matchingEntry, path) {
+	var shouldBeTransitive =
+		metAllArgs(['all', 'transitive']) ||
+
+		// CSS focused
+		metAllArgs(['sass', 'autominCss', 'transitive']) ||
+		metAllArgs(['stylus', 'autominCss', 'transitive']) ||
+		metAllArgs(['less', 'autominCss', 'transitive']) ||
+
+		// JS focused
+		metAllArgs(['coffeescript', 'automin', 'transitive']) ||
+		metAllArgs(['typescript', 'automin', 'transitive']);
+
+	var found = false;
+
+	// by default the transitivity is set to the path the result should be the destination
+	transitivity.dest = matchingEntry.dest;
+
+	if (shouldBeTransitive) {
+		var fileName = (/^.*[\/](.*)$/g.exec(path.hackSlashes()))[1];
+		var focusedPathFileName = "{0}/{1}".format([matchingEntry.dest, fileName]);
+
+		// define if it has to be transitive about CSS or JS
+		// transitivityLike
+		var trLike =
+			/.*[.](coffee|ts)$/.test(fileName) ? 'JS' :
+			/.*[.](scss|styl|less)$/.test(fileName) ? 'CSS' :
+			'UNDEFINED';
+
+		var pathesTo =
+			trLike == 'JS' ? config.pathesToJs :
+			trLike == 'CSS' ? config.pathesToStyle :
+			null;
+
+		// get the B step matching configuration and check if there is a matching from 
+		// A step destination to B step wtching folder
+		var matchingEntryFinal = getMatchingEntryConfig(focusedPathFileName, pathesTo);
+
+		found = matchingEntryFinal != null;
+		transitivity.should = found;
+
+		if (found) {
+			transitivity.compressing =
+				trLike == 'JS' ? (M.uglify) :
+				trLike == 'CSS' ? cleanCssMinification :
+				(M.nop);
+
+			transitivity.suffixing = renameSuffixMin;
+
+			// substitution of matchingEntryConfig A step destination replaced by C step destination
+			transitivity.dest = matchingEntryFinal.dest;
+		}
+	}
+}
+
+// -- [services_tasks/funcs/mzg_tasks_micro_services.js] -- 
+function renameSuffixMin() {
+	return (M.rename)({
+		suffix: '.min'
+	});
+}
+
+function cleanCssMinification() {
+	return (M.cleanCSS)({
+		'compatibility': 'ie8'
+	});
+}
+
+function insertSignatureAfter(actionDone, thanksToModule) {
+	return (M.insert).append("\n/* -- {1} wth Gloups v {2} - {3} | thanks to {4} -- */".format(
+		[
+			actionDone.replace(/[\s]+$/, ''),
+			GLOUPS_VERSION,
+			shortDateComputed(),
+			thanksToModule
+		]
+	));
+}
+
+function autoprefix() {
+	return (M.autoprefixer)({
+		browsers: AUTOPREFIXER_BROWSERS,
+		cascade: false
+	});
+}
+
+// -- [supports/mzg_changed_files_logging.js] -- 
 function logChangedRealTargetedFiles(mainLazyPipeObj, realTargets) {
 	var descr = mainLazyPipeObj.forMatchingObj.pathesDescr;
 	var pafn;
 	var actionOnFile = mainLazyPipeObj.message.action;
 
-	cpt = 0;
+	var cpt = 0;
 	// call with logging of the time taken by the task
 	if (realTargets.length > 1) {
 		realTargets.forEach(function(file) {
@@ -1127,164 +1435,181 @@ function getProjectNameWithFileFromPathDesc(descr, file) {
 	};
 }
 
-function transitiveAndSourcemappingWrap(glob_transitivity, mainLazyPipeObj) {
 
-	// UNBOXING -----------------------------------------------------------------------------------
-	var lazyPipeProcess = mainLazyPipeObj.process;
-	var forMatchingObj = mainLazyPipeObj.forMatchingObj,
-		path = forMatchingObj.path,
-		pathesDescription = forMatchingObj.pathesDescr; // pathesToJs/CSS/SASS/etc. ...;
-	var message = mainLazyPipeObj.message;
-
-	// find the config through the json and getting watch ; dest ; sourcemapp etc.
-	var matchingEntry = getMatchingEntryConfig(path, pathesDescription);
-
-	// LAZYPIPE wrapping transitivity and sourcemapping -------------------------------
-	var thinkTransitively = transitiveWrapAround(glob_transitivity, matchingEntry, path, lazyPipeProcess);
-	var sourceMappedProcess = setSourceMappingAndSign(thinkTransitively, matchingEntry, message);
-
-	return sourceMappedProcess;
-}
-
-function setSourceMappingAndSign(lazyPipeProcess, matchingEntry, sign) {
-	var sourcemapping = matchingEntry.sourcemaps;
+// -- [services_tasks/funcs/mzg_lisences_handeling.js] -- 
+function separateLisences(athis, isTransitive) {
 	return (M.lazyPipe)()
+		.pipe(function() {
+			return (M.through).obj(function(chunk, enc, cb) {
 
-		// if sourcemaps desired initialize them or do nothing
-		.pipe(sourcemapping ?
-			(M.sourcemaps).init :
-			(M.nop))
+				var _data =
+					athis.lisences.source_kind == 'simple' ? (M.fs).readFileSync(chunk.path, "utf8") :
+					athis.lisences.source_kind == 'complex' ? chunk._contents.toString() :
+					""; // no content
 
-		// transitivity handleing here in general
-		.pipe(lazyPipeProcess)
+				if (athis.lisences.source_kind == 'complex') {
+					chunk._contents = distributeLisencesOutOfChunk(athis, isTransitive, _data);
 
-		// put a sign after the end of the file stream to indicate it used Gloups and some modules
-		.pipe(insertSignatureAfter, sign.action, sign.module)
+					// the content must be buffered
+					chunk._contents = Buffer.from(chunk._contents, 'utf8');
 
-		// if sourcemaps desired write them or do nothing
-		.pipe(sourcemapping ?
-			function() {
-				return (M.sourcemaps).write('./');
-			} :
-			(M.nop));
+				} else if (athis.lisences.source_kind == 'simple') {
+					athis.prehamptedData = _data;
+				}
+
+				cb(null, chunk);
+			});
+		});
 }
 
-function transitiveWrapAround(glob_transitivity, matchingEntry, path, lazyPipeProcess) {
+function separatePrehamptedLisences(athis) {
+	return (M.lazyPipe)()
+		.pipe(function() {
+			return (M.through).obj(function(chunk, enc, cb) {
 
-	// do not let the default draft folder as a destination, change it straight away
-	if (glob_transitivity != null && glob_transitivity.dest == "draft") {
-		transitivitySetupCore(glob_transitivity, matchingEntry, path);
+				// get data back from athis and transforming it to string
+				var prehamptedData = athis.prehamptedData;
+
+				// nothing to affect with this because that lazypipe is used with simple services
+				// which are not affected by the transitivity ...
+				var isTransitive;
+
+				chunk._contents = Buffer.from(distributeLisencesOutOfChunk(athis, isTransitive, prehamptedData), 'utf8');
+
+				cb(null, chunk);
+			});
+		});
+}
+
+function lisencesSetup(athis) {
+
+	athis.lisences = {
+		data: '',
+		source_kind: '',
+	};
+
+	return (M.lazyPipe)()
+		.pipe(function() {
+			return (M.through).obj(function(chunk, enc, cb) {
+				athis.lisences.source_kind =
+					/.*[.](?:scss|styl|less|ts|coffee)$/.test(chunk.path) ? "complex" :
+					/.*[.](?:css|js)$/.test(chunk.path) ? 'simple' :
+					'unknown';
+				cb(null, chunk);
+			});
+		});
+}
+
+function aLazyPipeThatIsPipingLikeNop() {
+	return (M.lazyPipe)()
+		.pipe((M.nop));
+}
+
+function distributeLisencesOutOfChunk(athis, isTransitive, _data) {
+	var result = readLisences(_data);
+	athis.lisences.data = result.lisences;
+
+	return isTransitive ? result.not_lisences : _data;
+}
+
+function readLisences(_data) {
+
+	var reading = new classReading();
+	reading.initialize(_data, 0);
+
+	var readingLisenceObj = {
+		reading: reading,
+		line: '',
+		cpt: 0,
+		result: [],
+		anti_result: [],
+		canprint: false,
+		inLisence: false
+	};
+
+	reading.readLines(function() {
+		readingLisencesProcess(readingLisenceObj);
+	});
+	return {
+		lisences: readingLisenceObj.result.join('\n'),
+		not_lisences: readingLisenceObj.anti_result.join('\n')
+	};
+}
+
+function readingLisencesProcess(R) { // R : reading object (specific to lisences reading)
+	R.line = R.reading.line;
+	R.canprint = false;
+	if (/^.*(?:\/\*!).*(?:\*\/).*$/.test(R.line)) {
+		R.canprint = true;
+	} else if (/^.*(?:\/\*!).*$/.test(R.line)) {
+		R.canprint = true;
+		R.inLisence = true;
+	} else if (R.inLisence && /^.*(?:\*\/).*$/.test(R.line)) {
+		R.canprint = true;
+		R.inLisence = false;
 	}
 
-	// if high leveled services, make a lazypipe where the transitivity is applied
-	var lzpTransitivityApplied = glob_transitivity != null ?
-		(M.lazyPipe)()
-		.pipe(transitivitySetup, glob_transitivity, matchingEntry, path) :
-
-		// else do nothing
-		(M.nop);
-
-	// if high leveled services, make a lazypipe compressed and suffixed
-	var lzpTransitivityCompression = glob_transitivity != null ?
-		(M.lazyPipe)()
-		.pipe(glob_transitivity.compressing)
-		.pipe(glob_transitivity.suffixing) :
-
-		// else do nothing
-		(M.nop);
-
-	return (M.lazyPipe)()
-		.pipe(lzpTransitivityApplied)
-		.pipe(lazyPipeProcess)
-		.pipe(lzpTransitivityCompression);
+	inLisenceProcess(R);
 }
 
-function transitivitySetup(transitivity, matchingEntry, path) {
-	return (M.through).obj(function(chunk, enc, callback) {
-		transitivitySetupCore(transitivity, matchingEntry, path);
-		callback(null, chunk);
-	});
-}
+function inLisenceProcess(R) {
+	if (R.inLisence) {
+		if (R.line.length > 0) {
+			R.canprint = true;
 
-function transitivitySetupCore(transitivity, matchingEntry, path) {
-	var shouldBeTransitive =
-		metAllArgs(['all', 'transitive']) ||
+		} else if (++R.cpt % 3 == 2) {
+			R.canprint = true;
+		}
 
-		// CSS focused
-		metAllArgs(['sass', 'mincss', 'transitive']) ||
-		metAllArgs(['stylus', 'mincss', 'transitive']) ||
-		metAllArgs(['less', 'mincss', 'transitive']) ||
-
-		// JS focused
-		metAllArgs(['coffee', 'minjs', 'transitive']) ||
-		metAllArgs(['typescript', 'minjs', 'transitive']);
-
-	var found = false;
-
-	// by default the transitivity is set to the path the result should be the destination
-	transitivity.dest = matchingEntry.dest;
-
-	if (shouldBeTransitive) {
-		var fileName = (/^.*[\/](.*)$/g.exec(path.hackSlashes()))[1];
-		var focusedPathFileName = "{0}/{1}".format([matchingEntry.dest, fileName]);
-
-		// define if it has to be transitive about CSS or JS
-		// transitivityLike
-		var trLike = /.*[.](coffee|ts)$/.test(fileName) ? 'JS' :
-			/.*[.](scss|styl|less)$/.test(fileName) ? 'CSS' :
-			'UNDEFINED';
-
-		var pathesTo = trLike == 'JS' ? config.pathesToJs :
-			trLike == 'CSS' ? config.pathesToStyle :
-			null;
-
-		// get the B step matching configuration and check if there is a matching from 
-		// A step destination to B step wtching folder
-		var matchingEntryFinal = getMatchingEntryConfig(focusedPathFileName, pathesTo);
-
-		found = matchingEntryFinal != null;
-		transitivity.should = found;
-
-		if (found) {
-			transitivity.compressing =
-				trLike == 'JS' ? (M.uglify) :
-				trLike == 'CSS' ? cleanCssMinification :
-				(M.nop);
-
-			transitivity.suffixing = renameSuffixMin;
-
-			// substitution of matchingEntryConfig A step destination replaced by C step destination
-			transitivity.dest = matchingEntryFinal.dest;
+		if (R.line.length > 0) {
+			R.cpt = 0;
 		}
 	}
+	if (R.canprint) {
+		R.result.push(R.line);
+	} else {
+		R.anti_result.push(R.line);
+	}
 }
 
-function renameSuffixMin() {
-	return (M.rename)({
-		suffix: '.min'
+function applyLicenceSplitting(mainLazyPipeObj) {
+	return (M.through).obj(function(chunk, enc, cb) {
+		var lisences = mainLazyPipeObj.process.lisences;
+
+		if (lisences && lisences.data != '') {
+			var match = /^.*[\/\\]([^\.]+).*[.](css|js)$/.exec(chunk.path.hackSlashes());
+
+			// The only transformation that can wiped the comments (lisences) out is 
+			// minification so otherwise lisences are saved
+			if (match && /^.*[.]min[.].*$/.test(chunk.path.hackSlashes())) {
+				var dest = mainLazyPipeObj.destCallBack(false);
+
+				var finalLisenseFilePath = dest + '/' + match[1] + '.lisence.' + match[2];
+
+				(M.fssync).write(finalLisenseFilePath, "{0} \n/* -- {1} with Gloups v {2} - {3} | thanks to {4} -- */".format([
+						lisences.data,
+						'Lisence(s) exported',
+						GLOUPS_VERSION,
+						shortDateComputed(),
+						'gulp-through2 ; gulp-fssync'
+					]),
+					'utf8'
+				);
+
+				var descr = mainLazyPipeObj.forMatchingObj.pathesDescr;
+
+				// projectAndFileName
+				var pafn = getProjectNameWithFileFromPathDesc(descr, finalLisenseFilePath.hackSlashes());
+
+				gloupslog(" {0} '{1}{2}'".format(['Lis. reported ', chalk.bgCyan(' ' + pafn.projectName + ' '), chalk.cyan(pafn.fileName + ' ')]));
+			}
+
+		}
+		cb(null, chunk);
 	});
 }
 
-function cleanCssMinification() {
-	return (M.cleanCSS)({
-		compatibility: 'ie8'
-	});
-}
-
-function insertSignatureAfter(actionDone, thanksToModule) {
-	return (M.insert).append("\n/* -- {0} with Gloups {1} | using {2} -- */".format([
-        actionDone, GLOUPS_VERSION, thanksToModule
-    ]));
-}
-
-function autoprefix() {
-	return (M.autoprefixer)({
-		browsers: AUTOPREFIXER_BROWSERS,
-		cascade: false
-	});
-}
-
-// -- [services_tasks/mzg_services_funcs.js] -- 
+// -- [services_tasks/funcs/mzg_services_funcs.js] -- 
 function contains(a, obj) {
 	var i = a.length;
 	while (i--) {
@@ -1296,8 +1621,7 @@ function contains(a, obj) {
 }
 
 function getMatchingPrincipalSCSS(projectPath, path) {
-	var m = null;
-	m = /^.*[\/\\](.*)$/.exec(path);
+	var m = /^.*[\/\\](.*)$/.exec(path);
 
 	// filter to not let pass files starting by underscores "_.*"
 	if (m && m[1] && /^_.*$/.test(m[1])) {
@@ -1311,7 +1635,7 @@ function getMatchingPrincipalSCSS(projectPath, path) {
 		var lpp = path.substr(ppl); // local path to the partial 
 
 		// ellipsizing the path to get a match with
-		ellipsedPath = pathEllipzizeing(normalized, 0, (lpp.split("/").length));
+		var ellipsedPath = pathEllipzizeing(normalized, 0, (lpp.split("/").length));
 
 		var matchings = [];
 		var matchingDef = config.sassMaching;
@@ -1392,6 +1716,9 @@ function checkMultipleRules(inputString, mixinRulesArr, index) {
 	}
 	return result;
 }
+/*	*************************************************************************************************************************************************************************************************
+	*                                 										REWRITING TASKS : Tasks Changing gulpfile.js 																			*
+ 	*************************************************************************************************************************************************************************************************/
 
 // -- [supports/rewriting/tasks/mzg_apply_temp_task.js] -- 
 gulp.task('applyTemp', function() {
@@ -1401,6 +1728,7 @@ gulp.task('applyTemp', function() {
             var dStart = new Date();
 
             gulp.src(gulpFileTempPath)
+                .pipe((M.insert).prepend('"use strict";\n'))
                 .pipe((M.rename)('gulpfile.js'))
                 .pipe(gulp.dest(function(file) {
 
@@ -1426,6 +1754,7 @@ gulp.task('applyDist', function() {
 
 			gulp.src(gulpFileTempPath2)
 				.pipe((M.rename)('gulpfile.js'))
+				.pipe((M.insert).prepend('/*jshint esversion: 6 */\n/*jshint ignore:start */\n'))
 				.pipe(gulp.dest(function(file) {
 					var folder = getGulpfolderFromFileBase(file);
 					var dResult = ms2Time(new Date() - dStart);
@@ -1441,6 +1770,7 @@ gulp.task('applyDist', function() {
 					M.fssync.copy('gloups.bat', 'dist/gloups.bat');
 					cb(null, chunk);
 				}));
+
 		}
 	});
 });
@@ -1537,7 +1867,7 @@ function readJsonConfig(filePath) {
 	reading.readLines(function() {
 
 		// stripping comments ---------------------------------------------------------------------
-		l = reading.getLine();
+		l = reading.line;
 		if ((has_smthng = (m = /^(.*)\/\/.*$/g.exec(l)))) { // "(.. content ..) [//] .. .."
 			content = m[1];
 		} else if ((has_smthng = (m = /^(.*)\/\*$/g.exec(l)))) { // "(.. content ..) [/*] .. .."
@@ -1741,7 +2071,7 @@ function pushEllipsizedPartials(projectRootPath, styleSheet, index) {
     var l, m;
 
     reading.readLines(function() {
-        l = reading.getLine();
+        l = reading.line;
         if ((m = /^@import[\s].*["](.*)["]/.exec(l)) && m[1]) {
 
             // full path to the partial
@@ -1868,7 +2198,6 @@ function tasksToRunOnArgvs() {
 
     // strips all non options or presets arguments
     var subAr = getSliceOfMatchingOptions(subs, GLOUPS_OPTIONS);
-    var subAdvAr = getSliceOfMatchingOptions(subs, SERVICES_ADVANCED_OPTIONS);
 
     for (var service in subAr) {
         try {
@@ -1883,7 +2212,7 @@ function tasksToRunOnArgvs() {
                 effectiveServices = SERVICES[service].split(' ');
 
             } else {
-                effectiveServices.push(SERVICES[service]);
+                effectiveServices.push(service);
             }
         } catch (err) {
             errors.push(err + " Error with option: ");
@@ -1958,6 +2287,8 @@ function getGulpfolderFromFileBase(file) {
 function configurationOfRewriteOnArvs() {
     var argvs = translateAliassesInArgs(process.argv, RewriteServices);
     var subAr = getSliceOfMatchingOptions(argvs, "ugly|beauty|once|multiple");
+    var matchOption;
+
     subAr.forEach(function(serv) {
         try {
             var opt = (/^--(.*)$/.exec(serv));
@@ -1967,9 +2298,7 @@ function configurationOfRewriteOnArvs() {
                 RewriteServices.times = matchOption == 'multiple' ? matchOption : RewriteServices.times;
             }
 
-        } catch (err) {
-            errors.push(err + " Error with option: ");
-        }
+        } catch (err) {/* nothing */}
     });
 
     return {
@@ -2005,7 +2334,7 @@ function logHelp() {
 
 	console.log("\n\n");
 	reading.readLines(function() {
-		line = reading.getLine().replace(/\r?\n|\r/g, '');
+		line = reading.line.replace(/\r?\n|\r/g, '');
 
 		// reading the help.md file [MARKDOWN]
 		// Titles are cyan
@@ -2064,15 +2393,25 @@ function logErrorsOnTaskArgvs(errors) {
 }
 
 function logProjectErrored(project) {
-    gloupslog(" {0}  - SOMETING IS WRONG".format([chalk.bgRed(' '+project.project+' ')]));
+	// terminalCols
+	gloupslog(" {0}  - SOMETHING IS WRONG \n".format([chalk.bgRed(' ' + project.project + ' ')]));
+	gloupslog(" {0} {1}\n".format([logFilePath(project.path + '/config.mzg.json'), chalk.red(': MISMATCH')]));
+
 	console.log(
-		"\n    {0}\n    {1} {2}\n\n {3}\n {4}\n    > {5}\n\n".format([
-            'this project seems to have no configuration .INI file defined',
-            logFilePath(project.path + '\\config.mzg.ini'), chalk.red(': MISSING'),
-            chalk.gray.inverse(' SOLUTION '),
-            '    run the command to setup projects local configuraitons:',
-            chalk.grey('$ gulp scanProjects')
-        ]));
+		(getColoredParagraph(" The path to that folder does not match to an actual project root folder containing a config.mzg.json file.",chalk.bgRed)) +
+		("\n\n {0}\n".format([chalk.bgWhite.black(' SOLUTION ')])) +
+		('\n' + getColoredParagraph(" ", chalk.bgWhite.grey)) +
+		(getColoredParagraph(" Check the path to see if there is no mistake and fix it in the project definition.", chalk.bgWhite.grey)) +
+		('\n' + getColoredParagraph(" ", chalk.bgWhite.grey)) +
+		(getColoredParagraph(" You can otherwise run the command to set up a configuration file at this path and also create nonexistent folders :", chalk.bgWhite.grey)) +
+		('\n' + getColoredParagraph(" $ gulp scanProjects", chalk.bgWhite.black)) +
+		(getColoredParagraph(" ", chalk.bgWhite.grey))
+	);
+}
+
+function getColoredParagraph(paragraph, chalkColor) {
+	var tc = process.stdout.columns;
+	return chalkColor(paragraph + Array(tc - paragraph.length % tc).join(' '));
 }
 
 function logProcessCompleteOnFile(files, realAction, process) {
@@ -2115,8 +2454,18 @@ function ms2Time(ms) {
 function dateComputed() {
 	var date = new Date();
 
-	var days = ["Mon", "Tues", "Wednes", "Thirth", "Fri", "Satur", "Sun"];
+	var days = ["Mon", "Tues", "Wednes", "Thurth", "Fri", "Satur", "Sun"];
 	return [days[date.getDay() - 1], "day,", [date.getMonth() + 1, date.getDate(), date.getFullYear()].join("-")].join("");
+}
+
+function twodigits(num) {
+	return ("0" + num).slice(-2)
+}
+
+function shortDateComputed() {
+	var date = new Date();
+
+	return [twodigits(date.getMonth() + 1), twodigits(date.getDate()), date.getFullYear()].join("-");
 }
 
 function timeComputed() {
@@ -2146,13 +2495,13 @@ function logServiceActivatedPushed(purpose, projectName, addon) {
 		}
 
 		console.log(" Watch :'{0}{1}'\n Dest. :'{2}{3}'".format([
-            chalk.bgCyan(' ' + projectName+' '), chalk.cyan('/' + addon.watch + ' '),
-            chalk.bgCyan(' ' + projectName+' '), chalk.cyan('/' + addon.dest + ' ')
+            chalk.bgCyan(' ' + projectName + ' '), chalk.cyan('/' + addon.watch + ' '),
+            chalk.bgCyan(' ' + projectName + ' '), chalk.cyan('/' + addon.dest + ' ')
         ]));
 
 		var sourcemaps = addon.sourcemaps;
 		if (sourcemaps !== undefined) {
-			console.log(sourcemaps ? '         '+chalk.bgGreen(" Sourcemaps ! ") : '');
+			console.log(sourcemaps ? '         ' + chalk.bgGreen(" Sourcemaps ! ") : '');
 		}
 	}
 }
@@ -2172,7 +2521,7 @@ function logTaskPurpose(taskName) {
 	var tasks = {
 		"setVars": "" +
 			"  Sets configuration variables \n" +
-			'  See the .INI file of project mapping to set Gloups ready to serve your projects here :\n' +
+			'  See the mapping file to set Gloups able to serve your projects here :\n' +
 			'  > ' + logFilePath('custom/config.mzg.ini') + ':\n',
 		"automin": "" +
 			"  Will uglify .js files matching the folowing path(s):\n",
@@ -2186,8 +2535,8 @@ function logTaskPurpose(taskName) {
 			"  Will process .less files matching the folowing path(s):\n",
 		"sass": "" +
 			"  Will process .sass files matching the folowing path(s):\n",
-        "stylus": "" +
-            "  Will process .styl files matching the folowing path(s):\n",
+		"stylus": "" +
+			"  Will process .styl files matching the folowing path(s):\n",
 		"scanProjects": "" +
 			"  Creates configuration file in every project root folder\n"
 	};
@@ -2210,7 +2559,7 @@ function logWatchList(taskName) {
 		"autominCss": config.pathesToStyle,
 		"less": config.pathesToStyleLess,
 		"sass": config.pathesToSass,
-        "stylus": config.pathesToStylus
+		"stylus": config.pathesToStylus
 	};
 
 	if (associations[taskName]) {
@@ -2245,87 +2594,4 @@ function logTaskEndBeauty(one_time) {
 	} else {
 		console.log();
 	}
-}
-/*	*************************************************************************************************************************************************************************************************
-	*                                 										CLASSES : Classes for configuration purpose 																			*
- 	*************************************************************************************************************************************************************************************************/
-
-// -- [supports/files/mzg_stable_reading_file_class.js] -- 
-function classReading() {
-    this.line = null;
-    this.data = null;
-    this.iter = null;
-    this.stopped = false;
-    this.initialize = function(data, iter) {
-        this.data = data+' ';
-        this.iter = iter;
-        this.line = [];
-    };
-
-    this.readLines = function(processingLine) {
-        var c;
-        while ((!this.isStopped()) && (c = this.getNextChar())) {
-
-            // the line feed is encontoured 
-            if (/^[\n\r]$/g.test(c) || this.isEndReached()) {
-                this.toLine();
-                processingLine(this.getLine());
-                this.resetLine();
-            }
-
-            // just add the character
-            else {
-                this.feed(c);
-            }
-        }
-    };
-
-    this.stop = function() {
-        this.stopped = true;
-    };
-    
-    this.isStopped = function() {
-        return this.stopped;
-    };
-
-    this.setIter = function(iter) {
-        this.iter = iter;
-    };
-
-    this.setData = function(data) {
-        this.data = data;
-    };
-
-    this.toLine = function() {
-        this.line = this.line.join("");
-        this.line = this.line.replace(/^[\n\r]$/g, '');
-    };
-
-    this.resetLine = function() {
-        this.line = [];
-    };
-
-    this.getIter = function() {
-        return this.iter;
-    };
-
-    this.getData = function() {
-        return this.data;
-    };
-
-    this.getLine = function() {
-        return this.line;
-    };
-
-    this.getNextChar = function() {
-        return this.data[this.iter++];
-    };
-
-    this.isEndReached = function() {
-        return !this.data[this.iter];
-    };
-
-    this.feed = function(char) {
-        this.line.push(char);
-    };
 }

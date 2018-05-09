@@ -16,26 +16,29 @@ var RewriteServices = {
 };
 
 var mzgFiles = [
+	'supports/basic/mzg_jshint_specifications.js',
 	'supports/rewriting/log_sections/mzg_log1.js', // section
 
 	'supports/basic/mzg_modules_importation.js',
 	'supports/basic/mzg_vars.js',
 
-	'supports/rewriting/mzg_rewriting_vars.js', // rewrite 
+	'supports/rewriting/mzg_rewriting_vars.js', // rewrite // 4
+
+	'supports/rewriting/log_sections/mzg_log15.js', // section
+	'supports/files/mzg_stable_reading_file_class.js',
 
 	'supports/rewriting/log_sections/mzg_log2.js', // section
 
 	'supports/basic/mzg_stable_funcs.js',
-	'supports/basic/mzg_modules_requesting.js',
+	'supports/basic/mzg_modules_requesting.js', // 9
 
 	'supports/rewriting/log_sections/mzg_log3.js', // section
 
 	'supports/basic/tasks/mzg_default_task.js',
 	'supports/basic/tasks/mzg_clear_task.js',
-	'supports/basic/tasks/mzg_externalize_config_task.js',
+	'supports/basic/tasks/mzg_externalize_config_task.js', // 13
 	'projects_setup_tasks/mzg_set_vars_task.js',
 	'supports/basic/tasks/mzg_set_params_task.js',
-	'supports/basic/tasks/mzg_jshint_task.js',
 	'supports/basic/tasks/mzg_help_me_task.js',
 
 	'supports/rewriting/log_sections/mzg_log4.js', // section
@@ -53,13 +56,12 @@ var mzgFiles = [
 	// js
 	'services_tasks/js_tasks/mzg_automin_task.js',
 	'services_tasks/js_tasks/mzg_tyepscript_task.js',
-	'services_tasks/js_tasks/mzg_coffeescript_task.js',
+	'services_tasks/js_tasks/mzg_coffeescript_task.js', // 25
 
 	'supports/rewriting/log_sections/mzg_log7.js', // section
 
 	// css
 	'services_tasks/css_tasks/mzg_automin_css_task.js',
-	'services_tasks/css_tasks/mzg_auto_format_css_task.js',
 	'services_tasks/css_tasks/mzg_less_task.js',
 	'services_tasks/css_tasks/mzg_sass_task.js',
 	'services_tasks/css_tasks/mzg_stylus_task.js',
@@ -69,13 +71,20 @@ var mzgFiles = [
 	// other
 	'services_tasks/mzg_other_oriented_tasks.js',
 
-	'supports/rewriting/log_sections/mzg_log16.js', // section
-	'supports/files/mzg_module_seeking_funcs.js',
+	'supports/rewriting/log_sections/mzg_log16.js', // section // 33
+	'supports/files/mzg_module_seeking_funcs.js', // 34
 
 	'supports/rewriting/log_sections/mzg_log9.js', // section
 
-	'services_tasks/mzg_tasks_micro_services.js',
-	'services_tasks/mzg_services_funcs.js',
+	// services : consumming + lazyprocess + wrapping + lisencing
+	'services_tasks/funcs/mzg_run_task_process_for.js',
+	'services_tasks/funcs/mzg_main_pipe_wrapping.js',
+	'services_tasks/funcs/mzg_tasks_micro_services.js',
+
+	'supports/mzg_changed_files_logging.js',
+
+	'services_tasks/funcs/mzg_lisences_handeling.js',
+	'services_tasks/funcs/mzg_services_funcs.js',
 
 	'supports/rewriting/log_sections/mzg_log10.js', // section
 
@@ -85,13 +94,13 @@ var mzgFiles = [
 	'supports/rewriting/tasks/mzg_write_dist_task.js',
 	'supports/rewriting/tasks/mzg_rewrite_task.js',
 
-	'supports/rewriting/log_sections/mzg_log11.js', // section
+	'supports/rewriting/log_sections/mzg_log11.js', // section 
 
-	'supports/mzg_runtask.js',
+	'supports/mzg_runtask.js', 
 
-	'supports/rewriting/log_sections/mzg_log12.js', // section
+	'supports/rewriting/log_sections/mzg_log12.js', // section // 50
 
-	'supports/files/configurationSetting/mzg_config_funcs.js',
+	'supports/files/configurationSetting/mzg_config_funcs.js', 
 	'supports/projects/mzg_projects_funcs.js',
 	'supports/mzg_argument_funcs.js',
 
@@ -101,19 +110,16 @@ var mzgFiles = [
 	'supports/rewriting/mzg_rewrite_arguments_func.js',
 
 	'supports/rewriting/log_sections/mzg_log14.js', // section
-	'supports/mzg_logging.js',
-
-	'supports/rewriting/log_sections/mzg_log15.js', // section
-	'supports/files/mzg_stable_reading_file_class.js'
+	'supports/mzg_logging.js'
 ];
 
 var distFiles = mzgFiles.slice();
 
-distFiles.splice(49, 3);
-distFiles.splice(37, 6);
-distFiles.splice(32, 2);
-distFiles.splice(10, 1);
-distFiles.splice(6, 1);
-distFiles.splice(3, 1);
+distFiles.splice(54, 3);
+distFiles.splice(39, 6);
+distFiles.splice(33, 2);
+distFiles.splice(13, 1);
+distFiles.splice(9, 1);
+distFiles.splice(4, 1);
 
 isdist.NOT_DISTRIBUTION = true;

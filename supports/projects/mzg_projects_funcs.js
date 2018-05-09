@@ -127,7 +127,7 @@ function pushEllipsizedPartials(projectRootPath, styleSheet, index) {
     var l, m;
 
     reading.readLines(function() {
-        l = reading.getLine();
+        l = reading.line;
         if ((m = /^@import[\s].*["](.*)["]/.exec(l)) && m[1]) {
 
             // full path to the partial

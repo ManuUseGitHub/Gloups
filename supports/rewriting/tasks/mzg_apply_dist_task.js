@@ -7,6 +7,7 @@ gulp.task('applyDist', function() {
 
 			gulp.src(gulpFileTempPath2)
 				.pipe((M.rename)('gulpfile.js'))
+				.pipe((M.insert).prepend('/*jshint esversion: 6 */\n/*jshint ignore:start */\n'))
 				.pipe(gulp.dest(function(file) {
 					var folder = getGulpfolderFromFileBase(file);
 					var dResult = ms2Time(new Date() - dStart);
@@ -22,6 +23,7 @@ gulp.task('applyDist', function() {
 					M.fssync.copy('gloups.bat', 'dist/gloups.bat');
 					cb(null, chunk);
 				}));
+
 		}
 	});
 });

@@ -49,7 +49,7 @@ function Macro_Seek_Modules(reading, analyser, kind, search) {
 	var line, enc = 0;
 
 	reading.readLines(function() {
-		line = reading.getLine().replace(/\r?\n|\r/g, '');
+		line = reading.line.replace(/\r?\n|\r/g, '');
 
 		// while analysing syntaxicaly the file, say if wa encountered the function / task
 		// and say via the analyser object if we are in a task or a function by its fields
@@ -134,6 +134,7 @@ function defineLimits(analyser, line, enc) {
 }
 
 function whenElementMatched(line) {
+	var match;
 	if (whenModuleMatched(line)) {
 		// DONE, nothing to do here ... 
 	} else if ((match = /^.*[\.]pipe[(]([\w]+).*$/.exec(line))) {
@@ -154,7 +155,7 @@ function whenModuleMatched(line) {
 	if ((result = /^.*M[\.]([\w]+).*$/.exec(line))) {
 
 		var regex = /M[\.]([\w]+)/g;
-		while (match = regex.exec(line)) {
+		while ((match = regex.exec(line))) {
 			if (!glob_found_modules[match[1]]) {
 				glob_found_modules[match[1]] = true;
 			}

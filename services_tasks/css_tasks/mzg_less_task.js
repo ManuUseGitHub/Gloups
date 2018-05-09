@@ -9,21 +9,26 @@ gulp.task('less', function() {
 		// defines what files extension are allowed to be processed
 		'rules': [/.*.less$/],
 
+		// gathers comments that define lisences
+		'lisences': null,
+
 		// the pipe part that will be wrapped for sourcemapping and transitivity (here none)
-		'mainPipe': (M.lazyPipe)()
-			.pipe(function() {
-				return (M.less)({
-					paths: [(M.path).join(__dirname, 'less', 'includes')]
-				});
-			})
-			.pipe(autoprefix)
-			.pipe((M.stylefmt)),
+		'mainPipe': null,
 
 		// tells how to handle importation within preprocessed/precompiled files
 		'realTargetsFunction': function(filePath, matchingEntry) {
 			return [filePath];
 		}
 	};
+
+	obj.mainPipe = (M.lazyPipe)()
+		.pipe(function() {
+			return (M.less)({
+				paths: [(M.path).join(__dirname, 'less', 'includes')]
+			});
+		})
+		.pipe(autoprefix)
+		.pipe((M.stylefmt));
 
 	// PROCESS WITH THE VARIANT CONFIGURATION
 	runTaskProcessForPrecompiledFiles(this, config.pathesToStyleLess, obj);

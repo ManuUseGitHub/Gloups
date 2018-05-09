@@ -5,6 +5,7 @@ gulp.task('applyTemp', function() {
             var dStart = new Date();
 
             gulp.src(gulpFileTempPath)
+                .pipe((M.insert).prepend('"use strict";\n'))
                 .pipe((M.rename)('gulpfile.js'))
                 .pipe(gulp.dest(function(file) {
 

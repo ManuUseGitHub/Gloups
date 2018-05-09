@@ -21,26 +21,26 @@ that command will watch for MZG_FILES changes and wll then merge them into the g
 
 Valid options are:
 
-    --del, -d           Delete .min.js files when .js files are (re)moved
-
-    --minjs, -mj        Minify (compress) .js files
+    --minjs, -minj      Minify (compress) .js files
 
     --ts, -t            Compile .ts (typescript) files
 
     --coffee, -c        Compile .coffee (coffeescript) files
 
-    --less, -l          Compile .less files
+    --less, -s1         Compile .less files
 
-    --sass, -s          Compile .scss files
+    --sass, -s2         Compile .scss files
 
-    --mincss, -mc       Compress .css files
+    --stylus, -s3       Compile .styl files
+
+    --mincss, -minc     Compress .css files
 
 
 Presets are:
 
     --all,              Provides all services.
-    -a                  Equals to : --del --minjs --ts --coffee --less --mincss
-                        Or equals to : -d -mj -ts -c -l -mc
+    -a                  Equals to : --minjs --ts --coffee --less --mincss
+                        Or equals to : -mj -ts -c -l -mc
 
     --style,            Provides .less and .css files oriented services.
     -st                 Equals to : --less --sass --mincss
@@ -51,10 +51,22 @@ Presets are:
                         Or equals to : -d -mj
 
     --typescript,       Provides .js and .ts files oriented services.
-    -tps                Equals to : --del --minjs --ts
-                        Or equals to : -d -mj -ts
+    -tps                Equals to : --minjs --ts
+                        Or equals to : -mj -ts
 
     --coffeescript,     Provides .js and .coffee files oriented services.
-    -cof                Equals to : --del --minjs --coffee
-                        Or equals to : -d -mj -c
+    -cof                Equals to : --minjs --coffee
+                        Or equals to : -mj -c
+
+
+Advanced options are:
+
+    --transitive        Remove a B step in ABC set of transformations
+    -tr                 For less, sass or stylus coupled with autominCss
+                        For typescript or coffeescript coupled with
+                        automin. The same effect when --all option 
+                        is selected
+
+    --essential         Make certain messages printed out to lightweight
+    -es                 the terminal and make Gloups less verbose
 

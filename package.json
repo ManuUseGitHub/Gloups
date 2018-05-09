@@ -1,6 +1,6 @@
 {
   "name": "Gloups",
-  "version": "1.0.0",
+  "version": "6.2.4",
   "description": "An amazing gulp helper",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "fs-sync": "^1.0.4",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^5.0.0",
-    "gulp-clean-css": "^3.9.0",
+    "gulp-clean-css": "^3.9.4",
     "gulp-coffee": "^3.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-css-format": "^0.1.2",
@@ -46,6 +46,7 @@
     "gulp-stylus": "^2.7.0",
     "gulp-typescript": "^3.2.4",
     "gulp-uglify": "^3.0.0",
+    "gulp-uglifyes": "^0.1.3",
     "gulp-wait": "0.0.2",
     "jshint": "^2.9.5",
     "lazypipe": "^1.0.1",
