@@ -18,7 +18,7 @@ With Gloups, Just configure file paths to the root folder of your projects, a co
 
 ## End user installation
 
-1. Download the Gloups project or clone it.
+1. Download the Gloups project or clone it :
     
     ```
     $ git clone https://github.com/ManuUseGitHub/gloups.git 
@@ -26,13 +26,13 @@ With Gloups, Just configure file paths to the root folder of your projects, a co
     
     Extract the 'dist' folder, copy it where you want and open a terminal in it.
 
-2.  Run.
+2.  Run :
     
     ```
     $ npm install
     ```
 
-3.  Gloups use the gulp task runner so make sure it is installed.
+3.  Gloups use the gulp task runner so make sure it is installed :
     
     ```
     $ npm install -g gulp
@@ -41,34 +41,51 @@ With Gloups, Just configure file paths to the root folder of your projects, a co
 
 ## Setup
 
-1. Configure the projects mapping file (custom/config.json).
+1. Configure the projects mapping file (custom/config.json) :
 
-    Follow the instructions and examples to configure properly Gloups
+    Follow instructions and examples to configure properly Gloups
 
-2.  Scan projects.
-
-        $ gulp scanProjects 
-
+2. Scan projects :
+    
+    ```
+    $ gulp scanProjects 
+    ```
+    
     The effect of that command is to create a <b>config.mzg.json</b> file in project root folders you specified in the custom/config.json file.
 
     > config.mzg.json files are not blank and have instructions.
     > In these files, uncomment what services you want to enable.
     > Enable sourcemapping for services you want by switching sourcemaps fields to true
 
-    To check what service is enabled for what project run
+3. To check what service is enabled for what project run :
     
     ```
     $ gulp serviceMapping    
     ```
 
 ## Usage
-Once everything is set run gulp task 'serve' with options you want. For every possibilities, refer to the help.md file or run  ```$ gulp helpMe```. Some of them can make the experiance better such as the essential option if Gloups is too much verbose for you (```gulp serve <service(s)> --essential```). The simplest way is to run all services via the preset --all with the transitive option.
+Once everything is set run gulp task 'serve' with options you want. The simplest way is to run all services via the preset --all with the transitive option :
 
-    $ gulp serve --sass --less --stylus --mincss --ts --coffescript --minjs --transitive [--essential]
+    $ gulp serve --sass --less --stylus --mincss --ts --coffescript --minjs --transitive
     
 shorter :
 
-    $ gulp serve -a -tr [-es]
+    $ gulp serve -a -tr
+    
+For every possibilities, refer to the help.md file or run  ```$ gulp helpMe```. Some of them can make the experiance better such as the <b>essential</b> option if Gloups is too much verbose for you :
+
+    $ gulp serve ... --essential
+
+## Run Gloups from any directory !
+To use ```$ gloups ...``` command anywhere instead of ```$ gulp ...``` only in the gloups folder
+
+### WINDOWS
+add the path to gloups folder to global/environment variables like so
+    
+![logo](images/Capture.PNG)
+
+### UNIX
+Comming soon
 
 ## License
 [MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
