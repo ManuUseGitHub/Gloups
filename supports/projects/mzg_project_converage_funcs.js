@@ -1,18 +1,16 @@
-gulp.task('serve', ['setParams']);
-
 function coverFoldersToServe(confObj) {
 	for (var p_path in config.projects) {
 		var project = config.projects[p_path];
 		if (confObj.scope == '*' || project.project == confObj.scope) {
-			if (M.fssync.exists(project.path + '\\config.mzg.json')) {
-				if (confObj.shouldLog) {
-					console.log(' ' + chalk.bgGreen(' ' + project.project + ' '));
-				}
+			if ((M.fssync).exists(project.path + '\\config.mzg.json')) {
 				if (project.checked) {
+					if (confObj.shouldLog && !isPulseTask()) {
+						console.log(' ' + chalk.bgGreen(' ' + project.project + ' '));
+					}
 					setUpProjectWatchingPaths(project.path, confObj.shouldLog);
 				}
 			} else {
-				if (confObj.shouldLog) {
+				if (confObj.shouldLog && !isPulseTask()) {
 					logProjectErrored(project);
 				}
 			}

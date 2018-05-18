@@ -1,5 +1,5 @@
 var merging = function(event) {
-    (M.clear)();
+    gulp.start('clear');
     
     if (event) {
         modifiedMZGEvent = event;

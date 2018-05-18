@@ -1,3 +1,3 @@
 gulp.task('clear', function() {
-	(M.clear)();
+	process.stdout.write('\x1Bc');
 });

@@ -4,15 +4,6 @@
 /*jshint node:true*/
 /*jshint esversion: 6 */
 
-/*!
- * copyright !
- * gvghvggc
- * ghvnfchfc
- * gfhdhfdbdfxbdf
- */
-
-/*!ghvjgfchfcbdfxbdxvdswdswcswshfc gvjfhrtxgrdxgdx yjtdhertdgdxgbdxgbdxg fhfcbfcbfdxgfbdx*/
-
 /*	*************************************************************************************************************************************************************************************************
 	*                                 								VARIABLES :	module requirement    &    Configuration VARIABLES 																	*
  	*************************************************************************************************************************************************************************************************/
@@ -42,6 +33,7 @@ var M = {
 	// E ----------------------------------------------------------------------------------------------
 	exit: 'gulp-exit',
 	// F ----------------------------------------------------------------------------------------------
+	gfile:'gulp-file', // stream from string
 	fs: "fs", // check file existance
 	fssync: "fs-sync",
 	// I ----------------------------------------------------------------------------------------------
@@ -55,6 +47,7 @@ var M = {
 	nop: 'gulp-nop', // for alternate manipulations where no operations is needed
 	// P ----------------------------------------------------------------------------------------------
 	path: 'path',
+	progress: 'progress',
 	// R ----------------------------------------------------------------------------------------------
 	rename: "gulp-rename",
 	replace: "gulp-replace",
@@ -106,23 +99,29 @@ var SERVICES = {
 
 	'styles': 'autominCss less sass stylus',
 
-	'js': 'automin typescript coffeescript'
+	'js': 'automin typescript coffeescript',
+
+	'cof': 'automin coffeescript',
+
+	'tps': 'automin typescript'
 };
 
-var PRESET_OPTIONS = "all|styles|js";
+var PRESET_OPTIONS = "all|styles|cof|tps|js";
 var SERVICES_OPTIONS = "automin|autominCss|typescript|coffeescript|less|sass|stylus";
 var SERVICES_ADVANCED_OPTIONS = "transitive|essential";
 
 var ALL_SERVICES_OPTIONS = PRESET_OPTIONS + '|' + SERVICES_OPTIONS + '|' + SERVICES_ADVANCED_OPTIONS;
 
+// REGEX PATTERNS ---------------------------------------------------------------------------------
 var JS_REGEX_FILE_PATH_PATTERN = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";
+var FILE_COVERAGE_REGEXP = /^(.*)[\\\/]\*\*[\\\/]\*\..*$/;
+var FILE_STARTING_BY_UNDERSCORE = /^.*[\/\\](_.*)$/i;
+// ------------------------------------------------------------------------------------------------
 
 var GLOUPS_OPTIONS = SERVICES_OPTIONS + '|' + PRESET_OPTIONS;
 
 var SILENT_TASKS = "watch|vet|unit-test|integration-test";
 var ISALL = true;
-
-var isdist = {};
 
 // https://stackoverflow.com/questions/43064924/how-to-target-all-browsers-with-gulp-auto-prefixer
 var AUTOPREFIXER_BROWSERS = ['> 1%', 'last 2 versions', 'firefox >= 4', 'safari 7', 'safari 8', 'IE 8', 'IE 9', 'IE 10', 'IE 11'];
@@ -141,9 +140,12 @@ var DEFAULT_CONFIG = {
 	"projects": []
 };
 
-// Sets things up to serve
+// configurations
+var isdist = {};
+
 var config = getConfig();
 
+// global objects
 var glob_found_modules = {
 	'fs': true
 };
@@ -152,6 +154,12 @@ var glob_visited_elements = {
 	'infunc': {},
 	'intask': {}
 };
+
+var glob_timer;
+
+var glob_logging_obj = {};
+
+var glob_mayLogEssentials = metAllArgs(['essential']);
 
 // -- [supports/rewriting/mzg_rewriting_vars.js] -- 
 var bySetup = true; // messages will be displayed base on event fired by files.
@@ -200,6 +208,7 @@ var mzgFiles = [
 	'supports/rewriting/log_sections/mzg_log4.js', // section
 
 	'projects_setup_tasks/mzg_scan_projects_task.js',
+	'projects_setup_tasks/mzg_pulse_task.js',
 	'projects_setup_tasks/mzg_services_mapping_task.js',
 
 	'supports/rewriting/log_sections/mzg_log5.js', // section
@@ -211,8 +220,8 @@ var mzgFiles = [
 
 	// js
 	'services_tasks/js_tasks/mzg_automin_task.js',
-	'services_tasks/js_tasks/mzg_tyepscript_task.js',
-	'services_tasks/js_tasks/mzg_coffeescript_task.js', // 25
+	'services_tasks/js_tasks/mzg_tyepscript_task.js', // 25
+	'services_tasks/js_tasks/mzg_coffeescript_task.js', 
 
 	'supports/rewriting/log_sections/mzg_log7.js', // section
 
@@ -227,8 +236,8 @@ var mzgFiles = [
 	// other
 	'services_tasks/mzg_other_oriented_tasks.js',
 
-	'supports/rewriting/log_sections/mzg_log16.js', // section // 33
-	'supports/files/mzg_module_seeking_funcs.js', // 34
+	'supports/rewriting/log_sections/mzg_log16.js', // section // 34
+	'supports/files/mzg_module_seeking_funcs.js', // 35
 
 	'supports/rewriting/log_sections/mzg_log9.js', // section
 
@@ -252,11 +261,12 @@ var mzgFiles = [
 
 	'supports/rewriting/log_sections/mzg_log11.js', // section 
 
-	'supports/mzg_runtask.js', 
+	'supports/mzg_runtask.js', // 50
 
-	'supports/rewriting/log_sections/mzg_log12.js', // section // 50
+	'supports/rewriting/log_sections/mzg_log12.js', // section 
 
 	'supports/files/configurationSetting/mzg_config_funcs.js', 
+	'supports/projects/mzg_project_converage_funcs.js',
 	'supports/projects/mzg_projects_funcs.js',
 	'supports/mzg_argument_funcs.js',
 
@@ -271,9 +281,9 @@ var mzgFiles = [
 
 var distFiles = mzgFiles.slice();
 
-distFiles.splice(54, 3);
-distFiles.splice(39, 6);
-distFiles.splice(33, 2);
+distFiles.splice(56, 3);
+distFiles.splice(43, 6);
+distFiles.splice(34, 2);
 distFiles.splice(13, 1);
 distFiles.splice(9, 1);
 distFiles.splice(4, 1);
@@ -474,28 +484,32 @@ function getModule(module) {
 
 var logOrig = console.log;
 
-function gloupslog(args){
-	logOrig(args);
+function gloupslog(args) {
+
+	var pathActionMatch = /^([\s](?:(?:[^\s]+[\s]?)+)[\s]+)(['].*['])$/.exec(args);
+	if (isPulseTask() && pathActionMatch) {
+		gloupsHandlingPulseLogging({
+			'action': pathActionMatch[1],
+			'path': pathActionMatch[2]
+		});
+	} else {
+		logOrig(args);
+	}
 }
 
-var mayLogEssentials = metAllArgs(['essential']);
-
-if(mayLogEssentials){
-	console.log=function(){};
+if (glob_mayLogEssentials) {
+	console.log = function() {};
 	gloupslog(forNowShortLog(chalk.bgRed(' Logging only essential messages ')));
 }
-
 
 // -- [supports/basic/mzg_modules_requesting.js] -- 
 // gloups commandes
 if (process.argv[2] == '--gulpfile') {
-	if (process.argv[4] && !/^serve|rewrite$/.test(process.argv[4])) {
-		importNeededModules('intask', process.argv[4]);
-	}
-} else {
-	if (process.argv[2] && !/^serve|rewrite$/.test(process.argv[2])) {
-		importNeededModules('intask', process.argv[2]);
-	}
+	process.argv[2] = process.argv[4];
+}
+
+if (process.argv[2] && !/^serve|pulse|rewrite$/.test(process.argv[2])) {
+	importNeededModules('intask', process.argv[2]);
 }
  /*	*************************************************************************************************************************************************************************************************
 	*                                 							PROJECT TASKS : Tasks used to manage and setup custom configuration project 														*
@@ -508,7 +522,7 @@ gulp.task('default', ["setParams"]);
 
 // -- [supports/basic/tasks/mzg_clear_task.js] -- 
 gulp.task('clear', function() {
-	(M.clear)();
+	process.stdout.write('\x1Bc');
 });
 
 // -- [supports/basic/tasks/mzg_externalize_config_task.js] -- 
@@ -523,23 +537,17 @@ gulp.task('setVars', function() {
         getModule(M.path);
     }
 
-    if (!config.verbose) {
+    if (!config.verbose && !isPulseTask()) {
         logTaskPurpose(this.currentTask.name);
     }
-    for (var p_path in config.projects) {
-        var project = config.projects[p_path];
-        if (M.fssync.exists(project.path + '\\config.mzg.json')) {
-            console.log(' '+chalk.bgGreen(' '+project.project+' '));
-            if (project.checked) {
-                setUpProjectWatchingPaths(project.path);
-            }
-        } else {
-            logProjectErrored(project);
-        }
-    }
+
+    coverFoldersToServe({
+        'scope': '*',
+        'shouldLog': true
+    });
 
     // configuration for SASS watched paths ---------------------------
-    for (p_path in config.pathesToSass) {
+    for (var p_path in config.pathesToSass) {
         var watchPathForSass = config.pathesToSass[p_path].watch;
         var projectPath = config.pathesToSass[p_path].projectPath;
         mappSassMatching(projectPath, watchPathForSass);
@@ -547,7 +555,7 @@ gulp.task('setVars', function() {
 
     // gulp.task("externalizeConfig") is never undefined
     // so check if a NOT_DISTRIBUTION key is found or not
-    if (isdist.NOT_DISTRIBUTION) {
+    if (isdist.NOT_DISTRIBUTION && !isPulseTask()) {
         if (!config.verbose) {
             console.log(forNowLongLog("{0}\n", ["config externalized under config.json"]));
         }
@@ -555,8 +563,7 @@ gulp.task('setVars', function() {
         gulp.start("externalizeConfig");
     }
 
-    if (!config.verbose) {
-        console.log(forNowLongLog("{0}\n", ["config externalized under config.json"]));
+    if (!config.verbose && !isPulseTask()) {
         console.log(forNowLongLog("{0}\n", ["CONFIGURATON PROCEEDED"]));
     }
 });
@@ -626,6 +633,43 @@ gulp.task('scanProjects', function() {
     });
 });
 
+// -- [projects_setup_tasks/mzg_pulse_task.js] -- 
+gulp.task('pulse', function() {
+	
+	process.title = 'Gloups {0} | {1}'.format([GLOUPS_VERSION, 'Pulse !']);
+	var tasks = tasksToRunOnArgvs();
+
+	// modules are loaded automaticaly in production mode
+	if (isdist.NOT_DISTRIBUTION) {
+
+		// cannot syntaxicaly analyse following line (after this) so 
+		// it has to define what services tasks is needed
+		getAllNeededModules(tasks.concat(['setVars','pulse']));
+	}
+	
+	setConfig();
+	
+	gulp.start('clear');
+
+	// start every services matching arguments
+	gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
+
+	coverFoldersToServe({
+		'scope': '*',
+		'shouldLog': false
+	});
+
+	var folders = getAllServiceCoverageWatchFolders();
+	var fileNames = getEveryFilesCoveredOnce(folders);
+
+	gloupslog('Applying services ... please wait');
+	console.log(' ' + chalk.bgYellow(' ! ') + ' Long process ... few secondes required');
+
+	// the pulse will fire a change event on every file.
+	// every services will respond to it one another
+	fireEnventOnEveryCoveredFiles(fileNames);
+});
+
 // -- [projects_setup_tasks/mzg_services_mapping_task.js] -- 
 gulp.task('serviceMapping', function() {
     logTaskPurpose(this.currentTask.name);
@@ -637,7 +681,81 @@ gulp.task('serviceMapping', function() {
  	*************************************************************************************************************************************************************************************************/
 
 // -- [services_tasks/mzg_serve_task.js] -- 
-gulp.task('serve',['setParams']);
+gulp.task('serve', ['setParams']);
+
+function coverFoldersToServe(confObj) {
+	for (var p_path in config.projects) {
+		var project = config.projects[p_path];
+		if (confObj.scope == '*' || project.project == confObj.scope) {
+			if (M.fssync.exists(project.path + '\\config.mzg.json')) {
+				if (confObj.shouldLog) {
+					console.log(' ' + chalk.bgGreen(' ' + project.project + ' '));
+				}
+				if (project.checked) {
+					setUpProjectWatchingPaths(project.path, confObj.shouldLog);
+				}
+			} else {
+				if (confObj.shouldLog) {
+					logProjectErrored(project);
+				}
+			}
+		}
+	}
+}
+
+function fireEnventOnEveryCoveredFiles(fileNames) {
+	fileNames.sort(function(a, b) {
+		return a.localeCompare(b);
+	}).forEach(function(e, i) {
+		gulp.src(e)
+			.pipe(gulp.dest(function(file) {
+				return file.base;
+			}));
+	});
+}
+
+function getEveryFilesCoveredOnce(folders) {
+	var ficsObj = {};
+	folders.forEach(function(l, j) {
+
+		if (M.fssync.exists(l)) {
+			var pathsOfKind = walkSync(l, [], FILE_STARTING_BY_UNDERSCORE);
+
+			pathsOfKind.forEach(function(e, i) {
+				ficsObj[e.path] = true;
+			});
+		}
+	});
+
+	return Object.keys(ficsObj);
+}
+
+function getAllServiceCoverageWatchFolders() {
+	var folders = [];
+
+	[].concat(
+
+		// Javascript services folders
+		config.pathesToJs,
+		config.pathesToTs,
+		config.pathesToCoffee,
+
+		// CSS services folders
+		config.pathesToStylus,
+		config.pathesToSass,
+		config.pathesToStyle,
+		config.pathesToStyleLess
+
+		// every coverage
+	).forEach(function(e, i) {
+
+		// pushes watch base folders paths 
+		// MATCHING :: ^(abc/.../...)/**/*.ext$
+		folders.push(FILE_COVERAGE_REGEXP.exec(e.watch)[1]);
+	});
+
+	return folders;
+}
 /*	*************************************************************************************************************************************************************************************************
 	*                                 														CSS ORIENTED TASKS 																						*
  	*************************************************************************************************************************************************************************************************/
@@ -1082,8 +1200,8 @@ function seekInFoundElements(kind, elements) {
  	*************************************************************************************************************************************************************************************************/
 
 // -- [services_tasks/funcs/mzg_run_task_process_for.js] -- 
+/* jshint esversion:6 */
 function runTaskProcessForCompression(athis, pathesTo, obj) {
-	logTaskPurpose(athis.currentTask.name);
 
 	var mainLazyPipeObj = createMainLazyPipeObject(pathesTo, "Compressed    ", obj.module);
 
@@ -1123,7 +1241,6 @@ function runTaskProcessForCompression(athis, pathesTo, obj) {
 }
 
 function runTaskProcessForPrecompiledFiles(athis, pathesTo, obj) {
-	logTaskPurpose(athis.currentTask.name);
 
 	var mainLazyPipeObj = createMainLazyPipeObject(pathesTo, "Processed     ", obj.module);
 
@@ -1166,12 +1283,14 @@ function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
 
 	// OVERWRITING DEFAULT DESTINATION ------------------------------------------------------------
 	mainLazyPipeObj.destCallBack = function(haslog) {
-
 		if (haslog) {
-			gloupslog('');
-			logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
-		}
 
+			if (!isPulseTask()) {
+				gloupslog('');
+			}
+
+			logLongWaiting(mainLazyPipeObj);
+		}
 		var destPath = glob_transitivity != null ?
 			glob_transitivity.dest :
 			mainLazyPipeObj.pathesDescr.dest; // must be defined for non transitive services
@@ -1182,10 +1301,74 @@ function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
 	// CONSUMMING ---------------------------------------------------------------------------------
 	gulp.src(realTargets)
 		.pipe(sourceMappedProcess())
+		.on('end', function() {
+			logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
+			exitOnPulseAfterCount();
+		})
 		.pipe(applyLicenceSplitting(mainLazyPipeObj))
 		.pipe(gulp.dest(mainLazyPipeObj.destCallBack(true)));
 }
 
+function exitOnPulseAfterCount() {
+	if (isPulseTask()) {
+		resetTimer({
+			total: 100,
+			format: ':bar pulse closing in (:countdown)'
+		}, function() {
+			
+			gulp.start('clear');
+			gloupslogSumerise();
+
+			process.exit();
+		}, 100);
+	}
+}
+
+function isPulseTask() {
+	return process.argv[2] == 'pulse';
+}
+
+function logLongWaiting(mainLazyPipeObj) {
+	// complex services takes several times so they have to inform the user
+	if (mainLazyPipeObj.source_kind == 'complex') {
+
+		resetTimer({
+			total: 2
+		}, function() {
+			console.log(' ' + chalk.bgYellow(' ! ') + ' Long process ... few secondes required');
+		});
+	}
+}
+
+function resetTimer(obj, callback, stepTime) {
+	var format = obj.format ? obj.format : '';
+	if (/.*:countdown.*/.test(format)) {
+		obj.total++;
+	}
+	var bar = new(M.progress)(format, {
+		total: obj.total,
+		width: 80,
+		complete:String.fromCharCode(9608),
+		incomplete:chalk.grey('.')
+	});
+
+	if (glob_timer) {
+		clearInterval(glob_timer);
+	}
+	glob_timer = setInterval(function() {
+		if (/.*:countdown.*/.test(format)) {
+			bar.tick({
+				'countdown': (obj.total - bar.curr-1)
+			});
+		} else {
+			bar.tick();
+		}
+		if (bar.complete) {
+			callback();
+			clearInterval(glob_timer);
+		}
+	}, stepTime ? stepTime : 500);
+}
 
 // -- [services_tasks/funcs/mzg_main_pipe_wrapping.js] -- 
 function transitiveAndSourcemappingWrap(glob_transitivity, mainLazyPipeObj) {
@@ -1270,17 +1453,16 @@ function applyLazyPipeSet(obj) {
 			.pipe(lisencesSetup(lazyPipeProcess))
 			.pipe(separateLisences(lazyPipeProcess))
 			.pipe(lazyPipeProcess)
-			.pipe(separatePrehamptedLisences(lazyPipeProcess))
+			.pipe(separatePreemptedLisences(lazyPipeProcess))
 			.pipe(obj.closing);
 
 	} else if (source_kind == 'complex') {
-		var istransitive = metAllArgs(['transitive']);
 
 		return (M.lazyPipe)()
 			.pipe(obj.opening)
 			.pipe(lisencesSetup(lazyPipeProcess))
 			.pipe(lazyPipeProcess)
-			.pipe(separateLisences(lazyPipeProcess, istransitive))
+			.pipe(separateLisences(lazyPipeProcess))
 			.pipe(obj.closing);
 	}
 }
@@ -1292,9 +1474,8 @@ function transitivitySetup(transitivity, matchingEntry, path) {
 	});
 }
 
-function transitivitySetupCore(transitivity, matchingEntry, path) {
-	var shouldBeTransitive =
-		metAllArgs(['all', 'transitive']) ||
+function shouldBeTransitive(){
+	return metAllArgs(['all', 'transitive']) ||
 
 		// CSS focused
 		metAllArgs(['sass', 'autominCss', 'transitive']) ||
@@ -1304,13 +1485,16 @@ function transitivitySetupCore(transitivity, matchingEntry, path) {
 		// JS focused
 		metAllArgs(['coffeescript', 'automin', 'transitive']) ||
 		metAllArgs(['typescript', 'automin', 'transitive']);
+}
 
+function transitivitySetupCore(transitivity, matchingEntry, path) {
+	
 	var found = false;
 
 	// by default the transitivity is set to the path the result should be the destination
 	transitivity.dest = matchingEntry.dest;
 
-	if (shouldBeTransitive) {
+	if (shouldBeTransitive()) {
 		var fileName = (/^.*[\/](.*)$/g.exec(path.hackSlashes()))[1];
 		var focusedPathFileName = "{0}/{1}".format([matchingEntry.dest, fileName]);
 
@@ -1349,8 +1533,15 @@ function transitivitySetupCore(transitivity, matchingEntry, path) {
 
 // -- [services_tasks/funcs/mzg_tasks_micro_services.js] -- 
 function renameSuffixMin() {
-	return (M.rename)({
-		suffix: '.min'
+	return (M.rename)(function(path) {
+		var suffix = '.min';
+		path.extname = suffix + path.extname;
+	});
+}
+
+function renameCustomSuffix(suffix) {
+	return (M.rename)(function(path) {
+		path.extname = suffix + path.extname;
 	});
 }
 
@@ -1361,7 +1552,7 @@ function cleanCssMinification() {
 }
 
 function insertSignatureAfter(actionDone, thanksToModule) {
-	return (M.insert).append("\n/* -- {1} wth Gloups v {2} - {3} | thanks to {4} -- */".format(
+	return (M.insert).append("\n/* -- {0} wth Gloups v {1} - {2} | thanks to {3} -- */".format(
 		[
 			actionDone.replace(/[\s]+$/, ''),
 			GLOUPS_VERSION,
@@ -1437,7 +1628,7 @@ function getProjectNameWithFileFromPathDesc(descr, file) {
 
 
 // -- [services_tasks/funcs/mzg_lisences_handeling.js] -- 
-function separateLisences(athis, isTransitive) {
+function separateLisences(athis) {
 	return (M.lazyPipe)()
 		.pipe(function() {
 			return (M.through).obj(function(chunk, enc, cb) {
@@ -1447,14 +1638,29 @@ function separateLisences(athis, isTransitive) {
 					athis.lisences.source_kind == 'complex' ? chunk._contents.toString() :
 					""; // no content
 
+				// When service are transitive, the complex service end up with a simple
 				if (athis.lisences.source_kind == 'complex') {
-					chunk._contents = distributeLisencesOutOfChunk(athis, isTransitive, _data);
 
-					// the content must be buffered
-					chunk._contents = Buffer.from(chunk._contents, 'utf8');
+					// Unlisenced content stripped of special comments
+					var unlisenced = distributeLisencesOutOfChunk(athis, _data);
 
+					// Content transformation but special comments have to be stripped off
+					if (shouldBeTransitive()) {
+
+						// Buffering to put in the chunk
+						chunk._contents = Buffer.from(unlisenced, 'utf8');
+					}
+
+					// When services are not transitive, the service is simple
 				} else if (athis.lisences.source_kind == 'simple') {
-					athis.prehamptedData = _data;
+
+					// Special comments have to be stripped off
+					chunk._contents = Buffer.from(distributeLisencesOutOfChunk(athis, _data), 'utf8');
+
+					// Need to save the special conmments because simple services such as 
+					// straight minification remove every content. So use 
+					// separatePreemptedLisences lazypipe result to recover preemptedLisence
+					athis.preemptedData = Buffer.from(athis.lisences.data, 'utf8');
 				}
 
 				cb(null, chunk);
@@ -1462,19 +1668,17 @@ function separateLisences(athis, isTransitive) {
 		});
 }
 
-function separatePrehamptedLisences(athis) {
+function separatePreemptedLisences(athis) {
 	return (M.lazyPipe)()
 		.pipe(function() {
 			return (M.through).obj(function(chunk, enc, cb) {
 
-				// get data back from athis and transforming it to string
-				var prehamptedData = athis.prehamptedData;
+				// get data back from athis and transform it to string
+				var preemptedData = athis.preemptedData.toString();
 
-				// nothing to affect with this because that lazypipe is used with simple services
-				// which are not affected by the transitivity ...
-				var isTransitive;
-
-				chunk._contents = Buffer.from(distributeLisencesOutOfChunk(athis, isTransitive, prehamptedData), 'utf8');
+				// nothing to affect with this because that lazypipe is used with services 
+				// that are not conserned by transitivities ...
+				distributeLisencesOutOfChunk(athis, preemptedData);
 
 				cb(null, chunk);
 			});
@@ -1491,10 +1695,22 @@ function lisencesSetup(athis) {
 	return (M.lazyPipe)()
 		.pipe(function() {
 			return (M.through).obj(function(chunk, enc, cb) {
+
+				// dDetermine the kind (simple or complex) of the service triggered by
+				// the file regarding its extension
 				athis.lisences.source_kind =
+
+					// A sass , a stylus , a less , a typeScript or a coffeeScript file :
+					// Complex service ! 
 					/.*[.](?:scss|styl|less|ts|coffee)$/.test(chunk.path) ? "complex" :
+
+					// A javaScript or a CSS file :
+					// Simple service !
 					/.*[.](?:css|js)$/.test(chunk.path) ? 'simple' :
+
+					// Not sure what it is ...
 					'unknown';
+
 				cb(null, chunk);
 			});
 		});
@@ -1505,11 +1721,11 @@ function aLazyPipeThatIsPipingLikeNop() {
 		.pipe((M.nop));
 }
 
-function distributeLisencesOutOfChunk(athis, isTransitive, _data) {
+function distributeLisencesOutOfChunk(athis, _data) {
 	var result = readLisences(_data);
 	athis.lisences.data = result.lisences;
 
-	return isTransitive ? result.not_lisences : _data;
+	return result.not_lisences;
 }
 
 function readLisences(_data) {
@@ -1524,12 +1740,16 @@ function readLisences(_data) {
 		result: [],
 		anti_result: [],
 		canprint: false,
-		inLisence: false
+		inLisence: false,
+		line_count: 0.5
 	};
 
 	reading.readLines(function() {
 		readingLisencesProcess(readingLisenceObj);
 	});
+
+
+
 	return {
 		lisences: readingLisenceObj.result.join('\n'),
 		not_lisences: readingLisenceObj.anti_result.join('\n')
@@ -1554,21 +1774,24 @@ function readingLisencesProcess(R) { // R : reading object (specific to lisences
 
 function inLisenceProcess(R) {
 	if (R.inLisence) {
-		if (R.line.length > 0) {
-			R.canprint = true;
-
-		} else if (++R.cpt % 3 == 2) {
+		if (R.line.length > 0 || (++R.cpt % 3 == 2)) {
 			R.canprint = true;
 		}
-
 		if (R.line.length > 0) {
 			R.cpt = 0;
 		}
 	}
+
 	if (R.canprint) {
 		R.result.push(R.line);
 	} else {
 		R.anti_result.push(R.line);
+	}
+
+	// progress
+	(R.line_count += 0.5);
+	if (Number.isInteger(R.line_count)) {
+		//stepUp();
 	}
 }
 
@@ -1577,14 +1800,14 @@ function applyLicenceSplitting(mainLazyPipeObj) {
 		var lisences = mainLazyPipeObj.process.lisences;
 
 		if (lisences && lisences.data != '') {
-			var match = /^.*[\/\\]([^\.]+).*[.](css|js)$/.exec(chunk.path.hackSlashes());
+			var match = /^.*[\/\\]([^\.]+.*)min.(css|js)$/.exec(chunk.path.hackSlashes());
 
 			// The only transformation that can wiped the comments (lisences) out is 
 			// minification so otherwise lisences are saved
 			if (match && /^.*[.]min[.].*$/.test(chunk.path.hackSlashes())) {
 				var dest = mainLazyPipeObj.destCallBack(false);
 
-				var finalLisenseFilePath = dest + '/' + match[1] + '.lisence.' + match[2];
+				var finalLisenseFilePath = dest + '/' + match[1] + 'lisence.' + match[2];
 
 				(M.fssync).write(finalLisenseFilePath, "{0} \n/* -- {1} with Gloups v {2} - {3} | thanks to {4} -- */".format([
 						lisences.data,
@@ -1941,188 +2164,270 @@ function makePathesCoveringAllFilesFor(projectFolder, matchingForEntry, subpathT
 	return entrySet;
 }
 
+// -- [supports/projects/mzg_project_converage_funcs.js] -- 
+function coverFoldersToServe(confObj) {
+	for (var p_path in config.projects) {
+		var project = config.projects[p_path];
+		if (confObj.scope == '*' || project.project == confObj.scope) {
+			if ((M.fssync).exists(project.path + '\\config.mzg.json')) {
+				if (project.checked) {
+					if (confObj.shouldLog && !isPulseTask()) {
+						console.log(' ' + chalk.bgGreen(' ' + project.project + ' '));
+					}
+					setUpProjectWatchingPaths(project.path, confObj.shouldLog);
+				}
+			} else {
+				if (confObj.shouldLog && !isPulseTask()) {
+					logProjectErrored(project);
+				}
+			}
+		}
+	}
+}
+
+function fireEnventOnEveryCoveredFiles(fileNames) {
+	fileNames.sort(function(a, b) {
+		return a.localeCompare(b);
+	}).forEach(function(e, i) {
+		gulp.src(e)
+			.pipe(gulp.dest(function(file) {
+				return file.base;
+			}));
+	});
+}
+
+function getEveryFilesCoveredOnce(folders) {
+	var ficsObj = {};
+	folders.forEach(function(l, j) {
+
+		if (M.fssync.exists(l)) {
+			var pathsOfKind = walkSync(l, [], FILE_STARTING_BY_UNDERSCORE);
+
+			pathsOfKind.forEach(function(e, i) {
+				ficsObj[e.path] = true;
+			});
+		}
+	});
+
+	return Object.keys(ficsObj);
+}
+
+function getAllServiceCoverageWatchFolders() {
+	var folders = [];
+
+	[].concat(
+
+		// Javascript services folders
+		config.pathesToJs,
+		config.pathesToTs,
+		config.pathesToCoffee,
+
+		// CSS services folders
+		config.pathesToStylus,
+		config.pathesToSass,
+		config.pathesToStyle,
+		config.pathesToStyleLess
+
+		// every coverage
+	).forEach(function(e, i) {
+
+		// pushes watch base folders paths 
+		// MATCHING :: ^(abc/.../...)/**/*.ext$
+		folders.push(FILE_COVERAGE_REGEXP.exec(e.watch)[1]);
+	});
+
+	return folders;
+}
+
 // -- [supports/projects/mzg_projects_funcs.js] -- 
 /**
- * @Function
+ @Function
  * fills the config arrays according to a current service mapping provided by a json file 
  * (the file is a direct configuraiton)
  * 
- * @param  {String}
+ * @param {String} project_path [description]
+ * @param {Boolean} shouldLog    [description]
  */
-function setUpProjectWatchingPaths(project_path) {
-    var projectServices = readJsonConfig(project_path + '/config.mzg.json');
+function setUpProjectWatchingPaths(project_path,shouldLog) {
+	var projectServices = readJsonConfig(project_path + '/config.mzg.json');
 
-    console.log("Activated Services for target project under the path [FOLDER]:");
-    console.log(logFilePath(project_path) + "\n");
+    if (shouldLog && !isPulseTask()){
+        console.log("Activated Services for target project under the path [FOLDER]:");
+        console.log(logFilePath(project_path) + "\n");
+    }
+    	
+	config.pathesToJs = makePathesCoveringAllFilesFor(project_path, {
+		'pathesToService': (config.pathesToJs),
+		'addon': projectServices.minify_js
+	}, '/**/*.js', 'Compress .js files into .min.js files');
 
-    config.pathesToJs = makePathesCoveringAllFilesFor(project_path, {
-        'pathesToService': (config.pathesToJs),
-        'addon': projectServices.minify_js
-    }, '/**/*.js', 'Compress .js files into .min.js files');
+	config.pathesToTs = makePathesCoveringAllFilesFor(project_path, {
+		'pathesToService': (config.pathesToTs),
+		'addon': projectServices.ts_to_js
+	}, '/**/*.ts', 'Compile .ts files into .js file');
 
-    config.pathesToTs = makePathesCoveringAllFilesFor(project_path, {
-        'pathesToService': (config.pathesToTs),
-        'addon': projectServices.ts_to_js
-    }, '/**/*.ts', 'Compile .ts files into .js file');
+	config.pathesToCoffee = makePathesCoveringAllFilesFor(project_path, {
+		'pathesToService': (config.pathesToCoffee),
+		'addon': projectServices.coffee_to_js
+	}, '/**/*.coffee', 'Compile .coffee files into .js file');
 
-    config.pathesToCoffee = makePathesCoveringAllFilesFor(project_path, {
-        'pathesToService': (config.pathesToCoffee),
-        'addon': projectServices.coffee_to_js
-    }, '/**/*.coffee', 'Compile .coffee files into .js file');
+	config.pathesToStyle = makePathesCoveringAllFilesFor(project_path, {
+		'pathesToService': (config.pathesToStyle),
+		'addon': projectServices.minify_css
+	}, '/**/*.css', 'Compress .css files');
 
-    config.pathesToStyle = makePathesCoveringAllFilesFor(project_path, {
-        'pathesToService': (config.pathesToStyle),
-        'addon': projectServices.minify_css
-    }, '/**/*.css', 'Compress .css files');
+	config.pathesToStyleLess = makePathesCoveringAllFilesFor(project_path, {
+		'pathesToService': (config.pathesToStyleLess),
+		'addon': projectServices.less
+	}, '/**/*.less', 'Compile .less files into .css files');
 
-    config.pathesToStyleLess = makePathesCoveringAllFilesFor(project_path, {
-        'pathesToService': (config.pathesToStyleLess),
-        'addon': projectServices.less
-    }, '/**/*.less', 'Compile .less files into .css files');
+	config.pathesToSass = makePathesCoveringAllFilesFor(project_path, {
+		'pathesToService': (config.pathesToSass),
+		'addon': projectServices.sass
+	}, '/**/*.scss', 'Compile .scss files into .css files');
 
-    config.pathesToSass = makePathesCoveringAllFilesFor(project_path, {
-        'pathesToService': (config.pathesToSass),
-        'addon': projectServices.sass
-    }, '/**/*.scss', 'Compile .scss files into .css files');
-
-    config.pathesToStylus = makePathesCoveringAllFilesFor(project_path, {
-        'pathesToService': (config.pathesToStylus),
-        'addon': projectServices.stylus
-    }, '/**/*.styl', 'Compile .styl files into .css files');
+	config.pathesToStylus = makePathesCoveringAllFilesFor(project_path, {
+		'pathesToService': (config.pathesToStylus),
+		'addon': projectServices.stylus
+	}, '/**/*.styl', 'Compile .styl files into .css files');
 }
 
 function getMatchingEntryConfig(filePath, configTab) {
-    filePath = filePath.hackSlashes();
+	filePath = filePath.hackSlashes();
 
-    // iterate on efery path within configTab to check 
-    // what path sources fire the change event then find
-    // the destination referenced via 'entry.dest'
-    for (var p_path in configTab) {
+	// iterate on efery path within configTab to check 
+	// what path sources fire the change event then find
+	// the destination referenced via 'entry.dest'
+	for (var p_path in configTab) {
 
-        var entry = configTab[p_path];
-        var watch = entry.watch.hackSlashes();
-        var dest = entry.dest.hackSlashes();
+		var entry = configTab[p_path];
+		var watch = entry.watch.hackSlashes();
+		var dest = entry.dest.hackSlashes();
 
-        // EX. >abc/efg/hij/klm/nop<
-        var pattern = '^([^\\\\/*]+).([^\\*]+)([\\/]?[\\/*]+[\\/]?)(.*)$';
-        var base = (new RegExp(pattern, "g").exec(watch))[2];
-        var matching = (new RegExp('^.*(?:' + base + ').*$', "g").exec(filePath));
+		// EX. >abc/efg/hij/klm/nop<
+		var pattern = '^([^\\\\/*]+).([^\\*]+)([\\/]?[\\/*]+[\\/]?)(.*)$';
+		var base = (new RegExp(pattern, "g").exec(watch))[2];
+		var matching = (new RegExp('^.*(?:' + base + ').*$', "g").exec(filePath));
 
-        if (matching) {
-            return entry;
-        }
-    }
-    return null;
+		if (matching) {
+			return entry;
+		}
+	}
+	return null;
 }
 
 function watchList(configTab) {
-    var list = [];
-    for (var p_path in configTab) {
-        var watch = configTab[p_path].watch;
-        list.push(watch);
-    }
-    return list;
+	var list = [];
+	for (var p_path in configTab) {
+		var watch = configTab[p_path].watch;
+		list.push(watch);
+	}
+	return list;
 }
 
 function watchListLight(configTab) {
-    var list = [];
+	var list = [];
 
-    configTab.forEach( function(element) {
-        var watch = element.watch;
+	configTab.forEach(function(element) {
+		var watch = element.watch;
 
-        var ppl = element.projectPath.length; // path to project length
-        var lpp = watch.substr(ppl); // local path to the partial 
+		var ppl = element.projectPath.length; // path to project length
+		var lpp = watch.substr(ppl); // local path to the partial 
 
-        list.push({'project':element.projectName,'watch':lpp});
-    });
-    return list;
+		list.push({
+			'project': element.projectName,
+			'watch': lpp
+		});
+	});
+	return list;
 }
 
 function mappSassMatching(projectRootPath, watchPathForSass) {
-    // ===========================================================================================================
-    // the configuration is set to look into every folder under the watch path ?
-    var m;
-    if ((m = /^(.*)[\\\/]\*\*[\\\/]\*\..*$/.exec(watchPathForSass)) && m[1]) {
+	// ===========================================================================================================
+	// the configuration is set to look into every folder under the watch path ?
+	var m;
+	if ((m = /^(.*)[\\\/]\*\*[\\\/]\*\..*$/.exec(watchPathForSass)) && m[1]) {
 
-        config.sassMaching = [];
-        var pathsToSCSSPrimary = walkSync(m[1], [], new RegExp("^.*[\\\/](_.*)$", 'i'));
-        var i = 0;
+		config.sassMaching = [];
+		var pathsToSCSSPrimary = walkSync(m[1], [], new RegExp("^.*[\\\/](_.*)$", 'i'));
+		var i = 0;
 
-        pathsToSCSSPrimary.forEach(function(styleSheet) {
-            config.sassMaching.push({
-                identifier: styleSheet.fileName,
-                target: styleSheet.path,
-                partials: []
-            });
+		pathsToSCSSPrimary.forEach(function(styleSheet) {
+			config.sassMaching.push({
+				identifier: styleSheet.fileName,
+				target: styleSheet.path,
+				partials: []
+			});
 
-            pushEllipsizedPartials(projectRootPath, styleSheet, i++);
-        });
-    }
-    // ===========================================================================================================
+			pushEllipsizedPartials(projectRootPath, styleSheet, i++);
+		});
+	}
+	// ===========================================================================================================
 }
 
 function pushEllipsizedPartials(projectRootPath, styleSheet, index) {
 
-    var reading = new classReading();
-    var _data = (M.fs).readFileSync(styleSheet.path, "utf8");
-    reading.initialize(_data, 0);
+	var reading = new classReading();
+	var _data = (M.fs).readFileSync(styleSheet.path, "utf8");
+	reading.initialize(_data, 0);
 
-    var ppl = projectRootPath.length; // project path Length
-    var l, m;
+	var ppl = projectRootPath.length; // project path Length
+	var l, m;
 
-    reading.readLines(function() {
-        l = reading.line;
-        if ((m = /^@import[\s].*["](.*)["]/.exec(l)) && m[1]) {
+	reading.readLines(function() {
+		l = reading.line;
+		if ((m = /^@import[\s].*["](.*)["]/.exec(l)) && m[1]) {
 
-            // full path to the partial
-            var fpp = "{0}/{1}".format([styleSheet.dir, m[1]]);
+			// full path to the partial
+			var fpp = "{0}/{1}".format([styleSheet.dir, m[1]]);
 
-            // local path to the partial 
-            var lpp = fpp.substr(ppl);
+			// local path to the partial 
+			var lpp = fpp.substr(ppl);
 
-            var ellipsedPath = pathEllipzizeing(fpp, 0, (lpp.split("/").length));
-            config.sassMaching[index].partials.push(ellipsedPath);
-        }
-    });
+			var ellipsedPath = pathEllipzizeing(fpp, 0, (lpp.split("/").length));
+			config.sassMaching[index].partials.push(ellipsedPath);
+		}
+	});
 }
 
 function pathEllipzizeing(path, sub, sup) {
-    // patern + format !!! {-1} = "{", {-2} = "}" !!!
-    var patern = "^(?:(?:((?:[^\/\\]+[\\\/]{-1}1,2{-2}){-1}{0}{-2}).*((?:[\\\/][^\/\\?]+){-1}{1},{-2}[\\\/]?)[^?]*).*|([^?]*).*)$".format([sub, sup]);
-    var m = new RegExp(patern, 'g').exec(path);
-    return m[3] ? m[3] : (m[1] + '...' + m[2]); // if no ellips is posible, return the full path;
+	// patern + format !!! {-1} = "{", {-2} = "}" !!!
+	var patern = "^(?:(?:((?:[^\/\\]+[\\\/]{-1}1,2{-2}){-1}{0}{-2}).*((?:[\\\/][^\/\\?]+){-1}{1},{-2}[\\\/]?)[^?]*).*|([^?]*).*)$".format([sub, sup]);
+	var m = new RegExp(patern, 'g').exec(path);
+	return m[3] ? m[3] : (m[1] + '...' + m[2]); // if no ellips is posible, return the full path;
 }
 
 // https://gist.github.com/kethinov/6658166
 // List all files in a directory in Node.js recursively in a synchronous fashion
-var walkSync = function(dir, filelist, regexFilter) {
-    var files = (M.fs).readdirSync(dir);
-    filelist = filelist || [];
-    files.forEach(function(file) {
-        if ((M.fs).statSync((M.path).join(dir, file)).isDirectory()) {
-            filelist = walkSync(M.path.join(dir, file), filelist, regexFilter);
-        } else {
-            if (!regexFilter.test(dir + '/' + file))
-                filelist.push({
-                    "dir": dir.hackSlashes(),
-                    "path": (dir + '/' + file).hackSlashes(),
-                    "fileName": file
-                });
-        }
-    });
-    return filelist;
-};
+function walkSync(dir, filelist, regexFilter) {
+	var files = (M.fs).readdirSync(dir);
+	var pathModule = (M.path);
+	filelist = filelist || [];
+	files.forEach(function(file) {
+		if ((M.fs).statSync(pathModule.join(dir, file)).isDirectory()) {
+			filelist = walkSync(pathModule.join(dir, file), filelist, regexFilter);
+		} else {
+			if (!regexFilter.test(dir + '/' + file))
+				filelist.push({
+					"dir": dir.hackSlashes(),
+					"path": (dir + '/' + file).hackSlashes(),
+					"fileName": file
+				});
+		}
+	});
+	return filelist;
+}
 
-function getProjectNameFromRootPath(projectRootPath){
-    var projects = getConfig().projects;
-    for(var p in projects){
-        if(projectRootPath == projects[p].path){
-            return projects[p].project;
-        }        
-    }
+function getProjectNameFromRootPath(projectRootPath) {
+	var projects = getConfig().projects;
+	for (var p in projects) {
+		if (projectRootPath == projects[p].path) {
+			return projects[p].project;
+		}
+	}
 
-    // default
-    return projectRootPath;
+	// default
+	return projectRootPath;
 }
 
 // -- [supports/mzg_argument_funcs.js] -- 
@@ -2240,7 +2545,7 @@ function checkPresetsOverdose(optionsCount, service) {
 
 // -- [supports/rewriting/mzg_rewriting_funcs.js] -- 
 var merging = function(event) {
-    (M.clear)();
+    gulp.start('clear');
     
     if (event) {
         modifiedMZGEvent = event;
@@ -2594,4 +2899,47 @@ function logTaskEndBeauty(one_time) {
 	} else {
 		console.log();
 	}
+}
+
+function gloupsHandlingPulseLogging(logObj) {
+
+	// action string left and right trimed
+	var action = logObj.action.replace(/^[\s]+/, '').replace(/[\s]+$/, '');
+
+	var path = logObj.path;
+
+	// adding a new action heading
+	if (!glob_logging_obj[action]) {
+		glob_logging_obj[action] = {};
+	}
+
+	// pushing the current file matching the heading
+	if (!glob_logging_obj[action][path.replace(/'/, '')]) {
+		glob_logging_obj[action][path.replace(/'/, '')] = true;
+	}
+}
+
+function gloupslogSumerise() {
+
+	Object.keys(glob_logging_obj).forEach(function(e, i) {
+
+		if (i > 0) {
+			logOrig('\n');
+		}
+
+		var filesAsList = Object.keys(glob_logging_obj[e]);
+
+		// printing action heading
+		logOrig(' Files labeled {0} ({1})\n'.format([
+			chalk.bgRed(' ' + e + ' '),
+			filesAsList.length
+		]));
+
+		// printing files matching the action heading
+		filesAsList.sort(function(a, b) {
+			return a.localeCompare(b);
+		}).forEach(function(element, index) {
+			logOrig(' ' + element);
+		});
+	});
 }

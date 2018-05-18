@@ -80,17 +80,16 @@ function applyLazyPipeSet(obj) {
 			.pipe(lisencesSetup(lazyPipeProcess))
 			.pipe(separateLisences(lazyPipeProcess))
 			.pipe(lazyPipeProcess)
-			.pipe(separatePrehamptedLisences(lazyPipeProcess))
+			.pipe(separatePreemptedLisences(lazyPipeProcess))
 			.pipe(obj.closing);
 
 	} else if (source_kind == 'complex') {
-		var istransitive = metAllArgs(['transitive']);
 
 		return (M.lazyPipe)()
 			.pipe(obj.opening)
 			.pipe(lisencesSetup(lazyPipeProcess))
 			.pipe(lazyPipeProcess)
-			.pipe(separateLisences(lazyPipeProcess, istransitive))
+			.pipe(separateLisences(lazyPipeProcess))
 			.pipe(obj.closing);
 	}
 }
@@ -102,9 +101,8 @@ function transitivitySetup(transitivity, matchingEntry, path) {
 	});
 }
 
-function transitivitySetupCore(transitivity, matchingEntry, path) {
-	var shouldBeTransitive =
-		metAllArgs(['all', 'transitive']) ||
+function shouldBeTransitive(){
+	return metAllArgs(['all', 'transitive']) ||
 
 		// CSS focused
 		metAllArgs(['sass', 'autominCss', 'transitive']) ||
@@ -114,13 +112,16 @@ function transitivitySetupCore(transitivity, matchingEntry, path) {
 		// JS focused
 		metAllArgs(['coffeescript', 'automin', 'transitive']) ||
 		metAllArgs(['typescript', 'automin', 'transitive']);
+}
 
+function transitivitySetupCore(transitivity, matchingEntry, path) {
+	
 	var found = false;
 
 	// by default the transitivity is set to the path the result should be the destination
 	transitivity.dest = matchingEntry.dest;
 
-	if (shouldBeTransitive) {
+	if (shouldBeTransitive()) {
 		var fileName = (/^.*[\/](.*)$/g.exec(path.hackSlashes()))[1];
 		var focusedPathFileName = "{0}/{1}".format([matchingEntry.dest, fileName]);
 

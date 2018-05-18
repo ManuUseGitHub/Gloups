@@ -1,20 +1,25 @@
 # Gloups
 ### COMMANDS
-Viable commands are:
+Available commands are:
 
     $ gulp helpMe           Shows this help ...
     $ gulp serve --options  Allows to mixin options (see options)
-    $ gulp setve --preset   WARN: one preset only (no mixin)
+    $ gulp serve --preset   WARN: one preset only (no mixin)
 
-Viable rewrite gulpfile.js commands are:
+    $ gulp pulse --options  do the same as serve but apply services 
+                            for all files in one shot. It is 
+                            perfect for an already made setup 
+
+Available rewrite gulpfile.js commands are:
 
     $ gulp rewrite [--multiple] [--ugly] 
          > rewrite the file [watching for changes on files (see MZG_FILES)]
          > rewrite the file [minified].
 
-> WARN: unavailable for production very soon.
+> WARN: available in dev only.
 
-that command will watch for MZG_FILES changes and wll then merge them into the gulpfile.js
+that command will watch for MZG_FILES changes and will then merge them into the gulpfile.js
+use this command with precaution otherwise, you can break the gulpfile project
 
 
 ### OPTIONS
@@ -56,17 +61,27 @@ Presets are:
 
     --coffeescript,     Provides .js and .coffee files oriented services.
     -cof                Equals to : --minjs --coffee
-                        Or equals to : -mj -c
+                        Or equals to : -minj -c
 
 
 Advanced options are:
 
-    --transitive        Remove a B step in ABC set of transformations
-    -tr                 For less, sass or stylus coupled with autominCss
-                        For typescript or coffeescript coupled with
-                        automin. The same effect when --all option 
-                        is selected
+    --transitive        Removes a step in a set of transformations linked 
+    -tr                 by files destination. 
 
     --essential         Make certain messages printed out to lightweight
     -es                 the terminal and make Gloups less verbose
 
+
+Transitive combinations:
+
+    --mincss -tr        For less, sass or stylus 
+                        coupled with --mincss
+
+    --minjs -tr         For typescript or coffeescript 
+                        coupled with --minjs.
+
+
+    --all -tr           For both style and script files 
+    --minjs --mincss -tr 
+                        is equal

@@ -1,5 +1,5 @@
+/* jshint esversion:6 */
 function runTaskProcessForCompression(athis, pathesTo, obj) {
-	logTaskPurpose(athis.currentTask.name);
 
 	var mainLazyPipeObj = createMainLazyPipeObject(pathesTo, "Compressed    ", obj.module);
 
@@ -39,7 +39,6 @@ function runTaskProcessForCompression(athis, pathesTo, obj) {
 }
 
 function runTaskProcessForPrecompiledFiles(athis, pathesTo, obj) {
-	logTaskPurpose(athis.currentTask.name);
 
 	var mainLazyPipeObj = createMainLazyPipeObject(pathesTo, "Processed     ", obj.module);
 
@@ -82,12 +81,14 @@ function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
 
 	// OVERWRITING DEFAULT DESTINATION ------------------------------------------------------------
 	mainLazyPipeObj.destCallBack = function(haslog) {
-
 		if (haslog) {
-			gloupslog('');
-			logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
-		}
 
+			if (!isPulseTask()) {
+				gloupslog('');
+			}
+
+			logLongWaiting(mainLazyPipeObj);
+		}
 		var destPath = glob_transitivity != null ?
 			glob_transitivity.dest :
 			mainLazyPipeObj.pathesDescr.dest; // must be defined for non transitive services
@@ -98,6 +99,71 @@ function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
 	// CONSUMMING ---------------------------------------------------------------------------------
 	gulp.src(realTargets)
 		.pipe(sourceMappedProcess())
+		.on('end', function() {
+			logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
+			exitOnPulseAfterCount();
+		})
 		.pipe(applyLicenceSplitting(mainLazyPipeObj))
 		.pipe(gulp.dest(mainLazyPipeObj.destCallBack(true)));
+}
+
+function exitOnPulseAfterCount() {
+	if (isPulseTask()) {
+		resetTimer({
+			total: 100,
+			format: ':bar pulse closing in (:countdown)'
+		}, function() {
+			
+			gulp.start('clear');
+			gloupslogSumerise();
+
+			process.exit();
+		}, 100);
+	}
+}
+
+function isPulseTask() {
+	return process.argv[2] == 'pulse';
+}
+
+function logLongWaiting(mainLazyPipeObj) {
+	// complex services takes several times so they have to inform the user
+	if (mainLazyPipeObj.source_kind == 'complex') {
+
+		resetTimer({
+			total: 2
+		}, function() {
+			console.log(' ' + chalk.bgYellow(' ! ') + ' Long process ... few secondes required');
+		});
+	}
+}
+
+function resetTimer(obj, callback, stepTime) {
+	var format = obj.format ? obj.format : '';
+	if (/.*:countdown.*/.test(format)) {
+		obj.total++;
+	}
+	var bar = new(M.progress)(format, {
+		total: obj.total,
+		width: 80,
+		complete:String.fromCharCode(9608),
+		incomplete:chalk.grey('.')
+	});
+
+	if (glob_timer) {
+		clearInterval(glob_timer);
+	}
+	glob_timer = setInterval(function() {
+		if (/.*:countdown.*/.test(format)) {
+			bar.tick({
+				'countdown': (obj.total - bar.curr-1)
+			});
+		} else {
+			bar.tick();
+		}
+		if (bar.complete) {
+			callback();
+			clearInterval(glob_timer);
+		}
+	}, stepTime ? stepTime : 500);
 }

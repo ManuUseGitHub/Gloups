@@ -31,23 +31,29 @@ var SERVICES = {
 
 	'styles': 'autominCss less sass stylus',
 
-	'js': 'automin typescript coffeescript'
+	'js': 'automin typescript coffeescript',
+
+	'cof': 'automin coffeescript',
+
+	'tps': 'automin typescript'
 };
 
-var PRESET_OPTIONS = "all|styles|js";
+var PRESET_OPTIONS = "all|styles|cof|tps|js";
 var SERVICES_OPTIONS = "automin|autominCss|typescript|coffeescript|less|sass|stylus";
 var SERVICES_ADVANCED_OPTIONS = "transitive|essential";
 
 var ALL_SERVICES_OPTIONS = PRESET_OPTIONS + '|' + SERVICES_OPTIONS + '|' + SERVICES_ADVANCED_OPTIONS;
 
+// REGEX PATTERNS ---------------------------------------------------------------------------------
 var JS_REGEX_FILE_PATH_PATTERN = "^(?:((?:[^\\.]+|..)[\\x2F\\x5C])|)((?:([^\\.^\\x2F^\\x5C]+)(?:((?:[.](?!\\bmin\\b)(?:[^\\.]+))+|))(?:([.]min)([.]js)|([.]js))))$";
+var FILE_COVERAGE_REGEXP = /^(.*)[\\\/]\*\*[\\\/]\*\..*$/;
+var FILE_STARTING_BY_UNDERSCORE = /^.*[\/\\](_.*)$/i;
+// ------------------------------------------------------------------------------------------------
 
 var GLOUPS_OPTIONS = SERVICES_OPTIONS + '|' + PRESET_OPTIONS;
 
 var SILENT_TASKS = "watch|vet|unit-test|integration-test";
 var ISALL = true;
-
-var isdist = {};
 
 // https://stackoverflow.com/questions/43064924/how-to-target-all-browsers-with-gulp-auto-prefixer
 var AUTOPREFIXER_BROWSERS = ['> 1%', 'last 2 versions', 'firefox >= 4', 'safari 7', 'safari 8', 'IE 8', 'IE 9', 'IE 10', 'IE 11'];
@@ -66,9 +72,12 @@ var DEFAULT_CONFIG = {
 	"projects": []
 };
 
-// Sets things up to serve
+// configurations
+var isdist = {};
+
 var config = getConfig();
 
+// global objects
 var glob_found_modules = {
 	'fs': true
 };
@@ -77,3 +86,9 @@ var glob_visited_elements = {
 	'infunc': {},
 	'intask': {}
 };
+
+var glob_timer;
+
+var glob_logging_obj = {};
+
+var glob_mayLogEssentials = metAllArgs(['essential']);

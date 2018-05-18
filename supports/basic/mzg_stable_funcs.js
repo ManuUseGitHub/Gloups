@@ -94,13 +94,20 @@ function getModule(module) {
 
 var logOrig = console.log;
 
-function gloupslog(args){
-	logOrig(args);
+function gloupslog(args) {
+
+	var pathActionMatch = /^([\s](?:(?:[^\s]+[\s]?)+)[\s]+)(['].*['])$/.exec(args);
+	if (isPulseTask() && pathActionMatch) {
+		gloupsHandlingPulseLogging({
+			'action': pathActionMatch[1],
+			'path': pathActionMatch[2]
+		});
+	} else {
+		logOrig(args);
+	}
 }
 
-var mayLogEssentials = metAllArgs(['essential']);
-
-if(mayLogEssentials){
-	console.log=function(){};
+if (glob_mayLogEssentials) {
+	console.log = function() {};
 	gloupslog(forNowShortLog(chalk.bgRed(' Logging only essential messages ')));
 }

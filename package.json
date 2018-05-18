@@ -1,6 +1,6 @@
 {
   "name": "Gloups",
-  "version": "6.2.4",
+  "version": "6.3.0",
   "description": "An amazing gulp helper",
   "main": "index.js",
   "scripts": {
@@ -32,6 +32,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-css-format": "^0.1.2",
     "gulp-exit": "0.0.2",
+    "gulp-file": "^0.4.0",
     "gulp-help": "^1.6.1",
     "gulp-insert": "^0.5.0",
     "gulp-jshint": "^2.1.0",
@@ -52,13 +53,15 @@
     "lazypipe": "^1.0.1",
     "less-plugin-clean-css": "^1.5.1",
     "path": "^0.12.7",
+    "progress": "^2.0.0",
+    "progress-stream": "^2.0.0",
     "run-sequence": "^2.2.0",
     "through2": "^2.0.3",
     "typescript": "^2.7.2",
     "yargs": "^10.0.3"
   },
   "dependencies": {
-    "clear": "^0.1.0",
+    "ajv": "^6.5.0",
     "global": "^4.3.2",
     "less-plugin-autoprefix": "^1.5.1",
     "npm": "^5.7.1",
