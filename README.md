@@ -9,17 +9,17 @@ Gloups is a tool that uses the gulp ecosystem and provides services like compres
 
 ## END USER INSTALLATION (DEV)
 
-1. getting the gloups folder
+1. Get the gloups folder
 
        $ git clone https://github.com/ManuUseGitHub/gloups.git
 
-2. make sure gulp is updated and install npm dependencies
+2. Make sure gulp is updated and install npm dependencies
 
        $ npm i -g gulp 
        $ cd gloups
        $ npm install
 
-3. check default configuration by running bellow command ... bad news should be printed out to catch your attention and guide you in order to show you how you have to configure gloups
+3. Check default configuration by running bellow command ... bad news should be printed out to catch your attention and guide you in order to show you how you have to configure gloups
 
        $ gulp serviceMapping
 
@@ -30,9 +30,9 @@ Gloups is a tool that uses the gulp ecosystem and provides services like compres
    
     The effect of that command is to create a <b>config.mzg.json</b> file in project root folders you specified in the custom/config.json file.
 
-    > config.mzg.json files are not blank and have instructions.
+    > Config.mzg.json files are not blank and have instructions.
     > In these files, uncomment what services you want to enable.
-    > Enable sourcemapping for services you want by switching sourcemaps fields to true
+    > Enable sourcemapping for services you want by switching sourcemaps fields to true.
 
 5. Follow the paths you gave in the configuration, open the config.mzg.json file. Configure it by following instructions and examples. 
 
@@ -40,7 +40,7 @@ Gloups is a tool that uses the gulp ecosystem and provides services like compres
 
        $ gulp serve --all [--transitivity]
    
-   shorter :
+   Shorter :
        
        $ gulp serve -a [-a]
 
@@ -68,21 +68,21 @@ Once everything is set run gulp task 'serve' with options you want. The simplest
 
     $ gulp serve --sass --less --stylus --mincss --ts --coffeescript --minjs --transitive
     
-shorter (with --all option) :
+Shorter (with --all option) :
 
     $ gulp serve -a -tr
 
 ## HELP
 > For every possibility, refer to the help.md file or with command run  ```$ gulp helpMe```. 
-> Some of them can make the experience better such as the ```--essential``` option if Gloups is too much verbose for you. just run ```$ gulp task --option(s) --essential``` or shorter:```$ gulp task -aliases -es```
+> Some of them can make the experience better such as the ```--essential``` option if Gloups is too much verbose for you. Just run ```$ gulp task --option(s) --essential``` or shorter:```$ gulp task -aliases -es```
 
-go check [help.md](HELP.md) !
+Go check [help.md](HELP.md) !
 
 ## EXTRAS
 
-More fun stuffs ! The Gloups project aims to be scalable in terms of implementing the solution but also in user experience. This section covers what Gloups can offer to improve its utilization. Be aware without further ado, We've been creative to make you saving time!
+More fun stuffs ! The Gloups project aims to be scalable in terms of implementing the solution but also in user experience. This section covers what Gloups can offer to improve its utilization. Be aware without further ado. We've been creative to make you saving time!
 
-go check [Extras.md](EXTRAS.md) !
+Go check [Extras.md](EXTRAS.md) !
 
 ## LICENSE
 [MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
