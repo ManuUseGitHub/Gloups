@@ -1,15 +1,15 @@
 ![logo](images/mzg2.ico)
-# Gloups V6.0
+# Gloups V6.3
 License
 
 [![MIT license][license-badge]][license-link]
 
 Main modules
 
-[![uglify service][uglify-badge]][uglify-link] [![typescript service][typescript-badge]][typescript-link] [![coffeescript service][coffee-badge]][coffee-link] [![less service][less-badge]][less-link] [![sass service][sass-badge]][sass-link] [![clean css service][cleanCSS-badge]][cleanCSS-link]
+[![uglify service][uglify-badge]][uglify-link] [![typescript service][typescript-badge]][typescript-link] [![coffeescript service][coffee-badge]][coffee-link] [![less service][less-badge]][less-link] [![sass service][sass-badge]][sass-link] [![stylus service][stylus-badge]][stylus-link] [![clean css service][cleanCSS-badge]][cleanCSS-link]
 
 ## A Gulp implementation once and for all
-Gloups is a tool that uses the gulp ecosystem and provides services like compression of scripts (<b>CSS</b> and <b>JS</b>), compilation/processing <b>LESS</b>, <b>SASS</b>, <b>TS</b>, <b>JS</b>, <b>CoffeeScript</b>. The difference between Gloups and simply using gulp is that Gloups is set globally from a root path like C:\ folder on Windows systems or Home folder on Unix systems once and watches for multiple projects.
+Gloups is a tool that uses the gulp ecosystem and provides services like compression of scripts (<b>CSS</b> and <b>JS</b>), compilation/processing <b>LESS</b>, <b>SASS</b>, <b>STYLUS</b>, <b>TS</b>, <b>JS</b>, <b>CoffeeScript</b>. The difference between Gloups and simply using gulp is that Gloups is set globally from a root path like C:\ folder on Windows systems or Home folder on Unix systems once and watches for multiple projects.
 
 ### Purpose
 The purpose is to avoid installing gulp in every project and reprogramming it dozens of time the same way for the same purposes. 
@@ -66,18 +66,55 @@ With Gloups, Just configure file paths to the root folder of your projects, a co
 ## Usage
 Once everything is set run gulp task 'serve' with options you want. The simplest way is to run all services via the preset --all with the transitive option :
 
-    $ gulp serve --sass --less --stylus --mincss --ts --coffescript --minjs --transitive
+    $ gulp serve --sass --less --stylus --mincss --ts --coffeescript --minjs --transitive
     
-shorter :
+shorter (with --all option) :
 
     $ gulp serve -a -tr
-    
-For every possibilities, refer to the help.md file or run  ```$ gulp helpMe```. Some of them can make the experiance better such as the <b>essential</b> option if Gloups is too much verbose for you :
 
-    $ gulp serve ... --essential
+## Help
+> For every possibilities, refer to the help.md file or with command run  ```$ gulp helpMe```. 
+> Some of them can make the experiance better such as the ```--essential``` option if Gloups is too much verbose for you. just run ```$ gulp task --option(s) --essential``` or shorter : ```$ gulp task -alliases -es```
+
+## Extras
+
+More fun stuffs ! The Gloups project aims to be scallable in terms of implementing the solution but also in user experience. This section covers what Gloups can offers to improve its utilization. Be aware without further ado, We've been creative to make you saving time !
+
+### Pulse
+Let's suppose that you already have a project with all kind of file gloups can handle and you configured config.mzg.json files in them. You probably want every single file to be analysed by gloups without opening any of them ... Saving time is saving energy when it comes to dev!
+
+Since the v6.3 release, Gloups comes with its ultimate service named <b>Pulse</b> ! That Pulse thing works like a living being's heart ... Once a pulse, blood is spread throughout the body.
+
+Pulse command works like serve command. By adapting the previous command, pulse could be run like this :
+    
+     $ gulp pulse --sass --less --stylus --mincss --ts --coffeescript --minjs --transitive
+
+shorter (with --all option) :
+
+    $ gulp pulse -a -tr
+
+The only difference with serve command is that <b>pulse</b> serves in one go instead of watching infinitely project folder as <serve> command does.
+
+### Pulse further explanation
+So when the task pulse is run, 
+
+1. Services requested by the task arguments are activated as if you've had run ```$gulp serve --option(s)``` command.
+
+2. All files Gloups is capable to transform or generate files from are listed.
+
+3. Every listed file is changed by just opening it then imediately write in the same source folder without changing anything. That little snippet do the trick:
+    ```
+    gulp.src(e)
+        .pipe(gulp.dest(function(file) {
+			return file.base;
+		}));
+    ```
+4. Gloups detect the changes and apply all transformations.
+
+5. the process wait for last changed files then quit.
 
 ## Run Gloups from any directory !
-To use ```$ gloups ...``` command anywhere instead of ```$ gulp ...``` only in the gloups folder
+To use ```$ gloups``` command anywhere instead of ```$ gulp``` only in the gloups folder
 
 ### WINDOWS
 add the path to gloups folder to global/environment variables like so
@@ -101,6 +138,9 @@ Comming soon
 
 [less-badge]: https://img.shields.io/badge/less-gulp--less-1d365d.svg?style=flat-square
 [less-link]: https://www.npmjs.com/package/gulp-less
+
+[stylus-badge]: https://img.shields.io/badge/stylus-gulp--stylus-ff6347.svg?style=flat-square
+[stylus-link]: https://www.npmjs.com/package/gulp-stylus
 
 [sass-badge]: https://img.shields.io/badge/sass-gulp--sass-c6538c.svg?style=flat-square
 [sass-link]: https://www.npmjs.com/package/gulp-sass
