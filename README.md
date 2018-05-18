@@ -85,9 +85,13 @@ shorter (with --all option) :
 > For every possibility, refer to the help.md file or with command run  ```$ gulp helpMe```. 
 > Some of them can make the experience better such as the ```--essential``` option if Gloups is too much verbose for you. just run ```$ gulp task --option(s) --essential``` or shorter:```$ gulp task -aliases -es```
 
+go check [help.md](HELP.md) !
+
 ## EXTRAS
 
 More fun stuffs ! The Gloups project aims to be scalable in terms of implementing the solution but also in user experience. This section covers what Gloups can offer to improve its utilization. Be aware without further ado, We've been creative to make you saving time!
+
+go check [Extras.md](EXTRAS.md) !
 
 ## LICENSE
 [MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
