@@ -11,7 +11,7 @@ Pulse command works like serve command. By adapting the previous command, pulse 
     
      $ gulp pulse --sass --less --stylus --mincss --ts --coffeescript --minjs --transitive
 
-shorter (with --all option) :
+Shorter (with --all option) :
 
     $ gulp pulse -a -tr
 
@@ -34,6 +34,8 @@ So when the task pulse is run,
 4. Gloups detect the changes and apply all transformations.
 
 5. the process wait for last changed files then quit.
+## ALIASES
+Use aliases, it can improve your workflow a lot ! Possible aliases list can be found in the help. Use the command ```$ gulp helpMe``` or follow this [link to help.md](HELP.md) file.
 
 ## RUN GLOUPS FROM ANY DIRECTORY !
 To use ```$ gloups``` command anywhere instead of ```$ gulp``` only in the gloups folder
