@@ -1,4 +1,4 @@
-# Gloups V6.3 /help
+# Gloups V6.3 / help
 
 [![MIT license][license-badge]][license-link]
 
