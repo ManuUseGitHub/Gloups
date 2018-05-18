@@ -91,3 +91,6 @@ Transitive combinations:
 
 ## License
 [MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
+
+[license-badge]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
+[license-link]: LICENSE
