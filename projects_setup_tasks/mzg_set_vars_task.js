@@ -4,23 +4,17 @@ gulp.task('setVars', function() {
         getModule(M.path);
     }
 
-    if (!config.verbose) {
+    if (!config.verbose && !isPulseTask()) {
         logTaskPurpose(this.currentTask.name);
     }
-    for (var p_path in config.projects) {
-        var project = config.projects[p_path];
-        if (M.fssync.exists(project.path + '\\config.mzg.json')) {
-            console.log(' '+chalk.bgGreen(' '+project.project+' '));
-            if (project.checked) {
-                setUpProjectWatchingPaths(project.path);
-            }
-        } else {
-            logProjectErrored(project);
-        }
-    }
+
+    coverFoldersToServe({
+        'scope': '*',
+        'shouldLog': true
+    });
 
     // configuration for SASS watched paths ---------------------------
-    for (p_path in config.pathesToSass) {
+    for (var p_path in config.pathesToSass) {
         var watchPathForSass = config.pathesToSass[p_path].watch;
         var projectPath = config.pathesToSass[p_path].projectPath;
         mappSassMatching(projectPath, watchPathForSass);
@@ -28,7 +22,7 @@ gulp.task('setVars', function() {
 
     // gulp.task("externalizeConfig") is never undefined
     // so check if a NOT_DISTRIBUTION key is found or not
-    if (isdist.NOT_DISTRIBUTION) {
+    if (isdist.NOT_DISTRIBUTION && !isPulseTask()) {
         if (!config.verbose) {
             console.log(forNowLongLog("{0}\n", ["config externalized under config.json"]));
         }
@@ -36,8 +30,7 @@ gulp.task('setVars', function() {
         gulp.start("externalizeConfig");
     }
 
-    if (!config.verbose) {
-        console.log(forNowLongLog("{0}\n", ["config externalized under config.json"]));
+    if (!config.verbose && !isPulseTask()) {
         console.log(forNowLongLog("{0}\n", ["CONFIGURATON PROCEEDED"]));
     }
 });

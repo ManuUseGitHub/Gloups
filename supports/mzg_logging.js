@@ -282,3 +282,46 @@ function logTaskEndBeauty(one_time) {
 		console.log();
 	}
 }
+
+function gloupsHandlingPulseLogging(logObj) {
+
+	// action string left and right trimed
+	var action = logObj.action.replace(/^[\s]+/, '').replace(/[\s]+$/, '');
+
+	var path = logObj.path;
+
+	// adding a new action heading
+	if (!glob_logging_obj[action]) {
+		glob_logging_obj[action] = {};
+	}
+
+	// pushing the current file matching the heading
+	if (!glob_logging_obj[action][path.replace(/'/, '')]) {
+		glob_logging_obj[action][path.replace(/'/, '')] = true;
+	}
+}
+
+function gloupslogSumerise() {
+
+	Object.keys(glob_logging_obj).forEach(function(e, i) {
+
+		if (i > 0) {
+			logOrig('\n');
+		}
+
+		var filesAsList = Object.keys(glob_logging_obj[e]);
+
+		// printing action heading
+		logOrig(' Files labeled {0} ({1})\n'.format([
+			chalk.bgRed(' ' + e + ' '),
+			filesAsList.length
+		]));
+
+		// printing files matching the action heading
+		filesAsList.sort(function(a, b) {
+			return a.localeCompare(b);
+		}).forEach(function(element, index) {
+			logOrig(' ' + element);
+		});
+	});
+}

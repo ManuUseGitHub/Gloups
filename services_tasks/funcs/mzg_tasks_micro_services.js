@@ -1,6 +1,13 @@
 function renameSuffixMin() {
-	return (M.rename)({
-		suffix: '.min'
+	return (M.rename)(function(path) {
+		var suffix = '.min';
+		path.extname = suffix + path.extname;
+	});
+}
+
+function renameCustomSuffix(suffix) {
+	return (M.rename)(function(path) {
+		path.extname = suffix + path.extname;
 	});
 }
 
@@ -11,7 +18,7 @@ function cleanCssMinification() {
 }
 
 function insertSignatureAfter(actionDone, thanksToModule) {
-	return (M.insert).append("\n/* -- {1} wth Gloups v {2} - {3} | thanks to {4} -- */".format(
+	return (M.insert).append("\n/* -- {0} wth Gloups v {1} - {2} | thanks to {3} -- */".format(
 		[
 			actionDone.replace(/[\s]+$/, ''),
 			GLOUPS_VERSION,
