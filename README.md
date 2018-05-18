@@ -11,21 +11,21 @@ Gloups is a tool that uses the gulp ecosystem and provides services like compres
 
 1. Get the gloups folder
 
-       $ git clone https://github.com/ManuUseGitHub/gloups.git
+        $ git clone https://github.com/ManuUseGitHub/gloups.git
 
 2. Make sure gulp is updated and install npm dependencies
 
-       $ npm i -g gulp 
-       $ cd gloups
-       $ npm install
+        $ npm i -g gulp 
+        $ cd gloups
+        $ npm install
 
 3. Check default configuration by running bellow command ... bad news should be printed out to catch your attention and guide you in order to show you how you have to configure gloups
 
-       $ gulp serviceMapping
+        $ gulp serviceMapping
 
 4. Once gloups is configured, generate custom configuration files by running the command : 
 
-       $ gulp scanprojects
+        $ gulp scanprojects
        
    
     The effect of that command is to create a <b>config.mzg.json</b> file in project root folders you specified in the custom/config.json file.
@@ -38,39 +38,39 @@ Gloups is a tool that uses the gulp ecosystem and provides services like compres
 
 6. Open a terminal into gloups folder and make Gloups serve you (watch over your projects)
 
-       $ gulp serve --all [--transitivity]
+        $ gulp serve --all [--transitivity]
    
    Shorter :
        
-       $ gulp serve -a [-a]
+        $ gulp serve -a [-a]
 
 ## END USER INSTALLATION (DISTRIBUTION)
 
 1. Get the dist folder
 
-       $ mkdir gloups
-       $ cd gloups
-       $ git init
-       $ git remote add origin -f https://github.com/ManuUseGitHub/gloups.git
-       $ git config core.sparsecheckout true
-       $ echo dist/* >> .git/info/sparse-checkout
-       $ git pull origin master
+        $ mkdir gloups
+        $ cd gloups
+        $ git init
+        $ git remote add origin -f https://github.com/ManuUseGitHub/gloups.git
+        $ git config core.sparsecheckout true
+        $ echo dist/* >> .git/info/sparse-checkout
+        $ git pull origin master
 
 2. Make sure gulp is updated and install npm dependencies
 
-       $ npm i -g gulp 
-       $ npm install
+        $ npm i -g gulp 
+        $ npm install
 
 3. Follow same steps as the installation for devs in <b>End user installation (dev) section</b> from step 3.
  
 ## USAGE
 Once everything is set run gulp task 'serve' with options you want. The simplest way is to run all services via the preset --all with the transitive option :
 
-    $ gulp serve --sass --less --stylus --mincss --ts --coffeescript --minjs --transitive
+        $ gulp serve --sass --less --stylus --mincss --ts --coffeescript --minjs --transitive
     
 Shorter (with --all option) :
 
-    $ gulp serve -a -tr
+        $ gulp serve -a -tr
 
 ## HELP
 > For every possibility, refer to the help.md file or with command run  ```$ gulp helpMe```. 
