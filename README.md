@@ -85,54 +85,6 @@ shorter (with --all option) :
 > For every possibilities, refer to the help.md file or with command run  ```$ gulp helpMe```. 
 > Some of them can make the experiance better such as the ```--essential``` option if Gloups is too much verbose for you. just run ```$ gulp task --option(s) --essential``` or shorter : ```$ gulp task -alliases -es```
 
-## Extras
-
-More fun stuffs ! The Gloups project aims to be scallable in terms of implementing the solution but also in user experience. This section covers what Gloups can offers to improve its utilization. Be aware without further ado, We've been creative to make you saving time !
-
-### Pulse
-Let's suppose that you already have a project with all kind of file gloups can handle and you configured config.mzg.json files in them. You probably want every single file to be analysed by gloups without opening any of them ... Saving time is saving energy when it comes to dev!
-
-Since the v6.3 release, Gloups comes with its ultimate service named <b>Pulse</b> ! That Pulse thing works like a living being's heart ... Once a pulse, blood is spread throughout the body.
-
-Pulse command works like serve command. By adapting the previous command, pulse could be run like this :
-    
-     $ gulp pulse --sass --less --stylus --mincss --ts --coffeescript --minjs --transitive
-
-shorter (with --all option) :
-
-    $ gulp pulse -a -tr
-
-The only difference with serve command is that <b>pulse</b> serves in one go instead of watching infinitely project folder as <serve> command does.
-
-### Pulse further explanation
-So when the task pulse is run, 
-
-1. Services requested by the task arguments are activated as if you've had run ```$gulp serve --option(s)``` command.
-
-2. All files Gloups is capable to transform or generate files from are listed.
-
-3. Every listed file is changed by just opening it then imediately write in the same source folder without changing anything. That little snippet do the trick:
-    ```
-    gulp.src(e)
-        .pipe(gulp.dest(function(file) {
-			return file.base;
-		}));
-    ```
-4. Gloups detect the changes and apply all transformations.
-
-5. the process wait for last changed files then quit.
-
-## Run Gloups from any directory !
-To use ```$ gloups``` command anywhere instead of ```$ gulp``` only in the gloups folder
-
-### WINDOWS
-add the path to gloups folder to global/environment variables like so
-    
-![logo](images/Capture.PNG)
-
-### UNIX
-Comming soon
-
 ## License
 [MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
 
