@@ -11,7 +11,7 @@
    height="20"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
    sodipodi:docname="js-gulp--uglify-f9ea85.svg">
   <metadata
      id="metadata21">
@@ -35,15 +35,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1600"
-     inkscape:window-height="877"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
      id="namedview17"
      showgrid="false"
      inkscape:zoom="4.0454545"
-     inkscape:cx="44"
+     inkscape:cx="-1.1123601"
      inkscape:cy="10"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-x="1592"
+     inkscape:window-y="307"
      inkscape:window-maximized="1"
      inkscape:current-layer="g10" />
   <g
@@ -67,19 +67,22 @@
     <text
        x="105"
        y="140"
-       transform="scale(.1)"
+       transform="scale(0.1)"
        textLength="90"
-       id="text12">js</text>
+       id="text12"
+       lengthAdjust="spacing"
+       style="line-height:0%">js</text>
     <text
        x="525"
        y="140"
-       transform="scale(.1)"
+       transform="scale(0.1)"
        textLength="590"
        id="text14"
-       style="fill:#555555;fill-opacity:1;">
+       style="line-height:0%;fill:#555555;fill-opacity:1"
+       lengthAdjust="spacing">
       <tspan
-         style="fill:#555555;fill-opacity:1;"
-         id="tspan4149">gulp-uglify</tspan>
+         style="fill:#555555;fill-opacity:1"
+         id="tspan4149">gulp-uglifyes</tspan>
     </text>
   </g>
   <style
