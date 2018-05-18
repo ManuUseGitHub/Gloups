@@ -1,5 +1,8 @@
-# Gloups
-### COMMANDS
+# Gloups V6.3 /help
+
+[![MIT license][license-badge]][license-link]
+
+## COMMANDS
 Available commands are:
 
     $ gulp helpMe           Shows this help ...
@@ -22,7 +25,7 @@ that command will watch for MZG_FILES changes and will then merge them into the 
 use this command with precaution otherwise, you can break the gulpfile project
 
 
-### OPTIONS
+## OPTIONS
 
 Valid options are:
 
@@ -85,3 +88,6 @@ Transitive combinations:
     --all -tr           For both style and script files 
     --minjs --mincss -tr 
                         is equal
+
+## License
+[MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
