@@ -1,12 +1,8 @@
-![logo](images/mzg2.ico)
+![logo](images/mzg2.ico) [![uglify service][uglify-badge]][uglify-link] [![typescript service][typescript-badge]][typescript-link] [![coffeescript service][coffee-badge]][coffee-link] [![less service][less-badge]][less-link] [![sass service][sass-badge]][sass-link] [![stylus service][stylus-badge]][stylus-link] [![clean css service][cleanCSS-badge]][cleanCSS-link]
+
 # Gloups v6.3
-License
 
 [![MIT license][license-badge]][license-link]
-
-Main modules
-
-[![uglify service][uglify-badge]][uglify-link] [![typescript service][typescript-badge]][typescript-link] [![coffeescript service][coffee-badge]][coffee-link] [![less service][less-badge]][less-link] [![sass service][sass-badge]][sass-link] [![stylus service][stylus-badge]][stylus-link] [![clean css service][cleanCSS-badge]][cleanCSS-link]
 
 ## A GULP IMPLEMENTATION ONCE AND FOR ALL
 Gloups is a tool that uses the gulp ecosystem and provides services like compression of scripts (<b>CSS</b> and <b>JS</b>), compilation/processing <b>LESS</b>, <b>SASS</b>, <b>STYLUS</b>, <b>TS</b>, <b>JS</b>, <b>CoffeeScript</b>. The difference between Gloups and simply using gulp is that Gloups is set globally from a root path like C:\ folder on Windows systems or Home folder on Unix systems once and watches for multiple projects.
