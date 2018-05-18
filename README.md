@@ -22,7 +22,7 @@ With Gloups, Just configure file paths to the root folder of your projects, a co
 
        $ git clone https://github.com/ManuUseGitHub/gloups.git
 
-2. make sure gulp is updated and install npm depedencies
+2. make sure gulp is updated and install npm dependencies
 
        $ npm i -g gulp 
        $ cd gloups
@@ -65,7 +65,7 @@ With Gloups, Just configure file paths to the root folder of your projects, a co
        $ echo dist/* >> .git/info/sparse-checkout
        $ git pull origin master
 
-2. Make sure gulp is updated and install npm depedencies
+2. Make sure gulp is updated and install npm dependencies
 
        $ npm i -g gulp 
        $ npm install
@@ -82,12 +82,12 @@ shorter (with --all option) :
     $ gulp serve -a -tr
 
 ## HELP
-> For every possibilities, refer to the help.md file or with command run  ```$ gulp helpMe```. 
-> Some of them can make the experiance better such as the ```--essential``` option if Gloups is too much verbose for you. just run ```$ gulp task --option(s) --essential``` or shorter : ```$ gulp task -alliases -es```
+> For every possibility, refer to the help.md file or with command run  ```$ gulp helpMe```. 
+> Some of them can make the experience better such as the ```--essential``` option if Gloups is too much verbose for you. just run ```$ gulp task --option(s) --essential``` or shorter:```$ gulp task -aliases -es```
 
 ## EXTRAS
 
-More fun stuffs ! The Gloups project aims to be scallable in terms of implementing the solution but also in user experience. This section covers what Gloups can offers to improve its utilization. Be aware without further ado, We've been creative to make you saving time !
+More fun stuffs ! The Gloups project aims to be scalable in terms of implementing the solution but also in user experience. This section covers what Gloups can offer to improve its utilization. Be aware without further ado, We've been creative to make you saving time!
 
 ## LICENSE
 [MIT][license-link] © [ManuUseGitHub (Jean Luc Emmanuel VERHANNEMAN)](https://www.linkedin.com/in/jean-luc-emmanuel-verhanneman-5a9381ab/)
