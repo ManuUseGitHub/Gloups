@@ -102,11 +102,17 @@ function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
 		.on('end', function() {
 			logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
 			exitOnPulseAfterCount();
+			exitCountForLongLog();
 		})
 		.pipe(applyLicenceSplitting(mainLazyPipeObj))
 		.pipe(gulp.dest(mainLazyPipeObj.destCallBack(true)));
 }
 
+function exitCountForLongLog(){
+	if (!isPulseTask()) {
+		clearInterval(glob_timer);
+	}
+}
 function exitOnPulseAfterCount() {
 	if (isPulseTask()) {
 		resetTimer({
