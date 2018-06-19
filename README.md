@@ -42,7 +42,7 @@ Gloups is a tool that uses the gulp ecosystem and provides services like compres
    
    Shorter :
        
-        $ gulp serve -a [-a]
+        $ gulp serve -a [-tr]
 
 ## END USER INSTALLATION (DISTRIBUTION)
 
