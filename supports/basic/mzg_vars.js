@@ -24,6 +24,7 @@ var SERVICES = {
 	// advanced 
 	'tr': 'transitive',
 	'es': 'essential',
+	'n' : 'name',
 
 	// presets
 	'a': 'all',
@@ -38,9 +39,10 @@ var SERVICES = {
 	'tps': 'automin typescript'
 };
 
+var NOPE = "ACTUALY NOPE :( !";
 var PRESET_OPTIONS = "all|styles|cof|tps|js";
 var SERVICES_OPTIONS = "automin|autominCss|typescript|coffeescript|less|sass|stylus";
-var SERVICES_ADVANCED_OPTIONS = "transitive|essential";
+var SERVICES_ADVANCED_OPTIONS = "transitive|essential|name";
 
 var ALL_SERVICES_OPTIONS = PRESET_OPTIONS + '|' + SERVICES_OPTIONS + '|' + SERVICES_ADVANCED_OPTIONS;
 

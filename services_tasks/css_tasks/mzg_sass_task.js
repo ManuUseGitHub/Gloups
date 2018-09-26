@@ -29,7 +29,9 @@ gulp.task('sass', function() {
 		.pipe(function() {
 			return (M.sass)({
 				indentedSyntax: false
-			}).on('error', (M.sass).logError);
+			}).on('error', function(error){
+				// TODO : do something with the error
+			});
 		})
 		.pipe(autoprefix)
 		.pipe((M.stylefmt));

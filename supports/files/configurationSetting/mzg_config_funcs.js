@@ -53,7 +53,7 @@ function readJsonConfig(filePath) {
 }
 
 function setConfig() {
-	config.projects = readJsonConfig("custom/config.json").projects;
+	config.projects = require("./custom/config.js");
 }
 
 function makePathesCoveringAllFilesFor(projectFolder, matchingForEntry, subpathToExtention, purpose) {

@@ -28,6 +28,11 @@ String.prototype.hackSlashes = function() {
 	return this.replace(/[\\]/g, '/');
 };
 
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 // https://stackoverflow.com/questions/31361309/how-can-i-get-gulp-to-be-silent-for-some-tasks-unit-tests-vet-etc
 var cmd = String(process.argv[2]);
 

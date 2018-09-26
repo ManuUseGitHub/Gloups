@@ -7,13 +7,28 @@
  * @param {Boolean} shouldLog    [description]
  */
 function setUpProjectWatchingPaths(project_path,shouldLog) {
-	var projectServices = readJsonConfig(project_path + '/config.mzg.json');
+	var configPath = project_path + '/config.mzg.js';
+	var projectServices = require(configPath);
 
-    if (shouldLog && !isPulseTask()){
-        console.log("Activated Services for target project under the path [FOLDER]:");
-        console.log(logFilePath(project_path) + "\n");
-    }
-    	
+	var noService = removeUnconsistentServices(projectServices);
+
+	if (shouldLog && !isPulseTask()) {
+		if (noService) {
+			var msgNoService = logStuffedSpaceMessage(" No service ",align().center);
+			console.log(" {0}\n".format([chalk.bgWhite.yellow.inverse(msgNoService)]));
+		} else {
+
+			var msgPathAt = " Services of path : ";
+			var msg = logStuffedSpaceOverflowing(msgPathAt,align().left,chalk.bgWhite.cyan.inverse);
+			console.log(" {0}".format([msg]));
+
+			
+			var msg2 = logStuffedSpaceOverflowing(project_path,align().center,chalk.bgCyan.black);
+			console.log(" {0}\n".format([msg2]));
+		}
+	}
+
+
 	config.pathesToJs = makePathesCoveringAllFilesFor(project_path, {
 		'pathesToService': (config.pathesToJs),
 		'addon': projectServices.minify_js
@@ -49,6 +64,24 @@ function setUpProjectWatchingPaths(project_path,shouldLog) {
 		'addon': projectServices.stylus
 	}, '/**/*.styl', 'Compile .styl files into .css files');
 }
+
+function removeUnconsistentServices(projectServices) {
+	var projectServicesCopy = projectServices;
+	var isEmpty = true;
+
+	for (var e in projectServicesCopy) {
+
+		// remove services that has no entry
+		if (projectServicesCopy[e].length == 0) {
+			delete projectServices[e];
+		} else if (isEmpty) {
+			isEmpty = false;
+		}
+	}
+
+	return isEmpty;
+}
+
 
 function getMatchingEntryConfig(filePath, configTab) {
 	filePath = filePath.hackSlashes();
@@ -134,7 +167,7 @@ function pushEllipsizedPartials(projectRootPath, styleSheet, index) {
 
 	reading.readLines(function() {
 		l = reading.line;
-		if ((m = /^@import[\s].*["](.*)["]/.exec(l)) && m[1]) {
+		if ((m = /^@import[\s]+["](.*)["]/.exec(l)) && m[1]) {
 
 			// full path to the partial
 			var fpp = "{0}/{1}".format([styleSheet.dir, m[1]]);

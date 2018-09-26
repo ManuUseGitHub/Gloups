@@ -1,7 +1,7 @@
 gulp.task('applyTemp', function() {
     gulp.watch(gulpFileTempPath, function(event) {
         if (gulp.src(gulpFileTempPath).pipe((M.jsValidate)())) {
-            console.log(forNowShortLog("{0} is {1}", [logFilePath("gulpfile.js"), chalk.green('validate')]));
+            console.log(forNowShortLog("{0} is {1}", [logFilePath("gulpfile.js"), chalk.green('valid')]));
             var dStart = new Date();
 
             gulp.src(gulpFileTempPath)

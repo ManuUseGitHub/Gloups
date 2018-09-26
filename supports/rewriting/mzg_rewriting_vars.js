@@ -34,9 +34,10 @@ var mzgFiles = [
 
 	'supports/rewriting/log_sections/mzg_log3.js', // section
 
+	'supports/basic/tasks/mzg_setup_task.js',
 	'supports/basic/tasks/mzg_default_task.js',
-	'supports/basic/tasks/mzg_clear_task.js',
-	'supports/basic/tasks/mzg_externalize_config_task.js', // 13
+	'supports/basic/tasks/mzg_clear_task.js', // 13
+	'supports/basic/tasks/mzg_externalize_config_task.js', 
 	'projects_setup_tasks/mzg_set_vars_task.js',
 	'supports/basic/tasks/mzg_set_params_task.js',
 	'supports/basic/tasks/mzg_help_me_task.js',
@@ -44,6 +45,7 @@ var mzgFiles = [
 	'supports/rewriting/log_sections/mzg_log4.js', // section
 
 	'projects_setup_tasks/mzg_scan_projects_task.js',
+	'projects_setup_tasks/mzg_scan_here_task.js',
 	'projects_setup_tasks/mzg_pulse_task.js',
 	'projects_setup_tasks/mzg_services_mapping_task.js',
 
@@ -52,11 +54,11 @@ var mzgFiles = [
 	// serve
 	'services_tasks/mzg_serve_task.js',
 
-	'supports/rewriting/log_sections/mzg_log6.js', // section
+	'supports/rewriting/log_sections/mzg_log6.js', // section // 25
 
 	// js
-	'services_tasks/js_tasks/mzg_automin_task.js',
-	'services_tasks/js_tasks/mzg_tyepscript_task.js', // 25
+	'services_tasks/js_tasks/mzg_automin_task.js', 
+	'services_tasks/js_tasks/mzg_tyepscript_task.js', 
 	'services_tasks/js_tasks/mzg_coffeescript_task.js', 
 
 	'supports/rewriting/log_sections/mzg_log7.js', // section
@@ -67,13 +69,13 @@ var mzgFiles = [
 	'services_tasks/css_tasks/mzg_sass_task.js',
 	'services_tasks/css_tasks/mzg_stylus_task.js',
 
-	'supports/rewriting/log_sections/mzg_log8.js', // section
+	'supports/rewriting/log_sections/mzg_log8.js', // section // 34
 
 	// other
-	'services_tasks/mzg_other_oriented_tasks.js',
+	'services_tasks/mzg_other_oriented_tasks.js', // 35
 
-	'supports/rewriting/log_sections/mzg_log16.js', // section // 34
-	'supports/files/mzg_module_seeking_funcs.js', // 35
+	'supports/rewriting/log_sections/mzg_log16.js', // section 
+	'supports/files/mzg_module_seeking_funcs.js', 
 
 	'supports/rewriting/log_sections/mzg_log9.js', // section
 
@@ -93,11 +95,11 @@ var mzgFiles = [
 	'supports/rewriting/tasks/mzg_apply_dist_task.js',
 	'supports/rewriting/tasks/mzg_write_temp_task.js',
 	'supports/rewriting/tasks/mzg_write_dist_task.js',
-	'supports/rewriting/tasks/mzg_rewrite_task.js',
+	'supports/rewriting/tasks/mzg_rewrite_task.js', // 50
 
 	'supports/rewriting/log_sections/mzg_log11.js', // section 
 
-	'supports/mzg_runtask.js', // 50
+	'supports/mzg_runtask.js', 
 
 	'supports/rewriting/log_sections/mzg_log12.js', // section 
 
@@ -117,10 +119,10 @@ var mzgFiles = [
 
 var distFiles = mzgFiles.slice();
 
-distFiles.splice(56, 3);
-distFiles.splice(43, 6);
-distFiles.splice(34, 2);
-distFiles.splice(13, 1);
+distFiles.splice(58, 3);
+distFiles.splice(45, 6);
+distFiles.splice(36, 2);
+distFiles.splice(14, 1);
 distFiles.splice(9, 1);
 distFiles.splice(4, 1);
 

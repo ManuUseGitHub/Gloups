@@ -85,7 +85,7 @@ function logProjectErrored(project) {
 	gloupslog(" {0} {1}\n".format([logFilePath(project.path + '/config.mzg.json'), chalk.red(': MISMATCH')]));
 
 	console.log(
-		(getColoredParagraph(" The path to that folder does not match to an actual project root folder containing a config.mzg.json file.",chalk.bgRed)) +
+		(getColoredParagraph(" The path to that folder does not match to an actual project root folder containing a config.mzg.json file.", chalk.bgRed)) +
 		("\n\n {0}\n".format([chalk.bgWhite.black(' SOLUTION ')])) +
 		('\n' + getColoredParagraph(" ", chalk.bgWhite.grey)) +
 		(getColoredParagraph(" Check the path to see if there is no mistake and fix it in the project definition.", chalk.bgWhite.grey)) +
@@ -94,6 +94,112 @@ function logProjectErrored(project) {
 		('\n' + getColoredParagraph(" $ gulp scanProjects", chalk.bgWhite.black)) +
 		(getColoredParagraph(" ", chalk.bgWhite.grey))
 	);
+}
+
+function logStuffedSpaceOverflowing(message, alignement, chalkColor = null) {
+	var deff = getStuffingObj();
+
+	var lines = [];
+	var line = [];
+	var cpt = 0;
+	var padding = deff.trailing_space_count + deff.leading_space_count;
+	var max = process.stdout.columns - padding;
+
+	do {
+		if (cpt + 1 == message.length || line.length + padding > max) {
+
+			// add the last char when it is not a return character
+			if (cpt + 1 == message.length && message[cpt] != "\n"){
+				line.push(message[cpt]);
+			}
+
+			var stuffObj = getStuffingObj();
+			stuffObj.messages = line.join('');
+			stuffObj.align = alignement;
+
+			if (chalkColor)
+				lines.push((chalkColor)(logStuffedSpaceMessageCore(stuffObj)));
+			else
+				lines.push(logStuffedSpaceMessageCore(stuffObj));
+			
+			// empty the line
+			line = [];
+			
+			if(message[0] == " "){
+				line.push(" "); 
+			}
+
+			// push the firt character of the new line else it disappear ...
+			line.push(message[cpt]);
+
+		} else {
+			if (message[cpt] == "\n") {
+				var left = max - line.length-1;
+				var arr = " ".repeat(left).split(' ');
+				
+				arr.forEach(function(e){
+					line.push(" ");	
+				});
+			} else {
+				line.push(message[cpt]);
+			}
+		}
+	}
+	while (cpt++ < message.length);
+
+	return lines.join('\n' + (0 < deff.leading_space_count ? ' '.repeat(deff.leading_space_count) : ''));
+
+}
+
+function logStuffedSpaceMessage(message, alignement) {
+
+	var stuffObj = getStuffingObj();
+	stuffObj.messages = message;
+	stuffObj.align = alignement;
+
+	return logStuffedSpaceMessageCore(stuffObj);
+}
+
+function logStuffedSpaceMessageCore(stuffObj) {
+
+	var l = process.stdout.columns;
+
+	normalizeStuffMessages(stuffObj);
+
+	for (var i = 0, t = stuffObj.messages.length; i < t; ++i) {
+		l -= stuffObj.messages[i].length;
+	}
+
+	l -= stuffObj.leading_space_count;
+	l -= stuffObj.trailing_space_count;
+
+	if (stuffObj.messages.length == 1) {
+		return getSingleMessageStuffedSapceAligned(stuffObj, l);
+	}
+}
+
+function getSingleMessageStuffedSapceAligned(stuffObj = getStuffingObj(), l) {
+	//
+
+	if (!stuffObj.align || !align().existingPosition(stuffObj.align)) {
+		return stuffObj.messages[0];
+
+	} else if (stuffObj.align) {
+		if (stuffObj.align == align().left) {
+			return stuffObj.messages[0] + " ".repeat(l);
+
+		} else if (stuffObj.align == align().right) {
+			return " ".repeat(l) + stuffObj.messages[0];
+
+		} else if (stuffObj.align == align().center) {
+			var hl = l / 2;
+			var tl = l - hl;
+
+			var r = (process.stdout.columns - l) % 2;
+			return " ".repeat(hl) + stuffObj.messages[0] + " ".repeat(tl + r);
+
+		}
+	}
 }
 
 function getColoredParagraph(paragraph, chalkColor) {
@@ -324,4 +430,36 @@ function gloupslogSumerise() {
 			logOrig(' ' + element);
 		});
 	});
+}
+
+function normalizeStuffMessages(stuffObj) {
+	var messageIsArray = Array.isArray(stuffObj.messages);
+	if (!messageIsArray) {
+		stuffObj.messages = [stuffObj.messages];
+	}
+}
+
+function getStuffingObj() {
+	return {
+		messages: ["Hello world"],
+		leading_space_count: 1,
+		trailing_space_count: 1,
+		h_align: align().left
+	};
+}
+
+function align() {
+	return {
+		right: "right",
+		left: "left",
+		center: "center",
+		existingPosition: function(alignement) {
+			return (
+				alignement == this.right ? true :
+				alignement == this.left ? true :
+				alignement == this.center ? true :
+				false
+			);
+		}
+	}
 }

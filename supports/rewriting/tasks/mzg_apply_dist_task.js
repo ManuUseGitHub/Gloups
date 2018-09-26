@@ -16,11 +16,10 @@ gulp.task('applyDist', function() {
 				}))
 				.pipe((M.through).obj(function(chunk, enc, cb) {
 					M.fssync.copy('help.md', 'dist/help.md');
-
-					M.fssync.copy('custom/project_mapping_model.json', 'dist/custom/config.json');
-					M.fssync.copy('custom/config_model.json', 'dist/custom/config_model.json');
+					M.fssync.copy('custom/project_mapping_model.js', 'dist/custom/config.js');
+					M.fssync.copy('custom/config.mzg.js', 'dist/custom/config.mzg.js');
 					M.fssync.copy('package.json', 'dist/package.json');
-					M.fssync.copy('gloups.bat', 'dist/gloups.bat');
+					M.fssync.copy('Windows', 'dist/Windows');
 					cb(null, chunk);
 				}));
 

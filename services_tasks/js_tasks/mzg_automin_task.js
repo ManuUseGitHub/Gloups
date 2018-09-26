@@ -17,7 +17,7 @@ gulp.task('automin', function() {
 	};
 
 	obj.mainPipe = (M.lazyPipe)()
-		.pipe((M.uglify))
+		.pipe(M.uglify)
 		.pipe(renameSuffixMin);
 
 	// PROCESS WITH THE VARIANT CONFIGURATION

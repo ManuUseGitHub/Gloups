@@ -24,6 +24,7 @@ var M = {
 	// B ----------------------------------------------------------------------------------------------
 	//babel : 'gulp-babel', // for fixing uglify with ES6 version
 	// C ----------------------------------------------------------------------------------------------
+	childprocess: 'child_process',
 	cleanCSS: 'gulp-clean-css',
 	clear: 'clear',
 	coffee: 'gulp-coffee',
@@ -33,7 +34,6 @@ var M = {
 	// E ----------------------------------------------------------------------------------------------
 	exit: 'gulp-exit',
 	// F ----------------------------------------------------------------------------------------------
-	gfile:'gulp-file', // stream from string
 	fs: "fs", // check file existance
 	fssync: "fs-sync",
 	// I ----------------------------------------------------------------------------------------------
@@ -61,6 +61,7 @@ var M = {
 	ts: 'gulp-typescript',
 	// U ----------------------------------------------------------------------------------------------
 	uglify: 'gulp-uglifyes',
+	uglifyDef: 'gulp-uglify',
 	// W ----------------------------------------------------------------------------------------------
 	wait: 'gulp-wait',
 };
@@ -92,6 +93,7 @@ var SERVICES = {
 	// advanced 
 	'tr': 'transitive',
 	'es': 'essential',
+	'n' : 'name',
 
 	// presets
 	'a': 'all',
@@ -106,9 +108,10 @@ var SERVICES = {
 	'tps': 'automin typescript'
 };
 
+var NOPE = "ACTUALY NOPE :( !";
 var PRESET_OPTIONS = "all|styles|cof|tps|js";
 var SERVICES_OPTIONS = "automin|autominCss|typescript|coffeescript|less|sass|stylus";
-var SERVICES_ADVANCED_OPTIONS = "transitive|essential";
+var SERVICES_ADVANCED_OPTIONS = "transitive|essential|name";
 
 var ALL_SERVICES_OPTIONS = PRESET_OPTIONS + '|' + SERVICES_OPTIONS + '|' + SERVICES_ADVANCED_OPTIONS;
 
@@ -198,9 +201,10 @@ var mzgFiles = [
 
 	'supports/rewriting/log_sections/mzg_log3.js', // section
 
+	'supports/basic/tasks/mzg_setup_task.js',
 	'supports/basic/tasks/mzg_default_task.js',
-	'supports/basic/tasks/mzg_clear_task.js',
-	'supports/basic/tasks/mzg_externalize_config_task.js', // 13
+	'supports/basic/tasks/mzg_clear_task.js', // 13
+	'supports/basic/tasks/mzg_externalize_config_task.js', 
 	'projects_setup_tasks/mzg_set_vars_task.js',
 	'supports/basic/tasks/mzg_set_params_task.js',
 	'supports/basic/tasks/mzg_help_me_task.js',
@@ -208,6 +212,7 @@ var mzgFiles = [
 	'supports/rewriting/log_sections/mzg_log4.js', // section
 
 	'projects_setup_tasks/mzg_scan_projects_task.js',
+	'projects_setup_tasks/mzg_scan_here_task.js',
 	'projects_setup_tasks/mzg_pulse_task.js',
 	'projects_setup_tasks/mzg_services_mapping_task.js',
 
@@ -216,11 +221,11 @@ var mzgFiles = [
 	// serve
 	'services_tasks/mzg_serve_task.js',
 
-	'supports/rewriting/log_sections/mzg_log6.js', // section
+	'supports/rewriting/log_sections/mzg_log6.js', // section // 25
 
 	// js
-	'services_tasks/js_tasks/mzg_automin_task.js',
-	'services_tasks/js_tasks/mzg_tyepscript_task.js', // 25
+	'services_tasks/js_tasks/mzg_automin_task.js', 
+	'services_tasks/js_tasks/mzg_tyepscript_task.js', 
 	'services_tasks/js_tasks/mzg_coffeescript_task.js', 
 
 	'supports/rewriting/log_sections/mzg_log7.js', // section
@@ -231,13 +236,13 @@ var mzgFiles = [
 	'services_tasks/css_tasks/mzg_sass_task.js',
 	'services_tasks/css_tasks/mzg_stylus_task.js',
 
-	'supports/rewriting/log_sections/mzg_log8.js', // section
+	'supports/rewriting/log_sections/mzg_log8.js', // section // 34
 
 	// other
-	'services_tasks/mzg_other_oriented_tasks.js',
+	'services_tasks/mzg_other_oriented_tasks.js', // 35
 
-	'supports/rewriting/log_sections/mzg_log16.js', // section // 34
-	'supports/files/mzg_module_seeking_funcs.js', // 35
+	'supports/rewriting/log_sections/mzg_log16.js', // section 
+	'supports/files/mzg_module_seeking_funcs.js', 
 
 	'supports/rewriting/log_sections/mzg_log9.js', // section
 
@@ -257,11 +262,11 @@ var mzgFiles = [
 	'supports/rewriting/tasks/mzg_apply_dist_task.js',
 	'supports/rewriting/tasks/mzg_write_temp_task.js',
 	'supports/rewriting/tasks/mzg_write_dist_task.js',
-	'supports/rewriting/tasks/mzg_rewrite_task.js',
+	'supports/rewriting/tasks/mzg_rewrite_task.js', // 50
 
 	'supports/rewriting/log_sections/mzg_log11.js', // section 
 
-	'supports/mzg_runtask.js', // 50
+	'supports/mzg_runtask.js', 
 
 	'supports/rewriting/log_sections/mzg_log12.js', // section 
 
@@ -281,10 +286,10 @@ var mzgFiles = [
 
 var distFiles = mzgFiles.slice();
 
-distFiles.splice(56, 3);
-distFiles.splice(43, 6);
-distFiles.splice(34, 2);
-distFiles.splice(13, 1);
+distFiles.splice(58, 3);
+distFiles.splice(45, 6);
+distFiles.splice(36, 2);
+distFiles.splice(14, 1);
 distFiles.splice(9, 1);
 distFiles.splice(4, 1);
 
@@ -418,6 +423,11 @@ String.prototype.hackSlashes = function() {
 	return this.replace(/[\\]/g, '/');
 };
 
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 // https://stackoverflow.com/questions/31361309/how-can-i-get-gulp-to-be-silent-for-some-tasks-unit-tests-vet-etc
 var cmd = String(process.argv[2]);
 
@@ -516,6 +526,15 @@ if (process.argv[2] && !/^serve|pulse|rewrite$/.test(process.argv[2])) {
  	*************************************************************************************************************************************************************************************************/
 
 
+// -- [supports/basic/tasks/mzg_setup_task.js] -- 
+gulp.task('setup', function (cb) {
+  (M.childprocess).exec('"Windows/gloupsp.bat"', function (err, stdout, stderr) {
+    console.log(stdout);
+    console.log(stderr);
+    cb(err);
+  });
+});
+
 // -- [supports/basic/tasks/mzg_default_task.js] -- 
 // define the default task and add the watch task to it
 gulp.task('default', ["setParams"]);
@@ -526,8 +545,9 @@ gulp.task('clear', function() {
 });
 
 // -- [supports/basic/tasks/mzg_externalize_config_task.js] -- 
-gulp.task('externalizeConfig', function(cb){
-  (M.fs).writeFile('config.json', JSON.stringify(config,null,4), cb);
+gulp.task('externalizeConfig', function(cb) {
+
+	writeModuleFromObject("config.js",config,cb);
 });
 
 // -- [projects_setup_tasks/mzg_set_vars_task.js] -- 
@@ -621,21 +641,36 @@ gulp.task('helpMe', function() {
 
 // -- [projects_setup_tasks/mzg_scan_projects_task.js] -- 
 gulp.task('scanProjects', function() {
-    logTaskPurpose(this.currentTask.name);
-    setConfig();
-    config.projects.forEach(function(project) {
-        if (!M.fssync.exists(project.path + '\\config.mzg.json')) {
-            console.log("file :" + logFilePath(project.path + '\\config.mzg.json') + ' does not exist ... creation very soon');
-            gulp.src('custom/config_model.json')
-                .pipe((M.rename)('config.mzg.json'))
-                .pipe(gulp.dest(project.path));
-        }
-    });
+	logTaskPurpose(this.currentTask.name);
+	setConfig();
+	config.projects.forEach(function(project) {
+		if (!M.fssync.exists(project.path + '\\config.mzg.js')) {
+			console.log("creation of {0} which didn't exist".format([logFilePath(project.path+"/config.mzg.js")]));
+			gulp.src('custom/config.mzg.js')
+				.pipe((M.rename)('config.mzg.js'))
+				.pipe(gulp.dest(project.path));
+		}
+	});
+});
+
+// -- [projects_setup_tasks/mzg_scan_here_task.js] -- 
+gulp.task('scanHere', function() {
+	var currentDir;
+
+	// if you used gloups commands, the path is given for you
+	if ((currentDir = getCurrentRunningDirectory()) != NOPE) {
+
+		logTaskPurpose(this.currentTask.name);
+		setConfig();
+
+		var foundRecord = findProjectBinding(currentDir);
+		fixProjectBinding(currentDir, foundRecord);
+	}
 });
 
 // -- [projects_setup_tasks/mzg_pulse_task.js] -- 
 gulp.task('pulse', function() {
-	
+
 	process.title = 'Gloups {0} | {1}'.format([GLOUPS_VERSION, 'Pulse !']);
 	var tasks = tasksToRunOnArgvs();
 
@@ -644,30 +679,61 @@ gulp.task('pulse', function() {
 
 		// cannot syntaxicaly analyse following line (after this) so 
 		// it has to define what services tasks is needed
-		getAllNeededModules(tasks.concat(['setVars','pulse']));
+		getAllNeededModules(tasks.concat(['setVars', 'pulse']));
 	}
-	
-	setConfig();
-	
-	gulp.start('clear');
 
+	setConfig();
+
+	gulp.start('clear');
 	// start every services matching arguments
 	gulp.start(tasks.length > 0 ? ['setVars'].concat(tasks) : []);
 
-	coverFoldersToServe({
-		'scope': '*',
-		'shouldLog': false
-	});
-
 	var folders = getAllServiceCoverageWatchFolders();
 	var fileNames = getEveryFilesCoveredOnce(folders);
+	if (fileNames.length > 0) {
+		gloupslog('Applying services ... please wait');
+		console.log(' ' + chalk.bgYellow(' ! ') + ' Long process ... few secondes required');
 
-	gloupslog('Applying services ... please wait');
-	console.log(' ' + chalk.bgYellow(' ! ') + ' Long process ... few secondes required');
+		// the pulse will fire a change event on every file.
+		// every services will respond to it one another
+		fireEnventOnEveryCoveredFiles(fileNames);
+	} else {
 
-	// the pulse will fire a change event on every file.
-	// every services will respond to it one another
-	fireEnventOnEveryCoveredFiles(fileNames);
+		var currentDir = NOPE;
+		if ((currentDir = getCurrentRunningDirectory()) != NOPE) {
+
+			var foundRecord = findProjectBinding(currentDir);
+			if (foundRecord) {
+				//var log = logStuffedSpaceOverflowing(message,alignement,chalkColor = null);
+
+				var warningMsg = [
+					"",
+					" " + chalk.bgYellow(logStuffedSpaceMessage("No services found. It may occures for different reasons.", align().center)),
+					" " + chalk.bgYellow.black(logStuffedSpaceMessage(" Points :", align().left)),
+					" " + chalk.bgYellow(logStuffedSpaceMessage(" (a) you did not change the config.mzg file", align().left)),
+					" " + chalk.bgYellow(logStuffedSpaceMessage(" (b) you've made a mistake while writing matches into the config.mzg file", align().left)),
+					" " + chalk.bgYellow(logStuffedSpaceMessage(" (c) Gloups may have a problem (unlikely but possible) ", align().left))
+				];
+
+				var msg = warningMsg.join("\n");
+
+				gloupslog(msg);
+			} else {
+				var warningMsg = [
+				"",
+				" " + chalk.bgRed(logStuffedSpaceMessage("No services configuration found.", align().center)),
+				" " + chalk.bgRed(logStuffedSpaceMessage(" set a project configuration entry by running: gloups scanHere", align().left))
+				];
+
+				var msg = warningMsg.join("\n");
+
+				gloupslog(msg);
+			}
+
+		}
+		process.exit();
+	}
+
 });
 
 // -- [projects_setup_tasks/mzg_services_mapping_task.js] -- 
@@ -683,26 +749,6 @@ gulp.task('serviceMapping', function() {
 // -- [services_tasks/mzg_serve_task.js] -- 
 gulp.task('serve', ['setParams']);
 
-function coverFoldersToServe(confObj) {
-	for (var p_path in config.projects) {
-		var project = config.projects[p_path];
-		if (confObj.scope == '*' || project.project == confObj.scope) {
-			if (M.fssync.exists(project.path + '\\config.mzg.json')) {
-				if (confObj.shouldLog) {
-					console.log(' ' + chalk.bgGreen(' ' + project.project + ' '));
-				}
-				if (project.checked) {
-					setUpProjectWatchingPaths(project.path, confObj.shouldLog);
-				}
-			} else {
-				if (confObj.shouldLog) {
-					logProjectErrored(project);
-				}
-			}
-		}
-	}
-}
-
 function fireEnventOnEveryCoveredFiles(fileNames) {
 	fileNames.sort(function(a, b) {
 		return a.localeCompare(b);
@@ -712,49 +758,6 @@ function fireEnventOnEveryCoveredFiles(fileNames) {
 				return file.base;
 			}));
 	});
-}
-
-function getEveryFilesCoveredOnce(folders) {
-	var ficsObj = {};
-	folders.forEach(function(l, j) {
-
-		if (M.fssync.exists(l)) {
-			var pathsOfKind = walkSync(l, [], FILE_STARTING_BY_UNDERSCORE);
-
-			pathsOfKind.forEach(function(e, i) {
-				ficsObj[e.path] = true;
-			});
-		}
-	});
-
-	return Object.keys(ficsObj);
-}
-
-function getAllServiceCoverageWatchFolders() {
-	var folders = [];
-
-	[].concat(
-
-		// Javascript services folders
-		config.pathesToJs,
-		config.pathesToTs,
-		config.pathesToCoffee,
-
-		// CSS services folders
-		config.pathesToStylus,
-		config.pathesToSass,
-		config.pathesToStyle,
-		config.pathesToStyleLess
-
-		// every coverage
-	).forEach(function(e, i) {
-
-		// pushes watch base folders paths 
-		// MATCHING :: ^(abc/.../...)/**/*.ext$
-		folders.push(FILE_COVERAGE_REGEXP.exec(e.watch)[1]);
-	});
-
-	return folders;
 }
 /*	*************************************************************************************************************************************************************************************************
 	*                                 														CSS ORIENTED TASKS 																						*
@@ -780,7 +783,7 @@ gulp.task('automin', function() {
 	};
 
 	obj.mainPipe = (M.lazyPipe)()
-		.pipe((M.uglify))
+		.pipe(M.uglify)
 		.pipe(renameSuffixMin);
 
 	// PROCESS WITH THE VARIANT CONFIGURATION
@@ -947,7 +950,9 @@ gulp.task('sass', function() {
 		.pipe(function() {
 			return (M.sass)({
 				indentedSyntax: false
-			}).on('error', (M.sass).logError);
+			}).on('error', function(error){
+				// TODO : do something with the error
+			});
 		})
 		.pipe(autoprefix)
 		.pipe((M.stylefmt));
@@ -1305,6 +1310,16 @@ function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
 			logChangedRealTargetedFiles(mainLazyPipeObj, realTargets);
 			exitOnPulseAfterCount();
 			exitCountForLongLog();
+		})
+		.on('error', function(error) {
+			var cause = error.cause;
+			cause = cause?JSON.stringify(cause):error.message;
+
+			var msg = logStuffedSpaceOverflowing(" "+cause,align().left,chalk.bgWhite.red.inverse);
+			
+			console.log(" "+chalk.bgRed.black(logStuffedSpaceMessage("Plugin : "+error.plugin,align().left)));
+			console.log(" {0}".format([msg]));
+			
 		})
 		.pipe(applyLicenceSplitting(mainLazyPipeObj))
 		.pipe(gulp.dest(mainLazyPipeObj.destCallBack(true)));
@@ -1953,7 +1968,7 @@ function checkMultipleRules(inputString, mixinRulesArr, index) {
 gulp.task('applyTemp', function() {
     gulp.watch(gulpFileTempPath, function(event) {
         if (gulp.src(gulpFileTempPath).pipe((M.jsValidate)())) {
-            console.log(forNowShortLog("{0} is {1}", [logFilePath("gulpfile.js"), chalk.green('validate')]));
+            console.log(forNowShortLog("{0} is {1}", [logFilePath("gulpfile.js"), chalk.green('valid')]));
             var dStart = new Date();
 
             gulp.src(gulpFileTempPath)
@@ -1992,11 +2007,10 @@ gulp.task('applyDist', function() {
 				}))
 				.pipe((M.through).obj(function(chunk, enc, cb) {
 					M.fssync.copy('help.md', 'dist/help.md');
-
-					M.fssync.copy('custom/project_mapping_model.json', 'dist/custom/config.json');
-					M.fssync.copy('custom/config_model.json', 'dist/custom/config_model.json');
+					M.fssync.copy('custom/project_mapping_model.js', 'dist/custom/config.js');
+					M.fssync.copy('custom/config.mzg.js', 'dist/custom/config.mzg.js');
 					M.fssync.copy('package.json', 'dist/package.json');
-					M.fssync.copy('gloups.bat', 'dist/gloups.bat');
+					M.fssync.copy('Windows', 'dist/Windows');
 					cb(null, chunk);
 				}));
 
@@ -2128,7 +2142,7 @@ function readJsonConfig(filePath) {
 }
 
 function setConfig() {
-	config.projects = readJsonConfig("custom/config.json").projects;
+	config.projects = require("./custom/config.js");
 }
 
 function makePathesCoveringAllFilesFor(projectFolder, matchingForEntry, subpathToExtention, purpose) {
@@ -2171,14 +2185,71 @@ function makePathesCoveringAllFilesFor(projectFolder, matchingForEntry, subpathT
 }
 
 // -- [supports/projects/mzg_project_converage_funcs.js] -- 
+function purgeCoverage(confObj) {
+	var currentDir;
+
+	// if you used gloups commands, the path is given for you
+	if ((currentDir = getCurrentRunningDirectory()) != NOPE) {
+		var purgedList = [];
+
+		// checking all projects paths
+		config.projects.forEach(function(element, index) {
+
+			var p = element.path;
+			var match;
+
+			if ((match = /^..\/(.+)$/.exec(p))) {
+
+				// setting the path as a patern
+				var patern = "^(?:{0}.*)".format([p.replaceAll("/", "\\/")]);
+
+				var regex = new RegExp(patern, "g");
+
+				if (regex.test(currentDir)) {
+					purgedList.push(element);
+					if (purgedList.length > 1) {
+						purgedList = keepBest(purgedList, element);
+					}
+				}
+			}
+		});
+
+		config.projects = purgedList;
+	}
+}
+
+function keepBest(purgedList) {
+	var bestIndex = 0;
+	var bestPurgedList = [purgedList[0]];
+
+	for (var i = 0, t = purgedList.length; i < t; ++i) {
+		var aThisElem = purgedList[i];
+
+		if (purgedList[bestIndex].path.length < aThisElem.path.length) {
+			bestIndex = i;
+		}
+	}
+
+	var temp = purgedList[bestIndex];
+	bestPurgedList = [];
+	bestPurgedList.push(temp);
+	return bestPurgedList;
+}
+
 function coverFoldersToServe(confObj) {
+
+	// checking the --currentDir (the place where the terminal is running via gloups command) option 
+	// > removing unmaching projects if their path does not match with the current
+	purgeCoverage(confObj);
+
 	for (var p_path in config.projects) {
 		var project = config.projects[p_path];
 		if (confObj.scope == '*' || project.project == confObj.scope) {
-			if ((M.fssync).exists(project.path + '\\config.mzg.json')) {
+			if ((M.fssync).exists(project.path + '\\config.mzg.js')) {
 				if (project.checked) {
 					if (confObj.shouldLog && !isPulseTask()) {
-						console.log(' ' + chalk.bgGreen(' ' + project.project + ' '));
+						var projectNameCentered = logStuffedSpaceMessage(project.project, align().center);
+						console.log(" {0}".format([chalk.bgGreen(projectNameCentered)]));
 					}
 					setUpProjectWatchingPaths(project.path, confObj.shouldLog);
 				}
@@ -2204,9 +2275,11 @@ function fireEnventOnEveryCoveredFiles(fileNames) {
 
 function getEveryFilesCoveredOnce(folders) {
 	var ficsObj = {};
-	folders.forEach(function(l, j) {
 
-		if (M.fssync.exists(l)) {
+	folders.forEach(function(l, j) {
+		var pathExists = M.fssync.exists(l);
+
+		if (pathExists) {
 			var pathsOfKind = walkSync(l, [], FILE_STARTING_BY_UNDERSCORE);
 
 			pathsOfKind.forEach(function(e, i) {
@@ -2236,13 +2309,90 @@ function getAllServiceCoverageWatchFolders() {
 
 		// every coverage
 	).forEach(function(e, i) {
-
-		// pushes watch base folders paths 
-		// MATCHING :: ^(abc/.../...)/**/*.ext$
-		folders.push(FILE_COVERAGE_REGEXP.exec(e.watch)[1]);
+		if (e) {
+			// pushes watch base folders paths 
+			// MATCHING :: ^(abc/.../...)/**/*.ext$
+			folders.push(FILE_COVERAGE_REGEXP.exec(e.watch)[1]);
+		}
 	});
 
 	return folders;
+}
+
+function findProjectBinding(currentDir) {
+	var foundRecord = false;
+	config.projects.forEach(function(project) {
+		var match;
+
+		if ((match = /^..\/(.+)$/.exec(project.path))) {
+
+			// setting the path as a patern
+			var patern = "^[^\\/]+\\/(?:{0})$".format([match[1].replaceAll("/", "\\/")]);
+
+			if (new RegExp(patern).test(currentDir)) {
+				foundRecord = true;
+			}
+		}
+	});
+	return foundRecord;
+}
+
+function fixProjectBinding(currentDir, foundRecord) {
+	if (!foundRecord) {
+		console.log("No registration for :" + logFilePath(currentDir + '\\config.mzg.js') + ' updating now !');
+
+		var subs = translateAliassesInArgs(process.argv, SERVICES);
+		var sububar = getSliceOfMatchingOptions(subs, SERVICES_ADVANCED_OPTIONS);
+		var projectName = getOptionValue(subs, sububar[0]);
+
+		// set the folder name ass project name if no name given
+		projectName = projectName != null ? projectName : /^.*\/(.*)/.exec(currentDir)[1];
+
+		var projectDeff = {
+			"project": projectName,
+			"path": "{0}/{1}".format(["..", /^[^\/]+\/(.*)/.exec(currentDir)[1]]),
+			"checked": true
+		};
+
+		config.projects.push(projectDeff);
+		writeModuleFromObject("custom/config.js", config.projects);
+	}
+
+	if (!M.fssync.exists(currentDir + '\\config.mzg.js')) {
+		console.log("file :" + logFilePath(currentDir + '\\config.mzg.js') + ' does not exist ... creation very soon');
+
+		gulp.src('custom/config.mzg.js')
+			.pipe((M.rename)('config.mzg.js'))
+			.pipe(gulp.dest(currentDir));
+	}
+}
+
+function writeModuleFromObject(filepath, obj, cb = null) {
+	var destFolder = /^((?:[^\/]+\/?)+)\/.*/.exec(filepath);
+
+	// define the destination folder ... 
+	// if there is a full path like go/to/path/filename.xyz : 
+	// 		go/to/path 	will be given
+	// else :
+	// 		./ 			will be given (current)
+	destFolder = destFolder != null ? destFolder[1] : "./";
+
+
+	var heading = [
+		"/*",
+		" _____________________________________________________________________________________________",
+		"|                                                                                             |",
+		"|                               -- YOUR PROJECTS MAPPING HERE --                              |",
+		"|_____________________________________________________________________________________________|",
+		"*/\n"
+	];
+	(M.fssync).write(filepath, "", 'utf8');
+	gulp.src(filepath)
+		.pipe((M.insert).append(JSON.stringify(obj, null, 4)))
+		.pipe((M.insert).append(';'))
+		.pipe((M.insert).prepend('module.exports = '))
+		.pipe((M.insert).prepend(heading.join('\n')))
+		.pipe(gulp.dest(destFolder));
 }
 
 // -- [supports/projects/mzg_projects_funcs.js] -- 
@@ -2255,13 +2405,28 @@ function getAllServiceCoverageWatchFolders() {
  * @param {Boolean} shouldLog    [description]
  */
 function setUpProjectWatchingPaths(project_path,shouldLog) {
-	var projectServices = readJsonConfig(project_path + '/config.mzg.json');
+	var configPath = project_path + '/config.mzg.js';
+	var projectServices = require(configPath);
 
-    if (shouldLog && !isPulseTask()){
-        console.log("Activated Services for target project under the path [FOLDER]:");
-        console.log(logFilePath(project_path) + "\n");
-    }
-    	
+	var noService = removeUnconsistentServices(projectServices);
+
+	if (shouldLog && !isPulseTask()) {
+		if (noService) {
+			var msgNoService = logStuffedSpaceMessage(" No service ",align().center);
+			console.log(" {0}\n".format([chalk.bgWhite.yellow.inverse(msgNoService)]));
+		} else {
+
+			var msgPathAt = " Services of path : ";
+			var msg = logStuffedSpaceOverflowing(msgPathAt,align().left,chalk.bgWhite.cyan.inverse);
+			console.log(" {0}".format([msg]));
+
+			
+			var msg2 = logStuffedSpaceOverflowing(project_path,align().center,chalk.bgCyan.black);
+			console.log(" {0}\n".format([msg2]));
+		}
+	}
+
+
 	config.pathesToJs = makePathesCoveringAllFilesFor(project_path, {
 		'pathesToService': (config.pathesToJs),
 		'addon': projectServices.minify_js
@@ -2297,6 +2462,24 @@ function setUpProjectWatchingPaths(project_path,shouldLog) {
 		'addon': projectServices.stylus
 	}, '/**/*.styl', 'Compile .styl files into .css files');
 }
+
+function removeUnconsistentServices(projectServices) {
+	var projectServicesCopy = projectServices;
+	var isEmpty = true;
+
+	for (var e in projectServicesCopy) {
+
+		// remove services that has no entry
+		if (projectServicesCopy[e].length == 0) {
+			delete projectServices[e];
+		} else if (isEmpty) {
+			isEmpty = false;
+		}
+	}
+
+	return isEmpty;
+}
+
 
 function getMatchingEntryConfig(filePath, configTab) {
 	filePath = filePath.hackSlashes();
@@ -2382,7 +2565,7 @@ function pushEllipsizedPartials(projectRootPath, styleSheet, index) {
 
 	reading.readLines(function() {
 		l = reading.line;
-		if ((m = /^@import[\s].*["](.*)["]/.exec(l)) && m[1]) {
+		if ((m = /^@import[\s]+["](.*)["]/.exec(l)) && m[1]) {
 
 			// full path to the partial
 			var fpp = "{0}/{1}".format([styleSheet.dir, m[1]]);
@@ -2438,111 +2621,148 @@ function getProjectNameFromRootPath(projectRootPath) {
 
 // -- [supports/mzg_argument_funcs.js] -- 
 function translateAliassesInArgs(argvs, serviceArgs) {
-    var match;
-    var result = [];
-    argvs.forEach(function(arg) {
-        if ((match = /^-([^\-]+)$/.exec(arg))) {
-            result.push('--' + serviceArgs[match[1]]);
-        } else {
-            result.push(arg);
-        }
-    });
-    return result;
+	var match;
+	var result = [];
+	argvs.forEach(function(arg) {
+		if ((match = /^-([^\-]+)$/.exec(arg))) {
+			result.push('--' + serviceArgs[match[1]]);
+		} else {
+			result.push(arg);
+		}
+	});
+	return result;
+}
+
+function getCurrentRunningDirectory() {
+    var argvs = process.argv; 
+	var match;
+	var nextIsCurrentRunningDir = false;
+    var result = {'data':NOPE};
+
+    // seek for the currentDir option and its value
+	argvs.forEach(function(arg) {
+		if ((match = /^--currentDir$/.exec(arg))) {
+			nextIsCurrentRunningDir = true;
+		} else if (nextIsCurrentRunningDir) {
+            result.data = arg; 
+            return;
+		}
+	});
+
+    // give the hackslashed path
+	return result.data.hackSlashes();
 }
 
 function getSliceOfMatchingOptions(argvs, args) {
-    var start = 0;
-    var end = 0;
-    try {
-        argvs.forEach(function(arg) {
-            if (!(new RegExp("^--(" + args + ")$", "g")).test(arg)) {
-                if (start != end) {
-                    // there is no 'break' statement in JS ... so throw an exception is the best solution
-                    throw {};
-                }
-                start++;
-            }
-            end++;
-        });
-    } catch (e) { /*nothing*/ }
+	var start = 0;
+	var end = 0;
+	try {
+		argvs.forEach(function(arg) {
+			if (!(new RegExp("^--(" + args + ")$", "g")).test(arg)) {
+				if (start != end) {
+					// there is no 'break' statement in JS ... so throw an exception is the best solution
+					throw {};
+				}
+				start++;
+			}
+			end++;
+		});
+	} catch (e) { /*nothing*/ }
 
-    return argvs.slice(start, end);
+	return argvs.slice(start, end);
+}
+
+function getOptionValue(argvs,option) {
+	var result = null;
+	try {
+		
+		argvs.forEach(function(arg, index) {
+			if (arg == option) {
+				// there is no 'break' statement in JS ... so throw an exception is the best solution
+				
+				result = argvs[index+1];
+				throw {};
+			}
+		});
+	} catch (e) { /*nothing*/ }
+
+	return result;
 }
 
 function metAllArgs(argvNames) {
-    var subs = translateAliassesInArgs(process.argv, SERVICES);
-    var subAr = getSliceOfMatchingOptions(subs, ALL_SERVICES_OPTIONS);
+	var subs = translateAliassesInArgs(process.argv, SERVICES);
+	var subAr = getSliceOfMatchingOptions(subs, ALL_SERVICES_OPTIONS);
 
-    var subRegex = '';
+	var subRegex = '';
 
-    subAr.forEach(function(arg, index) {
+	subAr.forEach(function(arg, index) {
 
-        var argName = (new RegExp("^--(.*)$", "g")).exec(arg);
-        var argNam = argName[1];
+		var argName = (new RegExp("^--(.*)$", "g")).exec(arg);
+		var argNam = argName[1];
 
-        if (index != 0) {
-            subRegex += '|';
-        }
-        subRegex += argNam;
-    });
+		if (index != 0) {
+			subRegex += '|';
+		}
+		subRegex += argNam;
+	});
 
-    var failed = false;
-    for (var i in argvNames) {
-        var arg = argvNames[i];
+	var failed = false;
+	for (var i in argvNames) {
+		var arg = argvNames[i];
 
-        // the arg is misspeled !
-        if (!(new RegExp("^(" + subRegex + ")$", "g").test(arg))) {
-            failed = true;
-            break;
-        }
-    }
-    return !failed;
+		// the arg is misspeled !
+		if (!(new RegExp("^(" + subRegex + ")$", "g").test(arg))) {
+			failed = true;
+			break;
+		}
+	}
+	return !failed;
 }
 
 function tasksToRunOnArgvs() {
-    var effectiveServices = [];
-    var errors = [];
-    var optionsCount = 0;
+	var effectiveServices = [];
+	var errors = [];
+	var optionsCount = 0;
 
-    // translate aliasses into args equivalances like -a is replaced by --all in the arg. string
-    var subs = translateAliassesInArgs(process.argv, SERVICES);
+	// translate aliasses into args equivalances like -a is replaced by --all in the arg. string
+	var subs = translateAliassesInArgs(process.argv, SERVICES);
 
-    // strips all non options or presets arguments
-    var subAr = getSliceOfMatchingOptions(subs, GLOUPS_OPTIONS);
+	// strips all non options or presets arguments
+	var subAr = getSliceOfMatchingOptions(subs, GLOUPS_OPTIONS);
 
-    for (var service in subAr) {
-        try {
-            service = (/^[\-][\-]?([^\-]+)$/.exec(subAr[service]))[1];
+	for (var service in subAr) {
+		try {
+			service = (/^[\-][\-]?([^\-]+)$/.exec(subAr[service]))[1];
 
-            if (new RegExp("^\\b(" + PRESET_OPTIONS + ")\\b$").test(service)) {
+			if (new RegExp("^\\b(" + PRESET_OPTIONS + ")\\b$").test(service)) {
 
-                // check if a preset is single ; throws if not
-                checkPresetsOverdose(++optionsCount, service);
+				// check if a preset is single ; throws if not
+				checkPresetsOverdose(++optionsCount, service);
 
-                // convert the preset into a list of matching options
-                effectiveServices = SERVICES[service].split(' ');
+				// convert the preset into a list of matching options
+				effectiveServices = SERVICES[service].split(' ');
 
-            } else {
-                effectiveServices.push(service);
-            }
-        } catch (err) {
-            errors.push(err + " Error with option: ");
-            if (/^GRAVE ERROR.*$/.test(err)) {
-                effectiveServices = [];
-                break;
-            }
-        }
-        optionsCount++;
-    }
+			} else {
+				effectiveServices.push(service);
+			}
+		} catch (err) {
+			errors.push(err + " Error with option: ");
+			if (/^GRAVE ERROR.*$/.test(err)) {
+				effectiveServices = [];
+				break;
+			}
+		}
+		optionsCount++;
+	}
 
-    logErrorsOnTaskArgvs(errors);
-    return effectiveServices;
+	logErrorsOnTaskArgvs(errors);
+	return effectiveServices;
 }
 
 function checkPresetsOverdose(optionsCount, service) {
-    if (optionsCount > 1) {
-        throw "GRAVE ERROR: Presets should be alone : " + service;
-    }
+	if (optionsCount > 1) {
+		throw "GRAVE ERROR: Presets should be alone : " + service;
+	}
 }
  /*	*************************************************************************************************************************************************************************************************
 	*                                 													 REWRITING FUNCTIONS 																						*
@@ -2709,7 +2929,7 @@ function logProjectErrored(project) {
 	gloupslog(" {0} {1}\n".format([logFilePath(project.path + '/config.mzg.json'), chalk.red(': MISMATCH')]));
 
 	console.log(
-		(getColoredParagraph(" The path to that folder does not match to an actual project root folder containing a config.mzg.json file.",chalk.bgRed)) +
+		(getColoredParagraph(" The path to that folder does not match to an actual project root folder containing a config.mzg.json file.", chalk.bgRed)) +
 		("\n\n {0}\n".format([chalk.bgWhite.black(' SOLUTION ')])) +
 		('\n' + getColoredParagraph(" ", chalk.bgWhite.grey)) +
 		(getColoredParagraph(" Check the path to see if there is no mistake and fix it in the project definition.", chalk.bgWhite.grey)) +
@@ -2718,6 +2938,112 @@ function logProjectErrored(project) {
 		('\n' + getColoredParagraph(" $ gulp scanProjects", chalk.bgWhite.black)) +
 		(getColoredParagraph(" ", chalk.bgWhite.grey))
 	);
+}
+
+function logStuffedSpaceOverflowing(message, alignement, chalkColor = null) {
+	var deff = getStuffingObj();
+
+	var lines = [];
+	var line = [];
+	var cpt = 0;
+	var padding = deff.trailing_space_count + deff.leading_space_count;
+	var max = process.stdout.columns - padding;
+
+	do {
+		if (cpt + 1 == message.length || line.length + padding > max) {
+
+			// add the last char when it is not a return character
+			if (cpt + 1 == message.length && message[cpt] != "\n"){
+				line.push(message[cpt]);
+			}
+
+			var stuffObj = getStuffingObj();
+			stuffObj.messages = line.join('');
+			stuffObj.align = alignement;
+
+			if (chalkColor)
+				lines.push((chalkColor)(logStuffedSpaceMessageCore(stuffObj)));
+			else
+				lines.push(logStuffedSpaceMessageCore(stuffObj));
+			
+			// empty the line
+			line = [];
+			
+			if(message[0] == " "){
+				line.push(" "); 
+			}
+
+			// push the firt character of the new line else it disappear ...
+			line.push(message[cpt]);
+
+		} else {
+			if (message[cpt] == "\n") {
+				var left = max - line.length-1;
+				var arr = " ".repeat(left).split(' ');
+				
+				arr.forEach(function(e){
+					line.push(" ");	
+				});
+			} else {
+				line.push(message[cpt]);
+			}
+		}
+	}
+	while (cpt++ < message.length);
+
+	return lines.join('\n' + (0 < deff.leading_space_count ? ' '.repeat(deff.leading_space_count) : ''));
+
+}
+
+function logStuffedSpaceMessage(message, alignement) {
+
+	var stuffObj = getStuffingObj();
+	stuffObj.messages = message;
+	stuffObj.align = alignement;
+
+	return logStuffedSpaceMessageCore(stuffObj);
+}
+
+function logStuffedSpaceMessageCore(stuffObj) {
+
+	var l = process.stdout.columns;
+
+	normalizeStuffMessages(stuffObj);
+
+	for (var i = 0, t = stuffObj.messages.length; i < t; ++i) {
+		l -= stuffObj.messages[i].length;
+	}
+
+	l -= stuffObj.leading_space_count;
+	l -= stuffObj.trailing_space_count;
+
+	if (stuffObj.messages.length == 1) {
+		return getSingleMessageStuffedSapceAligned(stuffObj, l);
+	}
+}
+
+function getSingleMessageStuffedSapceAligned(stuffObj = getStuffingObj(), l) {
+	//
+
+	if (!stuffObj.align || !align().existingPosition(stuffObj.align)) {
+		return stuffObj.messages[0];
+
+	} else if (stuffObj.align) {
+		if (stuffObj.align == align().left) {
+			return stuffObj.messages[0] + " ".repeat(l);
+
+		} else if (stuffObj.align == align().right) {
+			return " ".repeat(l) + stuffObj.messages[0];
+
+		} else if (stuffObj.align == align().center) {
+			var hl = l / 2;
+			var tl = l - hl;
+
+			var r = (process.stdout.columns - l) % 2;
+			return " ".repeat(hl) + stuffObj.messages[0] + " ".repeat(tl + r);
+
+		}
+	}
 }
 
 function getColoredParagraph(paragraph, chalkColor) {
@@ -2948,4 +3274,36 @@ function gloupslogSumerise() {
 			logOrig(' ' + element);
 		});
 	});
+}
+
+function normalizeStuffMessages(stuffObj) {
+	var messageIsArray = Array.isArray(stuffObj.messages);
+	if (!messageIsArray) {
+		stuffObj.messages = [stuffObj.messages];
+	}
+}
+
+function getStuffingObj() {
+	return {
+		messages: ["Hello world"],
+		leading_space_count: 1,
+		trailing_space_count: 1,
+		h_align: align().left
+	};
+}
+
+function align() {
+	return {
+		right: "right",
+		left: "left",
+		center: "center",
+		existingPosition: function(alignement) {
+			return (
+				alignement == this.right ? true :
+				alignement == this.left ? true :
+				alignement == this.center ? true :
+				false
+			);
+		}
+	}
 }

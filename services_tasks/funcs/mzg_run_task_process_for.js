@@ -104,6 +104,16 @@ function consumePipeProcss(glob_transitivity, mainLazyPipeObj, realTargets) {
 			exitOnPulseAfterCount();
 			exitCountForLongLog();
 		})
+		.on('error', function(error) {
+			var cause = error.cause;
+			cause = cause?JSON.stringify(cause):error.message;
+
+			var msg = logStuffedSpaceOverflowing(" "+cause,align().left,chalk.bgWhite.red.inverse);
+			
+			console.log(" "+chalk.bgRed.black(logStuffedSpaceMessage("Plugin : "+error.plugin,align().left)));
+			console.log(" {0}".format([msg]));
+			
+		})
 		.pipe(applyLicenceSplitting(mainLazyPipeObj))
 		.pipe(gulp.dest(mainLazyPipeObj.destCallBack(true)));
 }

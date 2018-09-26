@@ -22,6 +22,7 @@
   "homepage": "https://github.com/ManuUseGitHub/Gloups#readme",
   "devDependencies": {
     "chalk": "^2.1.0",
+    "child-process": "^1.0.2",
     "del": "^2.2.2",
     "fs": "0.0.1-security",
     "fs-sync": "^1.0.4",
@@ -33,15 +34,14 @@
     "gulp-css-format": "^0.1.2",
     "gulp-exit": "0.0.2",
     "gulp-file": "^0.4.0",
-    "gulp-help": "^1.6.1",
     "gulp-insert": "^0.5.0",
     "gulp-jshint": "^2.1.0",
     "gulp-jsvalidate": "^3.0.0",
-    "gulp-less": "^3.5.0",
+    "gulp-less": "^4.0.0",
     "gulp-nop": "^0.0.3",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.6.1",
-    "gulp-sass": "^3.1.0",
+    "gulp-sass": "^4.0.1",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-stylefmt": "^1.1.0",
     "gulp-stylus": "^2.7.0",
@@ -63,8 +63,8 @@
   "dependencies": {
     "ajv": "^6.5.0",
     "global": "^4.3.2",
+    "graceful-fs": "^4.1.11",
     "less-plugin-autoprefix": "^1.5.1",
-    "npm": "^5.7.1",
     "vue-cli": "^2.9.3",
     "yarn": "^1.5.1"
   }
