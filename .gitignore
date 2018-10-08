@@ -6,12 +6,12 @@ package-lock\.json
 
 config.json
 
-custom/*.*
+#custom/*.*
 
 supports/rewriting/gulpfile_temp\.js
 supports/rewriting/gulpfile_temp2\.js
 
-dist/custom/*.*
+#dist/custom/*.*
 
 draft/*
 
